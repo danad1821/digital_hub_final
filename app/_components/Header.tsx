@@ -59,7 +59,7 @@ export default function Header() {
   const toggleSidebar = () => setIsOpen(!isOpen);
 
   return (
-    <header className="py-2 flex items-center bg-white px-0 sticky top-0 z-50 shadow-md">
+    <header className="py-4 flex items-center bg-white px-0 sticky top-0 z-50 shadow-md">
       <nav className="flex flex-nowrap w-full custom-container">
         <ul className="list-none w-full flex justify-between items-center">
           

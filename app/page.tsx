@@ -76,8 +76,8 @@ export default function Home() {
               NOTE: Horizontal spacing will be managed by justify-between AND the 
               ServiceCard's dynamic width calculation below.
             */}
-            {services.length > 0 ? services.map((service:any) => (
-              <ServiceCard key={service._id} service={service} />
+            {services.length > 0 ? services.map((service:any, index: any) => (
+              <ServiceCard key={service._id} service={service} serviceIndex={index} />
             )): <></>}
           </div>
         </div>

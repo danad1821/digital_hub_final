@@ -190,7 +190,7 @@ export default function ContactForm() {
           "text",
           "Your Full Name"
         )}
-        {renderInput(Mail, "Email", "email", "email", "Your Work Email")}
+        {renderInput(Mail, "Email", "email", "email", "Your Email")}
         {renderInput(
           Phone,
           "Phone Number",
@@ -243,5 +243,3 @@ export default function ContactForm() {
     </div>
   );
 }
-
-

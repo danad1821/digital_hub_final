@@ -24,27 +24,22 @@ export default function Footer() {
 
     // Placeholder for social links
     const socialLinks = [
-        { icon: FaFacebook, href: "" },
-        { icon: FaLinkedin, href: "" },
-        { icon: FaTwitter, href: "" },
+        { icon: FaFacebook, href: "1" },
+        { icon: FaLinkedin, href: "2" },
+        { icon: FaTwitter, href: "3" },
     ];
 
 
     return (
         <footer className="bg-[#0A1C30] text-gray-300">
             <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 custom-container">
-                
-                {/* --- Main FLEX Container: Logo, Links, Offices ---
-                  - flex-wrap: Allows columns to wrap onto a new line on smaller screens.
-                  - gap-y-8: Provides vertical spacing when columns wrap.
-                  - gap-x-12: Provides horizontal spacing on desktop.
-                */}
+
                 <div className="flex flex-wrap gap-y-8 gap-x-12">
                     
                     {/* Column 1: Company Logo & Slogan (Takes up ~50% on tablets, more on mobile) */}
                     <div className="w-full sm:w-[calc(50%-0.75rem)] lg:w-96">
                         <h3 className="text-2xl font-bold text-[#FF8C00] mb-4">
-                            ALTA MARITIME
+                            Alta Maritime
                         </h3>
                         <p className="text-base text-gray-400">
                             Your trusted partner in shipping & freight forwarding.

@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { FaChevronRight } from "react-icons/fa"; 
+import { useRouter } from "next/navigation";
 
 // 1. IMPROVEMENT: Define a strong TypeScript Interface
 interface Service {
@@ -11,7 +12,8 @@ interface Service {
     description: string;
 }
 
-export default function ServiceCard({ service }: { service: Service }) {
+export default function ServiceCard({ service, serviceIndex }: { service: Service, serviceIndex: any }) {
+    const router = useRouter();
     return (
         // 2. IMPROVEMENT: Apply responsive Flexbox sizing and hover effect
         <div className="w-full md:w-[calc(50%-0.5rem)] lg:w-[calc(25%-0.75rem)] 
@@ -46,8 +48,8 @@ export default function ServiceCard({ service }: { service: Service }) {
                 
                 {/* IMPROVEMENT: List of key services for better scannability */}
                 <ul className="space-y-1 text-sm text-gray-300 list-none mb-4">
-                    {service.items.slice(0, 3).map((item: any) => (
-                        <li key={item} className="flex items-start">
+                    {service.items.slice(0, 3).map((item: any, index: any) => (
+                        <li key={index} className="flex items-start">
                             <FaChevronRight className="w-3 h-3 text-[#FF8C00] mr-2 mt-1 flex-shrink-0" />
                             {item.name}
                         </li>
@@ -62,7 +64,8 @@ export default function ServiceCard({ service }: { service: Service }) {
                 {/* --- 3. CTA Button (IMPROVEMENT: Forced to bottom with mt-auto) --- */}
                 <button 
                     className="text-center bg-[#FF8C00] text-[#0A1C30] font-semibold rounded-lg p-2 cursor-pointer
-                                mt-auto hover:bg-orange-500 transition duration-300 shadow-md">
+                                mt-auto hover:bg-orange-500 transition duration-300 shadow-md"
+                                onClick={()=> router.push(`/aboutus?catIndex=${serviceIndex}`)}>
                     Know More
                 </button>
             </div>
