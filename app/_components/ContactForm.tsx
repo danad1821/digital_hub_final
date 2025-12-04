@@ -10,24 +10,25 @@ import {
   XCircle,
   Loader,
 } from "lucide-react";
+import axios from "axios";
 
 // Define the shape of the data for better type safety
 interface ContactData {
-  contactName: string;
+  fullName: string;
   email: string;
   phone: string;
   message: string;
 }
 
 // Regex for international phone numbers (flexible) and email
-const EMAIL_REGEX = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 // Allows for various international formats: +1 (555) 123-4567 or 0044 1234567890 etc.
 const PHONE_REGEX =
-  /^[+]?[(]?[0-9]{3}[)]?[-\\s.]?[0-9]{3}[-\\s.]?[0-9]{4,6}$/im;
+  /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/im;
 
 export default function ContactForm() {
   const [contactData, setContactData] = useState<ContactData>({
-    contactName: "",
+    fullName: "",
     email: "",
     phone: "",
     message: "",
@@ -49,7 +50,7 @@ export default function ContactForm() {
   };
 
   const validateForm = (data: ContactData): boolean => {
-    if (!data.contactName.trim()) {
+    if (!data.fullName.trim()) {
       setError("Contact Name is required.");
       return false;
     }
@@ -81,31 +82,41 @@ export default function ContactForm() {
     setStatus("loading");
 
     try {
-      // Note: This assumes you have a Next.js API route at /api/send-email
-      // that uses the Resend API key securely on the server side.
-      const response = await fetch("/api/send-email", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(contactData),
-      });
+      // Axios automatically handles JSON serialization of the data
+      const response = await axios.post("/api/messages", contactData);
 
-      const result = await response.json();
-
-      if (response.ok) {
+      // Axios throws for 4xx/5xx status codes, so if we reach here, it's a 2xx success.
+      // We check for 201 (Created) or 200 (OK)
+      if (response.status >= 200 && response.status < 300) {
         setStatus("success");
         // Clear the form on successful submission
-        setContactData({ contactName: "", email: "", phone: "", message: "" });
+        setContactData({ fullName: "", email: "", phone: "", message: "" });
         // Automatically clear success message after a few seconds
         setTimeout(() => setStatus("idle"), 5000);
       } else {
-        // Use the error message from the API response if available
-        setError(result.error || "Failed to send message. Please try again.");
+        // This block is technically unreachable if the server returns 4xx/5xx because Axios throws
+        setError("Unexpected response status from server.");
         setStatus("error");
       }
     } catch (err) {
-      setError("A network error occurred. Please check your connection.");
+      // This is where 4xx/5xx status codes (like the 500 error you saw) will land.
+      console.error(err);
+      
+      let errorMessage = "A network error occurred or the server is unavailable.";
+      
+      if (axios.isAxiosError(err) && err.response) {
+        // Attempt to get the detailed error message from the server response body
+        const serverError = err.response.data as { details?: string, error?: string };
+        if (serverError.details) {
+          errorMessage = `Server Validation Error: ${serverError.details}`;
+        } else if (serverError.error) {
+          errorMessage = `Server Error: ${serverError.error}`;
+        } else {
+          errorMessage = `Request failed with status ${err.response.status}.`;
+        }
+      }
+
+      setError(errorMessage);
       setStatus("error");
     }
   };
@@ -186,7 +197,7 @@ export default function ContactForm() {
         {renderInput(
           User,
           "Contact Name",
-          "contactName",
+          "fullName",
           "text",
           "Your Full Name"
         )}
