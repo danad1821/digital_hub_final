@@ -9,11 +9,6 @@
     --tertiary-color: #FF6B00;
 }
 
-*{
-    padding: 0;
-    margin: 0;
-}
-
 body{
   display: flex;
   flex-direction: column;
@@ -41,6 +36,13 @@ header{
 }
 
 .service-card{
-    margin: 5px;
+    margin: 10px 15px;
     padding: 15px;
+}
+.service-card button{
+    padding: 10px 5px;
+}
+
+button{
+    cursor: pointer;
 }
