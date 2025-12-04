@@ -1,54 +1,29 @@
-// page.tsx - route: /
+"use client";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import homeImage from "@/public/images/image4.jpeg"; // Assuming this is the ship image
 import ServiceCard from "./_components/ServiceCard";
 import ContactForm from "./_components/ContactForm";
-
-// Define the services data outside the component for clarity
-const services = [
-  {
-    image: "/images/image1.jpeg",
-    category: "Shipping",
-    items: [
-      "Agency",
-      "Brokerage",
-      "Chartering",
-      "P&I representation",
-      "Sale & purchase",
-    ],
-    description:
-      "We facilitate ship operations and seamless movement of varied cargo.",
-  },
-  {
-    image: "/images/image2.jpeg",
-    category: "Logistics",
-    items: ["Forwarding", "Cargo clearing", "NOVCC", "Project Cargo"],
-    description:
-      "Logistics provides complete, end-to-end solutions for reliable goods movement.",
-  },
-  {
-    image: "/images/image3.jpeg",
-    category: "Bunkering",
-    items: ["Brokerage", "Trading"],
-    description:
-      "We ensure reliable, competitive vessel fuel supply as both broker and trader.",
-  },
-  {
-    image: "/images/image6.jpeg",
-    category: "Cargo operation",
-    items: ["Cargo Handling", "Cargo survey", "Tally"],
-    description:
-      "We utilize specialized equipment for high-rate cargo handling and surveying.",
-  },
-];
+import axios from "axios";
 
 export default function Home() {
+  const [services, setServices] = useState<any>([]);
+
+  const getAllServices = async () => {
+    try {
+      const response = await axios.get("/api/services");
+      setServices(response.data);
+    } catch (error) {
+      console.error("Error fetching services: ", error);
+    }
+  };
+
+  useEffect(() => {
+    getAllServices();
+  }, []);
+
   return (
     <main className="min-h-screen">
-      {/* ========================================================
-        I. HERO SECTION (Ship Image & Intro) - UI/UX Improvements
-        ========================================================
-      */}
       <div className="relative h-[60vh] md:h-[80vh] overflow-hidden">
         {/* Background Image with better Next/Image usage */}
         <Image
@@ -101,9 +76,9 @@ export default function Home() {
               NOTE: Horizontal spacing will be managed by justify-between AND the 
               ServiceCard's dynamic width calculation below.
             */}
-            {services.map((service) => (
-              <ServiceCard key={service.category} service={service} />
-            ))}
+            {services.length > 0 ? services.map((service:any) => (
+              <ServiceCard key={service._id} service={service} />
+            )): <></>}
           </div>
         </div>
       </section>

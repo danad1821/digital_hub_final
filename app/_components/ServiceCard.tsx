@@ -7,7 +7,7 @@ import { FaChevronRight } from "react-icons/fa";
 interface Service {
     image: string;
     category: string;
-    items: string[];
+    items: Object[];
     description: string;
 }
 
@@ -46,10 +46,10 @@ export default function ServiceCard({ service }: { service: Service }) {
                 
                 {/* IMPROVEMENT: List of key services for better scannability */}
                 <ul className="space-y-1 text-sm text-gray-300 list-none mb-4">
-                    {service.items.slice(0, 3).map((item) => (
+                    {service.items.slice(0, 3).map((item: any) => (
                         <li key={item} className="flex items-start">
                             <FaChevronRight className="w-3 h-3 text-[#FF8C00] mr-2 mt-1 flex-shrink-0" />
-                            {item}
+                            {item.name}
                         </li>
                     ))}
                     {service.items.length > 3 && (

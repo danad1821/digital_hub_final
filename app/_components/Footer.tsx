@@ -18,7 +18,7 @@ export default function Footer() {
         { name: "Home", href: "/" },
         { name: "About Us", href: "/aboutus" },
         { name: "Partners & Agents", href: "/partners_and_agents" },
-        { name: "map", href: "/map" },
+        { name: "Map", href: "/map" },
         { name: "Contact Us", href: "/contactus" },
     ];
 

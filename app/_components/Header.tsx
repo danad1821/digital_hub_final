@@ -21,7 +21,7 @@ const MobileSidebar = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
       {/* Overlay to close the sidebar */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          className="fixed inset-0 bg-gray-500 opacity-50 z-40 lg:hidden"
           onClick={onClose}
         ></div>
       )}
