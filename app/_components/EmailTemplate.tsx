@@ -2,22 +2,17 @@ import * as React from 'react';
 
 interface EmailTemplateProps {
   fullName: string;
-  phone: string;
+  company: string;
   email: string;
   message: string;
 }
 
-export function EmailTemplate({ fullName, phone, email, message }: EmailTemplateProps) {
+export function EmailTemplate({ fullName, company, email, message }: EmailTemplateProps) {
   return (
     <div>
-      <h1>{fullName}!</h1>
-      <h2>Contact Info:</h2>
-      <div>
-        <p>{email}</p>
-        <p>{phone}</p>
-      </div>
-      <h2>Message:</h2>
+      <p>Hi, its {fullName} from {company}.</p>
       <p>{message}</p>
+      <p>Thank you for your time. You can reach me at {email}.</p>
     </div>
   );
 }

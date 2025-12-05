@@ -20,10 +20,9 @@ const MessageSchema = new mongoose.Schema(
       type: String,
       required: [true, "Message content is required."],
     },
-    phone: {
+    company: {
       type: String,
       trim: true,
-      maxlength: [20, "Phone number cannot be more than 20 characters"],
     },
     isRead: {
       type: Boolean,

@@ -175,14 +175,14 @@ export default function ContactForm() {
   );
 
   return (
-    <div className="bg-white px-4 rounded-xl min-w-lg mx-auto">
-      <form onSubmit={handleSubmit} className="space-y-4 min-w-full">
+    <div className="bg-white rounded-sm my-4 min-w-[45%] p-6">
+      <form onSubmit={handleSubmit} className="space-y-4">
         {renderInput("Full Name", "fullName", "text", "John Smith")}
         {renderInput("Email Address", "email", "email", "john@company.com")}
         {renderInput(
           "Company",
           "company",
-          "tel",
+          "text",
           "Your Company Name",
           false
         )}

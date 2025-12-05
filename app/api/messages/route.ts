@@ -35,7 +35,7 @@ export async function POST(request: Request) {
       subject: "Alta Maritime Inquiry",
       react: EmailTemplate({
         fullName: newMessage.fullName, // Use data from the successfully saved object
-        phone: newMessage.phone,
+        company: newMessage.company,
         email: newMessage.email,
         message: newMessage.message,
       }),

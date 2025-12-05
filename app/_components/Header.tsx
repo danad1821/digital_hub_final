@@ -75,7 +75,7 @@ export default function Header() {
   useEffect(() => {
     const handleScroll = () => {
       // Set threshold to 100px
-      const isScrolled = window.scrollY > 100;
+      const isScrolled = window.scrollY > 50;
       if (isScrolled !== scrolled) {
         setScrolled(isScrolled);
       }

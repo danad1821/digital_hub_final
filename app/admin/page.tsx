@@ -13,9 +13,10 @@ import {
 } from "lucide-react";
 import axios from "axios";
 
-const TEXT_POP_COLOR = "text-[#FF5733]";
+// COLOR CHANGE: Changed from Orange (#FF5733) to Electric Cyan (#00F0FF)
+const TEXT_POP_COLOR = "text-[#00FFFF]";
 
-const BG_POP_COLOR = "bg-[#FF5733]";
+const BG_POP_COLOR = "bg-[#00FFFF]";
 
 export default function Admin() {
   const [messages, setMessages] = useState<any[]>([]);
@@ -154,7 +155,8 @@ export default function Admin() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#0A1C30] text-white">
+      // COLOR CHANGE: Background changed from [#0A1C30] to [#11001C]
+      <div className="flex items-center justify-center min-h-screen bg-[#11001C] text-white">
         <Loader className="w-10 h-10 animate-spin mr-3" />
         <p className="text-xl">Loading Dashboard Data...</p>
       </div>
@@ -163,31 +165,32 @@ export default function Admin() {
 
   return (
     <main>
-      <h1>Alta Maritime Admin Dashboard</h1>
+      <h1>Dashboard</h1>
       <section className="flex items-center justify-center gap-5 flex-wrap p-2">
         <MetricCard
           title="Total Inquiries"
           value={totalInquiries.toString()}
           icon={Mail}
-          colorClass="text-red-600"
+          colorClass="text-red-400" // Adjusted for new dark background
         />
         <MetricCard
           title="Pending Follow-ups"
           value={pendingMessages.length.toString()}
           icon={Clock}
-          colorClass="text-yellow-600"
+          colorClass="text-yellow-400" // Adjusted for new dark background
         />
         <MetricCard
           title="Response Rate"
           value={`${responseRate}%`}
           icon={CheckCircle}
-          colorClass="text-green-600"
+          colorClass="text-green-400" // Adjusted for new dark background
         />
       </section>
       {/* Messages Table & Service Management */}
-      <section className="grid grid-cols-1 lg:grid-cols-3 gap-8 custom-container">
+      <section className="flex flex-wrap gap-5 items-start justify-center w-full">
         {/* Recent Inquiries Table (2/3 width) */}
-        <div className="lg:col-span-2 bg-[#1B2B40] p-6 rounded-xl shadow-2xl border border-gray-700">
+        {/* COLOR CHANGE: Background changed from [#1B2B40] to [#0A1C30] and border changed from gray-700 to gray-600 */}
+        <div className=" bg-[#0A1C30] p-6 rounded-xl shadow-2xl border border-gray-600">
           <h3 className="text-2xl font-bold text-white mb-4 flex items-center">
             <MessageSquare className={`w-6 h-6 mr-2 ${TEXT_POP_COLOR}`} />
             Pending Inquiries ({pendingMessages.length})
@@ -199,21 +202,20 @@ export default function Admin() {
         </div>
 
         {/* Service Management Actions (1/3 width) */}
-        <div className="lg:col-span-1 bg-[#1B2B40] p-6 rounded-xl shadow-2xl border border-gray-700 h-fit">
+        {/* COLOR CHANGE: Background changed from [#1B2B40] to [#0A1C30] and border changed from gray-700 to gray-600 */}
+        <div className="bg-[#0A1C30] p-6 rounded-xl shadow-2xl border border-gray-600 h-fit">
           <h3 className="text-2xl font-bold text-white mb-6">
             Manage Services
           </h3>
           <div className="space-y-4">
             <button
-              className={`w-full flex items-center justify-center px-4 py-3 ${BG_POP_COLOR} text-[#0A1C30] font-semibold rounded-lg shadow-lg hover:bg-orange-400 transition duration-200`}
+              // COLOR CHANGE: Button text color changed from [#0A1C30] to [#11001C] and hover color adjusted
+              className={`w-full flex items-center justify-center px-4 py-3 ${BG_POP_COLOR} text-[#11001C] font-semibold rounded-lg shadow-lg hover:bg-[#00D1E6] transition duration-200`}
             >
               <Ship className="w-5 h-5 mr-2" /> Add New Service
             </button>
             <button className="w-full flex items-center justify-center px-4 py-3 bg-gray-600 text-white font-semibold rounded-lg shadow-lg hover:bg-gray-500 transition duration-200">
               <Clock className="w-5 h-5 mr-2" /> Edit Existing Service
-            </button>
-            <button className="w-full flex items-center justify-center px-4 py-3 bg-red-600 text-white font-semibold rounded-lg shadow-lg hover:bg-red-500 transition duration-200">
-              <XCircle className="w-5 h-5 mr-2" /> Delete Service
             </button>
           </div>
         </div>

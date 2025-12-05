@@ -13,12 +13,12 @@ export default function Footer() {
 
     // New link groups based on the PDF content (Page 3)
     const serviceLinks = [
-        { name: "Heavy Lift Cargo", href: "/services/heavy-lift" },
-        { name: "Break Bulk Shipping", href: "/services/break-bulk" },
-        { name: "Project Logistics", href: "/services/project-logistics" },
-        { name: "Port Operations", href: "/services/port-operations" },
-        { name: "Machinery Relocation", href: "/services/relocation" },
-        { name: "Cargo Chartering", href: "/services/chartering" },
+        { name: "Heavy Lift Cargo", href: "/services?name=heavy-lift" },
+        { name: "Break Bulk Shipping", href: "/services?name=break-bulk" },
+        { name: "Project Logistics", href: "/services?name=project-logistics" },
+        { name: "Port Operations", href: "/services?name=port-operations" },
+        { name: "Machinery Relocation", href: "/services?name=relocation" },
+        { name: "Cargo Chartering", href: "/services?name=chartering" },
     ];
 
     const companyLinks = [

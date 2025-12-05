@@ -7,8 +7,8 @@ import HomeInfoCard from "./_components/HomeInfoCard";
 import ContactForm from "./_components/ContactForm";
 import Header from "./_components/Header"; // This is the component you want to change
 import axios from "axios";
-import { ArrowRight } from "lucide-react";
 import {
+  ArrowRight,
   Ship,
   Box,
   CloudLightning,
@@ -23,8 +23,10 @@ import {
   Phone,
   Pin,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter();
   const [services, setServices] = useState<any>([
     {
       icon: <Construction />,
@@ -171,10 +173,15 @@ export default function Home() {
             <span>delivering industrial cargo anywhere in the world.</span>
           </p>
           <div className="my-2 flex items-center gap-3 flex-wrap">
-            <button className="border border-[#00FFFF] bg-[#00FFFF] px-5 py-2 rounded-sm font-semibold whitespace-nowrap text-[#0A1C30] flex items-center gap-1">
+            <button className="border border-[#00FFFF] bg-[#00FFFF] px-5 py-2 rounded-sm font-semibold whitespace-nowrap text-[#0A1C30] flex items-center gap-1" onClick={()=>{router.push("/services")}}>
               Explore Services <ArrowRight className="text-md" />
             </button>
-            <button className="px-5 py-2 rounded-sm font-semibold whitespace-nowrap text-white border border-white">
+            <button
+              className="px-5 py-2 rounded-sm font-semibold whitespace-nowrap text-white border border-white"
+              onClick={() => {
+                router.push("/contact");
+              }}
+            >
               Contact Us
             </button>
           </div>
@@ -243,7 +250,7 @@ export default function Home() {
             Our Services
           </h2>
           <p className="text-center mb-8 text-gray-400">
-            Comprehensive amritime logisitcs solutions tailored for the complex
+            Comprehensive maritime logisitcs solutions tailored for the complex
             industrial cargo
           </p>
           <div className="flex flex-wrap gap-5 items-center justify-evenly">
@@ -271,10 +278,10 @@ export default function Home() {
                 width={100}
                 height={100}
                 className="w-[300px] h-[220px] rounded-sm shadow-md 
-      hover:shadow-xl 
-      transition 
-      duration-300 
-      hover:-translate-y-1 "
+                            hover:shadow-xl 
+                            transition 
+                            duration-300 
+                            hover:-translate-y-1 "
               />
             ))}
           </div>
@@ -306,9 +313,15 @@ export default function Home() {
             Strategically positioned across six continents to serve your
             logistics needs worldwide
           </p>
-          
+
           <div className="flex items-center justify-center">
-            <Image src='/images/world-map.jpg' alt='map' width={100} height={100} className="w-[70vw] h-[70vh] rounded-sm"></Image>
+            <Image
+              src="/images/world-map.jpg"
+              alt="map"
+              width={100}
+              height={100}
+              className="w-[70vw] h-[70vh] rounded-sm"
+            ></Image>
           </div>
         </div>
       </section>
