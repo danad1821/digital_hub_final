@@ -65,7 +65,7 @@ export default function ServiceCard({ service, serviceIndex }: { service: Servic
                 <button 
                     className="text-center bg-[#FF8C00] text-[#0A1C30] font-semibold rounded-lg p-2 cursor-pointer
                                 mt-auto hover:bg-orange-500 transition duration-300 shadow-md"
-                                onClick={()=> router.push(`/aboutus?catIndex=${serviceIndex}`)}>
+                                onClick={()=> router.push(`/about_us?catIndex=${serviceIndex}`)}>
                     Know More
                 </button>
             </div>

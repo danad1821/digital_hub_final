@@ -1,9 +1,14 @@
-// Footer.tsx
-import React from 'react';
+"use client";
+import { usePathname } from 'next/navigation';
 import { FaFacebook, FaLinkedin, FaTwitter } from 'react-icons/fa';
 
 export default function Footer() {
-    // Contact Information (Used for titles)
+    const pathname = usePathname();
+    if(pathname === "/admin"){
+        return(
+            <></>
+        )
+    }
     const contactInfo = {
         headOffice: {
             name: "Head Office (Lebanon)",
@@ -16,10 +21,10 @@ export default function Footer() {
     // Placeholder Links (Replace with actual routes)
     const quickLinks = [
         { name: "Home", href: "/" },
-        { name: "About Us", href: "/aboutus" },
+        { name: "About Us", href: "/about_us" },
         { name: "Partners & Agents", href: "/partners_and_agents" },
         { name: "Map", href: "/map" },
-        { name: "Contact Us", href: "/contactus" },
+        { name: "Contact Us", href: "/contact_us" },
     ];
 
     // Placeholder for social links

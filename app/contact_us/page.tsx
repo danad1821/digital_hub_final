@@ -3,7 +3,7 @@ import ContactForm from "../_components/ContactForm"
 export default function ContactUs(){
     return(
         <main className="container mx-auto px-4">
-            <h1 className="text-4xl sm:text-6xl font-bold my-8 tracking-tight text-center">Contact Us</h1>
+            <h1 className="text-4xl sm:text-5xl font-bold my-8 tracking-tight text-center">Contact Us</h1>
             
             {/* Flex container for the Contact Form and Contact Details */}
             <section className="flex flex-col md:flex-row gap-12 lg:gap-20 py-8">

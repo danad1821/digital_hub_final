@@ -9,8 +9,11 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export async function GET() {
   try {
     await connectToDatabase();
+    const messages = await Message.find().lean();
+    return NextResponse.json(messages, {status: 200})
   } catch (error) {
     console.error(error);
+    return NextResponse.json(error, {status: 500})
   }
 }
 

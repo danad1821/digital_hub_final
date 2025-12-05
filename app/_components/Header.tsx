@@ -5,13 +5,14 @@ import { useState } from 'react';
 import { RxHamburgerMenu } from 'react-icons/rx';
 import { IoClose } from 'react-icons/io5'; // Using a close icon for the sidebar
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 // Define the navigation links
 const NAV_LINKS = [
-  { name: 'About us', href: '/aboutus' },
+  { name: 'About us', href: '/about_us' },
   { name: 'Partners & Agents', href: '/partners_and_agents' },
   { name: 'Map', href: '/map' },
-  { name: 'Contact us', href: '/contactus' },
+  { name: 'Contact us', href: '/contact_us' },
 ];
 
 
@@ -54,9 +55,16 @@ const MobileSidebar = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
 };
 
 export default function Header() {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleSidebar = () => setIsOpen(!isOpen);
+
+  if(pathname === "/admin"){
+    return(
+      <></>
+    )
+  }
 
   return (
     <header className="py-4 flex items-center bg-white px-0 sticky top-0 z-50 shadow-md">
