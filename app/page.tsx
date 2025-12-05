@@ -87,6 +87,62 @@ export default function Home() {
         </div>
       </div>
 
+      <section className="flex items-center custom-container justify-between py-10 gap-x-10">
+        <div className="">
+          <p className="rounded-sm bg-[#00FFFF]/15 w-fit px-3 py-1 text-[#00FFFF] ">
+            Since 1994
+          </p>
+          <h2 className="text-4xl sm:text-5xl font-extrabold flex flex-col">
+            <span>Industrial Cargo</span>
+            <span
+              className="gradient-text 
+                   font-black 
+                   tracking-tight 
+                   bg-gradient-to-r 
+                   from-[#00FFFF] 
+                   to-[#0A1C30] pb-2"
+            >
+              Expertise
+            </span>
+          </h2>
+          <p className="text-md text-gray-700 mb-4">
+            Alta Maritime has been a trusted partner in global maritime
+            logistics for over three decades. We specialize in moving the
+            world's most challenging cargo—from heavy industrial machinery to
+            complete manufacturing facilities.
+          </p>
+          <p className="text-md text-gray-700 mb-4">
+            Our comprehensive network spans major ports worldwide, supported by
+            cutting-edge equipment and a team of logistics professionals who
+            understand the complexity of break bulk and project cargo.
+          </p>
+          <div className="flex item-center gap-5">
+            <div className="py-3">
+              <h3 className="text-[#00FFFF] text-3xl font-medium">30+</h3>
+              <p className="text-md text-gray-500">Years Experience</p>
+            </div>
+            <div className="py-3">
+              <h3 className="text-[#00FFFF] text-3xl font-medium">2000+</h3>
+              <p className="text-md text-gray-500">Projects Delivered</p>
+            </div>
+            <div className="py-3">
+              <h3 className="text-[#00FFFF] text-3xl font-medium">45</h3>
+              <p className="text-md text-gray-500">Global Ports</p>
+            </div>
+          </div>
+        </div>
+        <div className="relative min-w-1/2 min-h-full">
+          <Image
+            src="/images/image2.jpeg"
+            alt="industry"
+            width={200}
+            height={200}
+            className="z-[20] w-full h-full rounded-sm "
+          ></Image>
+          <div className="z-[-1] rounded-sm bg-[#00FFFF]/15 w-full absolute inset-0  rotate-3"></div>
+        </div>
+      </section>
+
       {/* ========================================================
         II. SERVICES SECTION - UI/UX Improvements
         ========================================================
