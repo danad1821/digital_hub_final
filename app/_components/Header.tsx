@@ -128,7 +128,7 @@ export default function Header() {
               
               // 2. Define classes for the CTA button (always solid, but colors might adjust slightly)
               const ctaClasses = `
-                px-5 py-2 rounded-md font-semibold whitespace-nowrap
+                px-5 py-2 rounded-sm font-semibold whitespace-nowrap
                 ${scrolled 
                   ? 'bg-[#00FFFF] text-black hover:bg-[#00FFFF]' // Darker blue on white background
                   : 'bg-[#00FFFF] text-black hover:bg-[#00FFFF]' // Same button, but add a slight border when transparent

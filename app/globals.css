@@ -45,3 +45,11 @@ header{
 button{
     cursor: pointer;
 }
+
+.gradient-text {
+            /* This is equivalent to Tailwind's 'bg-clip-text' */
+            -webkit-background-clip: text;
+            background-clip: text;
+            /* Hide the actual text color so the gradient shows through */
+            color: transparent;
+        }

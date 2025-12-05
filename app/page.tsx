@@ -7,14 +7,11 @@ import ServiceCard from "./_components/ServiceCard";
 import ContactForm from "./_components/ContactForm";
 import Header from "./_components/Header"; // This is the component you want to change
 import axios from "axios";
-
-// 1. Define a consistent height for the header (e.g., 5rem = 80px)
-const HEADER_HEIGHT_CLASS = 'h-20'; // This corresponds to p-4 py-4 in the header, adjust as needed
+import { ArrowRight } from "lucide-react";
 
 export default function Home() {
   const [services, setServices] = useState<any>([]);
 
-  // ... (getAllServices and useEffect remain the same) ...
   const getAllServices = async () => {
     try {
       const response = await axios.get("/api/services");
@@ -31,13 +28,13 @@ export default function Home() {
 
   return (
     <main className="min-h-screen">
-      
       {/* 2. HEADER: Rendered at the top. The Header component itself handles the sticky/scroll logic. */}
-      <Header /> 
-      
+      <Header />
+
       {/* 3. HERO SECTION: The image needs to sit right below (or behind) the header. */}
-      <div className={`relative mt-[-80px] h-[100vh] md:h-[100vh] overflow-hidden `}>
-        
+      <div
+        className={`relative mt-[-80px] h-[100vh] md:h-[100vh] overflow-hidden flex items-center justify-center`}
+      >
         {/* Background Image with better Next/Image usage */}
         <Image
           src={homeImage}
@@ -52,19 +49,41 @@ export default function Home() {
         <div className="absolute inset-0 bg-black/50"></div>
 
         {/* Hero Content: Add padding-top to compensate for the header when transparent */}
-        <div className="absolute inset-0 flex flex-col justify-center custom-container z-10 text-white p-4 pt-16 md:pt-20"> 
+        <div className="absolute inset-0 flex flex-col justify-center custom-container z-10 text-white pt-16 md:pt-20">
+          <p className="bg-gray-300/50 border border-gray-300 w-fit px-2 py-1 rounded-sm">
+            GLOBAL MARITIME LOGISTICS
+          </p>
           {/* Main Title: Bigger, bolder, and more distinct */}
-          <h1 className="text-4xl sm:text-6xl font-bold mb-4 tracking-tight">
-            <span className="text-[#FF8C00]">Alta</span> Maritime
+          <h1 className="text-5xl sm:text-6xl font-bold mb-4 tracking-tight flex flex-col">
+            <span>Moving the World's </span>
+            <span
+              className="gradient-text 
+                   font-black 
+                   tracking-tight 
+                   bg-gradient-to-r 
+                   from-[#00FFFF] 
+                   to-[#0A1C30] pb-2"
+            >
+              Heaviest Cargo
+            </span>
           </h1>
 
           {/* Subtitle/Mission Statement: Readable and impactful */}
-          <p className="max-w-3xl text-xl sm:text-2xl font-light leading-relaxed">
-            A trusted network of{" "}
-            <b>shipping, forwarding, and custom clearing agencies</b>, powering
-            maritime operations across the{" "}
-            <b>East Mediterranean and North African regions</b>.
+          <p className="max-w-3xl text-lg sm:text-xl font-light leading-relaxed flex flex-col">
+            <span>
+              Expert heavy lift solutions, break bulk shipping, and project
+              logistics{" "}
+            </span>
+            <span>delivering industrial cargo anywhere in the world.</span>
           </p>
+          <div className="my-2 flex items-center gap-3">
+            <button className="border border-[#00FFFF] bg-[#00FFFF] px-5 py-2 rounded-sm font-semibold whitespace-nowrap text-[#0A1C30] flex items-center gap-1">
+              Explore Services <ArrowRight className="text-md" />
+            </button>
+            <button className="px-5 py-2 rounded-sm font-semibold whitespace-nowrap text-white border border-white">
+              Contact Us
+            </button>
+          </div>
         </div>
       </div>
 
@@ -80,9 +99,17 @@ export default function Home() {
             Our Core Maritime Services
           </h2>
           <div className="flex flex-wrap justify-between gap-y-8">
-            {services.length > 0 ? services.map((service:any, index: any) => (
-              <ServiceCard key={service._id} service={service} serviceIndex={index} />
-            )): <></>}
+            {services.length > 0 ? (
+              services.map((service: any, index: any) => (
+                <ServiceCard
+                  key={service._id}
+                  service={service}
+                  serviceIndex={index}
+                />
+              ))
+            ) : (
+              <></>
+            )}
           </div>
         </div>
       </section>

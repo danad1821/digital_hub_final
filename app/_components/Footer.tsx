@@ -1,115 +1,161 @@
 "use client";
 import { usePathname } from 'next/navigation';
 import { FaFacebook, FaLinkedin, FaTwitter } from 'react-icons/fa';
+// Imported icon for the contact section
+import { Anchor } from "lucide-react"; 
+import { MdOutlineEmail, MdOutlineLocalPhone } from "react-icons/md"; 
 
 export default function Footer() {
     const pathname = usePathname();
-    if(pathname === "/admin"){
-        return(
-            <></>
-        )
+    if (pathname === "/admin") {
+        return <></>;
     }
-    const contactInfo = {
-        headOffice: {
-            name: "Head Office (Lebanon)",
-        },
-        algeriaOffice: {
-            name: "Algeria Office",
-        }
-    };
 
-    // Placeholder Links (Replace with actual routes)
-    const quickLinks = [
-        { name: "Home", href: "/" },
-        { name: "About Us", href: "/about_us" },
-        { name: "Partners & Agents", href: "/partners_and_agents" },
-        { name: "Map", href: "/map" },
-        { name: "Contact Us", href: "/contact_us" },
+    // New link groups based on the PDF content (Page 3)
+    const serviceLinks = [
+        { name: "Heavy Lift Cargo", href: "/services/heavy-lift" },
+        { name: "Break Bulk Shipping", href: "/services/break-bulk" },
+        { name: "Project Logistics", href: "/services/project-logistics" },
+        { name: "Port Operations", href: "/services/port-operations" },
+        { name: "Machinery Relocation", href: "/services/relocation" },
+        { name: "Cargo Chartering", href: "/services/chartering" },
     ];
 
-    // Placeholder for social links
+    const companyLinks = [
+        { name: "About Us", href: "/about" },
+        { name: "Our Fleet", href: "/fleet" },
+        { name: "Case Studies", href: "/case-studies" },
+        { name: "Careers", href: "/careers" },
+        { name: "News & Updates", href: "/news" },
+        { name: "Safety Standards", href: "/safety" },
+    ];
+
+    const legalLinks = [
+        { name: "Privacy Policy", href: "/privacy" },
+        { name: "Terms of Service", href: "/terms" },
+        { name: "Cookie Policy", href: "/cookies" },
+    ];
+
+    // Social links (using placeholder links)
     const socialLinks = [
-        { icon: FaFacebook, href: "1" },
-        { icon: FaLinkedin, href: "2" },
-        { icon: FaTwitter, href: "3" },
+        // Using sample links, replace '1', '2', '3' with actual URLs
+        { icon: FaLinkedin, href: "1" }, 
+        { icon: FaTwitter, href: "2" },
+        { icon: FaFacebook, href: "3" },
     ];
 
+
+    // Use a deep navy blue background
+    const footerBg = "bg-[#0A1C30]";
+    // Use white/light gray text for contrast
+    const textColor = "text-white"; 
+    // Accent color for hover effects (used the subtle orange from the logo)
+    const hoverColor = "hover:text-[#FF8C00]"; 
+
+    // Helper component for link columns
+    const LinkColumn = ({ title, links }: { title: string; links: typeof serviceLinks }) => (
+        <div className="flex flex-col gap-4">
+            <h4 className={`text-xl font-semibold mb-2 text-white`}>{title}</h4>
+            <ul className="space-y-3 text-base">
+                {links.map((link) => (
+                    <li key={link.name}>
+                        <a href={link.href} className={`text-gray-300 transition duration-150 ${hoverColor}`}>
+                            {link.name}
+                        </a>
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
 
     return (
-        <footer className="bg-[#0A1C30] text-gray-300">
-            <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 custom-container">
+        <footer className={`${footerBg} ${textColor} font-sans`}>
+            <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8 custom-container">
 
-                <div className="flex flex-wrap gap-y-8 gap-x-12">
+                {/* Main 4-Column Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
                     
-                    {/* Column 1: Company Logo & Slogan (Takes up ~50% on tablets, more on mobile) */}
-                    <div className="w-full sm:w-[calc(50%-0.75rem)] lg:w-96">
-                        <h3 className="text-2xl font-bold text-[#FF8C00] mb-4">
-                            Alta Maritime
-                        </h3>
-                        <p className="text-base text-gray-400">
-                            Your trusted partner in shipping & freight forwarding.
-                        </p>
-                        <p className="mt-2 text-sm text-gray-500">
-                            East Med & North Africa Specialists | Est. 2002
-                        </p>
-                    </div>
-
-                    {/* Column 2: Quick Links (Fixed Width / Less than 25%) */}
-                    <div className="min-w-[10rem] lg:flex-1">
-                        <h4 className="text-lg font-semibold text-white mb-4">Quick Links</h4>
-                        <ul className="space-y-2 text-sm">
-                            {quickLinks.map((link) => (
-                                <li key={link.name}>
-                                    <a href={link.href} className="hover:text-[#FF8C00] transition duration-150">
-                                        {link.name}
-                                    </a>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-
-                    {/* Column 3: Head Office Title (Fixed Width / Less than 25%) */}
-                    <div className="min-w-[10rem] lg:flex-1">
-                        <h4 className="text-lg font-semibold text-white mb-4">
-                            {contactInfo.headOffice.name}
-                        </h4>
-                        <p className="text-sm text-gray-400">
-                            See Contact Page for Details
-                        </p>
-                    </div>
-
-                    {/* Column 4: Algeria Office Title (Fixed Width / Less than 25%) */}
-                    <div className="min-w-[10rem] lg:flex-1 pt-1 pb-1">
-                        <h4 className="text-lg font-semibold text-white mb-4">
-                            {contactInfo.algeriaOffice.name}
-                        </h4>
-                        <p className="text-sm text-gray-400">
-                            See Contact Page for Details
-                        </p>
-                    </div>
-                    
-                </div>
-                
-                {/* --- Separator --- */}
-                <div className="mt-12 pt-8 border-t border-gray-700">
-                    
-                    {/* --- Socials & Copyright Row (Already uses Flex) --- */}
-                    <div className="flex flex-col md:flex-row justify-between items-center">
+                    {/* Column 1: Logo, Slogan, and Socials */}
+                    <div className="flex flex-col gap-6">
+                        {/* Logo Block */}
+                        <div className="flex items-center gap-2">
+                            <Anchor className="text-3xl text-[#00FFFF]" /> {/* Placeholder ship icon */}
+                            <h3 className="text-2xl font-bold text-white">
+                                ALTA MARITIME
+                            </h3>
+                        </div>
                         
+                        {/* Slogan */}
+                        <p className="text-sm text-gray-400 max-w-xs">
+                            Global maritime logistics solutions with expertise in heavy lift cargo and project management.
+                        </p>
+
                         {/* Social Media Icons */}
-                        <div className="space-x-4 text-white text-2xl order-2 md:order-1 mt-6 md:mt-0 flex gap-1">
+                        <div className="flex gap-2 mt-2">
                             {socialLinks.map((social) => (
-                                <a key={social.href} href={social.href} target="_blank" rel="noopener noreferrer" className="hover:text-[#FF8C00] transition duration-150">
-                                    <social.icon />
+                                <a 
+                                    key={social.href} 
+                                    href={social.href} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer" 
+                                    className={`p-3 border border-gray-700/50 rounded-md transition duration-200 text-gray-300 ${hoverColor}`}
+                                >
+                                    <social.icon className="text-lg" />
                                 </a>
                             ))}
                         </div>
+                    </div>
+
+                    {/* Column 2: Services */}
+                    <LinkColumn title="Services" links={serviceLinks} />
+                    
+                    {/* Column 3: Company */}
+                    <LinkColumn title="Company" links={companyLinks} />
+                    
+                    {/* Column 4: Get In Touch */}
+                    <div className="flex flex-col gap-6">
+                        <h4 className="text-xl font-semibold text-white">Get In Touch</h4>
+                        
+                        {/* Email */}
+                        <a href="mailto:info@altamaritime.com" className={`flex items-start gap-3 text-base text-gray-300 ${hoverColor} transition duration-150`}>
+                            <MdOutlineEmail className="text-2xl flex-shrink-0 mt-0.5 text-[#00FFFF]" />
+                            <span>info@altamaritime.com</span>
+                        </a>
+
+                        {/* Phone */}
+                        <a href="tel:+180062748463" className={`flex items-start gap-3 text-base text-gray-300 ${hoverColor} transition duration-150`}>
+                            <MdOutlineLocalPhone className="text-2xl flex-shrink-0 mt-0.5 text-[#00FFFF]" />
+                            <span>+1 (800) MARITIME</span>
+                        </a>
+
+                        <div className="pt-4 border-t border-gray-700">
+                            <p className="text-sm font-semibold text-gray-400 mb-1">24/7 Operations Center</p>
+                            <p className="text-sm text-gray-500">Emergency: +1 (800) 123-4567</p>
+                        </div>
+                    </div>
+                </div>
+                
+                {/* --- Bottom Legal Bar --- */}
+                <div className="mt-16 pt-8 border-t border-gray-800">
+                    <div className="flex flex-col md:flex-row justify-between items-center">
                         
                         {/* Copyright */}
-                        <p className="text-sm text-gray-500 order-1 md:order-2">
+                        <p className="text-sm text-gray-500 order-2 md:order-1 mt-6 md:mt-0">
                             &copy; {new Date().getFullYear()} Alta Maritime. All rights reserved.
                         </p>
                         
+                        {/* Legal Links */}
+                        <div className="flex space-x-6 text-sm order-1 md:order-2">
+                            {legalLinks.map((link) => (
+                                <a 
+                                    key={link.name} 
+                                    href={link.href} 
+                                    className={`text-gray-400 ${hoverColor} transition duration-150`}
+                                >
+                                    {link.name}
+                                </a>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>
