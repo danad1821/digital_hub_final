@@ -16,21 +16,20 @@ import axios from "axios";
 interface ContactData {
   fullName: string;
   email: string;
-  phone: string;
+  company: string;
   message: string;
 }
 
 // Regex for international phone numbers (flexible) and email
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 // Allows for various international formats: +1 (555) 123-4567 or 0044 1234567890 etc.
-const PHONE_REGEX =
-  /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/im;
+
 
 export default function ContactForm() {
   const [contactData, setContactData] = useState<ContactData>({
     fullName: "",
     email: "",
-    phone: "",
+    company: "",
     message: "",
   });
   const [error, setError] = useState<string>("");
@@ -56,11 +55,6 @@ export default function ContactForm() {
     }
     if (!EMAIL_REGEX.test(data.email)) {
       setError("A valid email address is required.");
-      return false;
-    }
-    // Phone is optional but if provided, must be valid
-    if (data.phone.trim() && !PHONE_REGEX.test(data.phone)) {
-      setError("Please enter a valid international phone number.");
       return false;
     }
     if (!data.message.trim() || data.message.trim().length < 10) {
@@ -90,7 +84,7 @@ export default function ContactForm() {
       if (response.status >= 200 && response.status < 300) {
         setStatus("success");
         // Clear the form on successful submission
-        setContactData({ fullName: "", email: "", phone: "", message: "" });
+        setContactData({ fullName: "", email: "", company: "", message: "" });
         // Automatically clear success message after a few seconds
         setTimeout(() => setStatus("idle"), 5000);
       } else {
@@ -101,12 +95,16 @@ export default function ContactForm() {
     } catch (err) {
       // This is where 4xx/5xx status codes (like the 500 error you saw) will land.
       console.error(err);
-      
-      let errorMessage = "A network error occurred or the server is unavailable.";
-      
+
+      let errorMessage =
+        "A network error occurred or the server is unavailable.";
+
       if (axios.isAxiosError(err) && err.response) {
         // Attempt to get the detailed error message from the server response body
-        const serverError = err.response.data as { details?: string, error?: string };
+        const serverError = err.response.data as {
+          details?: string;
+          error?: string;
+        };
         if (serverError.details) {
           errorMessage = `Server Validation Error: ${serverError.details}`;
         } else if (serverError.error) {
@@ -122,7 +120,6 @@ export default function ContactForm() {
   };
 
   const renderInput = (
-    Icon: React.ElementType,
     label: string,
     id: keyof ContactData,
     type: string = "text",
@@ -132,14 +129,11 @@ export default function ContactForm() {
     <div className="relative mb-6">
       <label
         htmlFor={id}
-        className="block text-sm font-medium text-gray-700 sr-only"
+        className=" text-sm font-medium text-gray-700"
       >
         {label}
       </label>
-      <div className="flex items-center bg-white rounded-lg shadow-sm border border-gray-300 focus-within:ring-2 focus-within:ring-[#FF8C00]">
-        <div className="p-3 text-[#FF8C00]">
-          <Icon className="w-5 h-5" />
-        </div>
+      <div className="flex items-center bg-white rounded-sm border border-gray-300 focus-within:ring-2 focus-within:ring-[#00FFFF]">
         <input
           type={type}
           id={id}
@@ -147,14 +141,13 @@ export default function ContactForm() {
           onChange={handleChange}
           placeholder={placeholder}
           required={required}
-          className="flex-1 p-3 bg-transparent outline-none text-gray-800 placeholder-gray-500 rounded-r-lg"
+          className="flex-1 p-3 bg-transparent outline-none text-gray-800 placeholder-gray-500 rounded-sm"
         />
       </div>
     </div>
   );
 
   const renderTextarea = (
-    Icon: React.ElementType,
     label: string,
     id: keyof ContactData,
     placeholder: string = label,
@@ -163,14 +156,11 @@ export default function ContactForm() {
     <div className="relative mb-6">
       <label
         htmlFor={id}
-        className="block text-sm font-medium text-gray-700 sr-only"
+        className="text-sm font-medium text-gray-700"
       >
         {label}
       </label>
-      <div className="flex bg-white rounded-lg shadow-sm border border-gray-300 focus-within:ring-2 focus-within:ring-[#FF8C00]">
-        <div className="p-3 text-[#FF8C00] self-start mt-2">
-          <Icon className="w-5 h-5" />
-        </div>
+      <div className="flex bg-white rounded-sm border border-gray-300 focus-within:ring-2 focus-within:ring-[#00FFFF]">
         <textarea
           id={id}
           value={contactData[id]}
@@ -178,43 +168,28 @@ export default function ContactForm() {
           placeholder={placeholder}
           required={required}
           rows={4}
-          className="flex-1 p-3 bg-transparent outline-none text-gray-800 placeholder-gray-500 rounded-r-lg resize-none"
+          className="flex-1 p-3 bg-transparent outline-none text-gray-800 placeholder-gray-500 rounded-sm resize-none"
         />
       </div>
     </div>
   );
 
   return (
-    <div className="bg-white p-8 md:p-10 rounded-xl shadow-2xl max-w-lg mx-auto border-t-4 border-[#FF8C00]">
-      <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
-        Get in Touch
-      </h2>
-      <p className="text-gray-500 mb-8 text-center">
-        We're here to help you navigate your maritime needs.
-      </p>
-
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="bg-white px-4 rounded-xl min-w-lg mx-auto">
+      <form onSubmit={handleSubmit} className="space-y-4 min-w-full">
+        {renderInput("Full Name", "fullName", "text", "John Smith")}
+        {renderInput("Email Address", "email", "email", "john@company.com")}
         {renderInput(
-          User,
-          "Contact Name",
-          "fullName",
-          "text",
-          "Your Full Name"
-        )}
-        {renderInput(Mail, "Email", "email", "email", "Your Email")}
-        {renderInput(
-          Phone,
-          "Phone Number",
-          "phone",
+          "Company",
+          "company",
           "tel",
-          "International Phone (Optional)",
+          "Your Company Name",
           false
         )}
         {renderTextarea(
-          MessageSquare,
-          "Message",
+          "Project Details",
           "message",
-          "Tell us about your requirements..."
+          "Tell us about your logistics needs..."
         )}
 
         {/* Status/Error Messages */}
@@ -236,7 +211,7 @@ export default function ContactForm() {
         <button
           type="submit"
           disabled={status === "loading"}
-          className="w-full flex items-center justify-center px-6 py-3 border cursor-pointer border-transparent text-base font-medium rounded-lg text-[#0A1C30] bg-[#FF8C00] hover:bg-orange-500 transition duration-300 shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
+          className="w-1/2 flex items-center justify-center px-6 py-3 border cursor-pointer border-transparent text-base font-medium rounded-sm text-[#0A1C30] bg-[#00FFFF] hover:bg-[#00FFFF]/50 transition duration-300 shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {status === "loading" ? (
             <>
@@ -246,7 +221,7 @@ export default function ContactForm() {
           ) : (
             <>
               <Send className="w-5 h-5 mr-2" />
-              Send Enquiry
+              Send Message
             </>
           )}
         </button>

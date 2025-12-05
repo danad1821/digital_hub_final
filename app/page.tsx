@@ -306,7 +306,10 @@ export default function Home() {
             Strategically positioned across six continents to serve your
             logistics needs worldwide
           </p>
-          <div></div>
+          
+          <div className="flex items-center justify-center">
+            <Image src='/images/world-map.jpg' alt='map' width={100} height={100} className="w-[70vw] h-[70vh] rounded-sm"></Image>
+          </div>
         </div>
       </section>
 
