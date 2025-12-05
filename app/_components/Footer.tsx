@@ -50,7 +50,7 @@ export default function Footer() {
     // Use white/light gray text for contrast
     const textColor = "text-white"; 
     // Accent color for hover effects (used the subtle orange from the logo)
-    const hoverColor = "hover:text-[#FF8C00]"; 
+    const hoverColor = "hover:text-[#00FFFF]"; 
 
     // Helper component for link columns
     const LinkColumn = ({ title, links }: { title: string; links: typeof serviceLinks }) => (

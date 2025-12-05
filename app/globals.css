@@ -53,3 +53,10 @@ button{
             /* Hide the actual text color so the gradient shows through */
             color: transparent;
         }
+
+
+@media (max-width: 580px){
+  .custom-container{
+    width: 90%;
+  }
+}
