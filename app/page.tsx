@@ -1,14 +1,20 @@
+// pages/index.tsx (Home.tsx)
 "use client";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import homeImage from "@/public/images/image4.jpeg"; // Assuming this is the ship image
 import ServiceCard from "./_components/ServiceCard";
 import ContactForm from "./_components/ContactForm";
+import Header from "./_components/Header"; // This is the component you want to change
 import axios from "axios";
+
+// 1. Define a consistent height for the header (e.g., 5rem = 80px)
+const HEADER_HEIGHT_CLASS = 'h-20'; // This corresponds to p-4 py-4 in the header, adjust as needed
 
 export default function Home() {
   const [services, setServices] = useState<any>([]);
 
+  // ... (getAllServices and useEffect remain the same) ...
   const getAllServices = async () => {
     try {
       const response = await axios.get("/api/services");
@@ -21,10 +27,17 @@ export default function Home() {
   useEffect(() => {
     getAllServices();
   }, []);
+  // ...
 
   return (
     <main className="min-h-screen">
-      <div className="relative h-[60vh] md:h-[80vh] overflow-hidden">
+      
+      {/* 2. HEADER: Rendered at the top. The Header component itself handles the sticky/scroll logic. */}
+      <Header /> 
+      
+      {/* 3. HERO SECTION: The image needs to sit right below (or behind) the header. */}
+      <div className={`relative mt-[-80px] h-[100vh] md:h-[100vh] overflow-hidden `}>
+        
         {/* Background Image with better Next/Image usage */}
         <Image
           src={homeImage}
@@ -38,8 +51,8 @@ export default function Home() {
         {/* Semi-transparent Dark Overlay for Text Readability */}
         <div className="absolute inset-0 bg-black/50"></div>
 
-        {/* Hero Content (Stronger Typography & Positioning) */}
-        <div className="absolute inset-0 flex flex-col justify-center custom-container z-10 text-white p-4">
+        {/* Hero Content: Add padding-top to compensate for the header when transparent */}
+        <div className="absolute inset-0 flex flex-col justify-center custom-container z-10 text-white p-4 pt-16 md:pt-20"> 
           {/* Main Title: Bigger, bolder, and more distinct */}
           <h1 className="text-4xl sm:text-6xl font-bold mb-4 tracking-tight">
             <span className="text-[#FF8C00]">Alta</span> Maritime
@@ -59,32 +72,24 @@ export default function Home() {
         II. SERVICES SECTION - UI/UX Improvements
         ========================================================
       */}
+      {/* 4. Services Section starts immediately after the Hero. */}
       <section className="py-6 md:py-12 bg-gray-50">
+        {/* ... (rest of the services section remains the same) ... */}
         <div className="custom-container">
-          {/* Section Header (Unchanged, already well-structured) */}
           <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-12">
             Our Core Maritime Services
           </h2>
-
-          {/* Services Layout: Using Flexbox for responsiveness */}
           <div className="flex flex-wrap justify-between gap-y-8">
-            {/* - flex-wrap: Allows items to wrap onto the next line.
-              - justify-between: Pushes the items to the edges, creating equal empty space 
-                between them for a clean layout, especially for 2 or 4 items per row.
-              - gap-y-8: Ensures consistent vertical spacing between wrapped rows.
-              
-              NOTE: Horizontal spacing will be managed by justify-between AND the 
-              ServiceCard's dynamic width calculation below.
-            */}
             {services.length > 0 ? services.map((service:any, index: any) => (
               <ServiceCard key={service._id} service={service} serviceIndex={index} />
             )): <></>}
           </div>
         </div>
       </section>
+
+      {/* ... (rest of the component remains the same) ... */}
       <section className="bg-[#0A1C30] py-16 md:py-24 text-white">
         <div className="custom-container flex flex-col lg:flex-row items-center justify-between gap-12">
-          {/* Left Column: Text and Call to Action (Flex Item 1) */}
           <div className="lg:w-1/2 w-full text-center lg:text-left">
             <h2 className="text-xl md:text-5xl font-extrabold mb-6 tracking-tight">
               Explore Our Global Reach on{" "}
@@ -94,24 +99,18 @@ export default function Home() {
               Discover the ports, offices, and strategic partners in our
               extensive network across the East Med and North Africa.
             </p>
-
-            {/* Improved CTA Button */}
             <button className="cursor-pointer inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-lg text-[#0A1C30] bg-[#FF8C00] hover:bg-orange-500 transition duration-300 shadow-md">
               Check Our Coverage
             </button>
           </div>
-
-          {/* Right Column: Map Image (Flex Item 2) */}
-          {/* IMPROVEMENT: Increased size, used 'fill' for better responsiveness, added styling */}
           <div className="lg:w-1/2 w-full relative h-64 md:h-80 lg:h-96 rounded-xl shadow-2xl overflow-hidden border-4 border-gray-700">
             <Image
               src="/images/world-map.jpg"
               alt="World Map showing Alta Maritime's coverage"
-              fill // Fills the container, must be used with relative/fixed parent
+              fill
               sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover object-center"
             />
-            {/* Subtle overlay to enhance map visibility */}
             <div className="absolute inset-0 bg-blue-900/10 mix-blend-multiply"></div>
           </div>
         </div>

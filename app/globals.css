@@ -26,13 +26,12 @@ footer{
 }
 
 .custom-container{
-  width: 90%;
+  width: 70%;
   margin: 0 auto;
 }
 
 header{
     padding: 10px 0;
-    color: var(--primary-color);
 }
 
 .service-card{

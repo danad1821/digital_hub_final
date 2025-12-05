@@ -20,7 +20,7 @@ export default function RootLayout({
       <body
         className="font-sans antialiased bg-white text-gray-800"
       >
-        <Header/>
+        {/* <Header/> */}
         {children}
         <Footer/>
       </body>
