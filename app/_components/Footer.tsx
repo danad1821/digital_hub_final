@@ -1,15 +1,11 @@
 "use client";
-import { usePathname } from 'next/navigation';
 import { FaFacebook, FaLinkedin, FaTwitter } from 'react-icons/fa';
 // Imported icon for the contact section
 import { Anchor } from "lucide-react"; 
 import { MdOutlineEmail, MdOutlineLocalPhone } from "react-icons/md"; 
+import Link from 'next/link';
 
 export default function Footer() {
-    const pathname = usePathname();
-    if (pathname === "/admin") {
-        return <></>;
-    }
 
     // New link groups based on the PDF content (Page 3)
     const serviceLinks = [
@@ -59,9 +55,9 @@ export default function Footer() {
             <ul className="space-y-3 text-base">
                 {links.map((link) => (
                     <li key={link.name}>
-                        <a href={link.href} className={`text-gray-300 transition duration-150 ${hoverColor}`}>
+                        <Link href={link.href} className={`text-gray-300 transition duration-150 ${hoverColor}`}>
                             {link.name}
-                        </a>
+                        </Link>
                     </li>
                 ))}
             </ul>
@@ -117,16 +113,16 @@ export default function Footer() {
                         <h4 className="text-xl font-semibold text-white">Get In Touch</h4>
                         
                         {/* Email */}
-                        <a href="mailto:info@altamaritime.com" className={`flex items-start gap-3 text-base text-gray-300 ${hoverColor} transition duration-150`}>
+                        <Link href="mailto:info@altamaritime.com" className={`flex items-start gap-3 text-base text-gray-300 ${hoverColor} transition duration-150`}>
                             <MdOutlineEmail className="text-2xl flex-shrink-0 mt-0.5 text-[#00FFFF]" />
                             <span>info@altamaritime.com</span>
-                        </a>
+                        </Link>
 
                         {/* Phone */}
-                        <a href="tel:+180062748463" className={`flex items-start gap-3 text-base text-gray-300 ${hoverColor} transition duration-150`}>
+                        <Link href="tel:+180062748463" className={`flex items-start gap-3 text-base text-gray-300 ${hoverColor} transition duration-150`}>
                             <MdOutlineLocalPhone className="text-2xl flex-shrink-0 mt-0.5 text-[#00FFFF]" />
                             <span>+1 (800) MARITIME</span>
-                        </a>
+                        </Link>
 
                         <div className="pt-4 border-t border-gray-700">
                             <p className="text-sm font-semibold text-gray-400 mb-1">24/7 Operations Center</p>

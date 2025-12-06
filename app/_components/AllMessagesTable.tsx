@@ -1,85 +1,82 @@
-import { CheckCircle, ToggleRight, User } from "lucide-react";
+// app/_components/AllMessagesTable.tsx
+import { User, Trash } from "lucide-react";
 
-interface PendingMessagesTableProps {
-  pendingMessages: any[];
-  onToggleRead: (id: string, status: boolean) => void;
-  onRowClick: (msg: any) => void; // NEW
+interface AllMessagesTableProps {
+  messages: any[];
+  onRowClick: (msg: any) => void;
+  onDeleteMessage: (id: string) => void;    // ⬅ NEW PROP
 }
 
 const TEXT_POP_COLOR = "text-[#00FFFF]";
-const BG_POP_COLOR = "bg-[#00FFFF]";
 
-export default function PendingMessagesTable({
-  pendingMessages,
-  onToggleRead,
+export default function AllMessagesTable({
+  messages,
   onRowClick,
-}: PendingMessagesTableProps) {
-  if (pendingMessages.length === 0) {
+  onDeleteMessage,
+}: AllMessagesTableProps) {
+  if (!messages || messages.length === 0) {
     return (
       <div className="text-center p-10 text-gray-400 border border-dashed border-gray-600 rounded-lg mt-4">
-        <CheckCircle className="w-8 h-8 mx-auto mb-2 text-green-500" />
-        <p className="text-lg font-semibold">No Pending Follow-ups!</p>
-        <p>All inquiries have been addressed for the moment.</p>
+        <p className="text-lg font-semibold">No Messages Found</p>
       </div>
     );
   }
 
   return (
     <div className="overflow-x-auto mt-4 rounded-sm">
-      <table className="min-w-full divide-y divide-gray-700 rounded-lg overflow-x-scroll">
+      <table className="min-w-full divide-y divide-gray-700 rounded-lg">
         <thead className="bg-[#0A1C30] border-b border-gray-600">
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-              Contact Name
+              Name
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
               Email
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider hidden sm:table-cell">
-              Date Received
+              Date
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-              Message Snippet
+              Message
             </th>
             <th className="px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
-              Action
+              Actions
             </th>
           </tr>
         </thead>
 
         <tbody className="divide-y divide-gray-700">
-          {pendingMessages.map((msg) => (
+          {messages.map((msg) => (
             <tr
               key={msg._id}
               className="bg-[#11001C] hover:bg-[#0A1C30] transition duration-150 cursor-pointer"
-              onClick={() => onRowClick(msg)} // NEW → Opens modal
+              onClick={() => onRowClick(msg)}
             >
-              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white flex items-center">
+              <td className="px-6 py-4 text-sm text-white flex items-center">
                 <User className={`w-4 h-4 mr-2 ${TEXT_POP_COLOR}`} />
                 {msg.fullName || "N/A"}
               </td>
 
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                {msg.email}
-              </td>
+              <td className="px-6 py-4 text-sm text-gray-300">{msg.email}</td>
 
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400 hidden sm:table-cell">
+              <td className="px-6 py-4 text-sm text-gray-400 hidden sm:table-cell">
                 {new Date(msg.createdAt).toLocaleDateString()}
               </td>
 
               <td className="px-6 py-4 text-sm text-gray-300 max-w-xs truncate">
-                {msg.message.substring(0, 10)}...
+                {msg.message.substring(0, 20)}...
               </td>
 
-              <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+              {/* DELETE BUTTON */}
+              <td className="px-6 py-4 text-center">
                 <button
+                  className="text-red-400 hover:text-red-600 transition"
                   onClick={(e) => {
-                    e.stopPropagation(); // prevents modal from opening
-                    onToggleRead(msg._id, msg.isRead);
+                    e.stopPropagation(); // ⬅ Prevent modal from opening
+                    onDeleteMessage(msg._id);
                   }}
-                  className={`inline-flex items-center px-3 py-1 border border-transparent rounded-full shadow-sm text-xs font-medium text-[#11001C] ${BG_POP_COLOR} hover:opacity-90 transition`}
                 >
-                  <ToggleRight className="w-4 h-4 mr-1" /> Mark Responded
+                  <Trash className="w-5 h-5" />
                 </button>
               </td>
             </tr>
