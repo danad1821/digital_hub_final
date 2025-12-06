@@ -108,19 +108,6 @@ export default function Home() {
     },
   ];
 
-  // const getAllServices = async () => {
-  //   try {
-  //     const response = await axios.get("/api/services");
-  //     setServices(response.data);
-  //   } catch (error) {
-  //     console.error("Error fetching services: ", error);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   getAllServices();
-  // }, []);
-  // // ...
 
   return (
     <main className="min-h-screen">
