@@ -110,45 +110,11 @@ export async function GET() {
  * @returns The newly created service document.
  */
 export async function POST(request: Request) {
-  let imageId: any;
-  let imageFile: File | undefined; // Define imageFile outside of try block for potential cleanup
-
   try {
     await connectToDatabase();
-
-    // 1. Parse the multipart/form-data request body
-    const { fields, files } = await parseFormData(request);
-
-    // 2. Check for the uploaded image file
-    imageFile = files.image;
-    if (!imageFile || imageFile.size === 0) {
-      return NextResponse.json(
-        {
-          message:
-            "Image file (field 'image') is required and cannot be empty.",
-          errors: { image: { message: "Image file is missing." } },
-        },
-        { status: 400 }
-      );
-    }
-
-    // 3. Upload file stream to GridFS and get the file ID
-    imageId = await uploadFileStreamToGridFS(imageFile, imageFile.name);
-
-    // 4. Construct service data using fields and the new imageId
-    // 'items' field is expected to be a JSON string from form data and needs parsing
-    const serviceData = {
-      category: fields.category,
-      description: fields.description,
-      image: imageId, // Use the GridFS ObjectId
-      items: JSON.parse(fields.items || "[]"),
-    };
-
-    // 5. Create a new Service instance and save it.
-    const newService = await Service.create(serviceData);
-
-    // 6. Return the created service with a 201 Created status
-    return NextResponse.json({ service: newService }, { status: 201 });
+    const data = await request.json();
+    const newService = await Service.create(data);
+    return NextResponse.json(newService, { status: 201 });
   } catch (error: any) {
     console.error("POST Service Error:", error);
 
@@ -160,17 +126,6 @@ export async function POST(request: Request) {
         {
           message: "Validation failed. Check required fields and data types.",
           errors: error.errors,
-        },
-        { status: 400 }
-      );
-    }
-
-    // MongoDB Duplicate Key Error (e.g., trying to save a category that already exists)
-    if (error.code === 11000) {
-      return NextResponse.json(
-        {
-          message: `The category '${error.keyValue.category}' already exists.`,
-          key: error.keyValue,
         },
         { status: 400 }
       );

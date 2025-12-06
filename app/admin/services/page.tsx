@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import AddServiceModal from "@/app/_components/AddServiceModal";
 import ServiceCard from "@/app/_components/ServiceCard";
 import { Plus, Search } from "lucide-react";
+import axios from "axios";
 
 export default function AdminServices() {
   const [services, setServices] = useState<any[]>([]);
@@ -11,30 +12,84 @@ export default function AdminServices() {
   const [selectedService, setSelectedService] = useState<any | null>(null);
   const [showModal, setShowModal] = useState(false);
 
-  // Filter services by name
-  const filteredServices = services.filter((s) =>
-    s.serviceName.toLowerCase().includes(search.toLowerCase())
+  /** ---------------------------
+   * LOAD ALL SERVICES
+   * --------------------------*/
+  const getAllServices = useCallback(async () => {
+    try {
+      const res = await axios.get("/api/services");
+      const data = res.data?.services || res.data || [];
+
+      setServices(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Failed to load services:", error);
+    }
+  }, []);
+
+  /** ---------------------------
+   * FILTER SERVICES
+   * --------------------------*/
+  const filteredServices = useMemo(() => {
+    return services.filter((s) =>
+      s.serviceName.toLowerCase().includes(search.toLowerCase())
+    );
+  }, [services, search]);
+
+  /** ---------------------------
+   * SAVE (ADD OR EDIT)
+   * --------------------------*/
+  const handleSaveService = useCallback(
+    async (service: any) => {
+      try {
+        if (selectedService) {
+          // UPDATE
+          const res = await axios.put(`/api/services/${service._id}`, service);
+          const updated = res.data?.service || res.data;
+
+          setServices((prev) =>
+            prev.map((s) => (s._id === updated._id ? updated : s))
+          );
+        } else {
+          // CREATE
+          console.log("Service: ", service)
+          const res = await axios.post(`/api/services`, service);
+          const created = res.data?.service || res.data;
+
+          setServices((prev) => [...prev, created]);
+        }
+
+        setShowModal(false);
+        setSelectedService(null);
+      } catch (error) {
+        console.error("Save service failed:", error);
+      }
+    },
+    [selectedService]
   );
 
-  const handleSaveService = (service: any) => {
-    setServices((prev) => {
-      const exists = prev.some((s) => s._id === service._id);
-      if (exists) {
-        return prev.map((s) => (s._id === service._id ? service : s));
-      }
-      return [...prev, service];
-    });
+  /** ---------------------------
+   * DELETE SERVICE
+   * --------------------------*/
+  const handleDeleteService = useCallback(async (id: string) => {
+    try {
+      await axios.delete(`/api/services/${id}`);
+      setServices((prev) => prev.filter((s) => s._id !== id));
+    } catch (error) {
+      console.error("Delete failed:", error);
+    }
+  }, []);
 
-    setShowModal(false);
-    setSelectedService(null);
-  };
-
-  const handleDeleteService = (id: string) => {
-    setServices((prev) => prev.filter((s) => s._id !== id));
-  };
+  /** ---------------------------
+   * LOAD SERVICES ON MOUNT
+   * --------------------------*/
+  useEffect(() => {
+    getAllServices();
+  }, [getAllServices]);
 
   return (
     <main className="p-8 text-white">
+      <h1 className="text-3xl font-bold mb-6 text-black">Services</h1>
+
       {/* Top Controls */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-8 gap-4">
         <div className="flex items-center gap-3 bg-[#11001C] p-2 px-4 rounded-lg border border-gray-700">
@@ -59,7 +114,7 @@ export default function AdminServices() {
         </button>
       </div>
 
-      {/* Service Cards Grid */}
+      {/* Service Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredServices.map((service) => (
           <ServiceCard
@@ -79,7 +134,10 @@ export default function AdminServices() {
         <AddServiceModal
           initialService={selectedService}
           onSave={handleSaveService}
-          onClose={() => setShowModal(false)}
+          onClose={() => {
+            setShowModal(false);
+            setSelectedService(null);
+          }}
         />
       )}
     </main>

@@ -6,3 +6,7 @@ const galleryImageSchema = new mongoose.Schema({
 {
     timestamps: true,
 })
+
+const GalleryImage = mongoose.models.GalleryImage || mongoose.model("GalleryImage", galleryImageSchema);
+
+export default GalleryImage;

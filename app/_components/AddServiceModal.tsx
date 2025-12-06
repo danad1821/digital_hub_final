@@ -10,9 +10,13 @@ export default function AddServiceModal({
   onSave: (service: any) => void;
   onClose: () => void;
 }) {
-  const [serviceName, setServiceName] = useState(initialService?.serviceName || "");
+  const [serviceName, setServiceName] = useState(
+    initialService?.serviceName || ""
+  );
   const [summary, setSummary] = useState(initialService?.summary || "");
-  const [description, setDescription] = useState(initialService?.description || "");
+  const [description, setDescription] = useState(
+    initialService?.description || ""
+  );
 
   return (
     <>
@@ -28,7 +32,6 @@ export default function AddServiceModal({
           </h3>
 
           <div className="space-y-3">
-
             <input
               placeholder="Service Name"
               value={serviceName}
@@ -53,12 +56,20 @@ export default function AddServiceModal({
 
           <button
             onClick={() =>
-              onSave({
-                serviceName,
-                summary,
-                description,
-                _id: initialService?._id || crypto.randomUUID(),
-              })
+              onSave(
+                initialService
+                  ? {
+                      _id: initialService._id,
+                      serviceName,
+                      summary,
+                      description,
+                    }
+                  : {
+                      serviceName,
+                      summary,
+                      description,
+                    }
+              )
             }
             className="w-full mt-4 bg-[#00FFFF] text-[#11001C] py-2 rounded font-semibold hover:opacity-90 transition"
           >
