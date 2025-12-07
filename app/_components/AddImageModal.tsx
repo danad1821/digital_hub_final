@@ -1,0 +1,126 @@
+'use client';
+
+import { addGalleryImage } from '@/app/_actions/gallery';
+import React, { useState, useTransition, useRef } from 'react';
+
+// Define the component's props
+interface AddImageModalProps {
+  onClose: () => void;
+}
+
+export default function AddImageModal({ onClose }: AddImageModalProps) {
+  // State for managing the file input and messages
+  const [file, setFile] = useState<File | null>(null);
+  const [message, setMessage] = useState<string>('');
+  const [isPending, startTransition] = useTransition();
+  
+  // Ref to reset the file input field after submission
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setMessage('');
+
+    if (!file) {
+      setMessage('Please select an image file to upload.');
+      return;
+    }
+
+    // Create FormData object and append the file
+    const formData = new FormData();
+    formData.append('image', file);
+    
+    // Start the server action
+    startTransition(async () => {
+      const result = await addGalleryImage(formData);
+
+      if ('error' in result) {
+        setMessage(`Upload Failed: ${result.error}`);
+      } else {
+        setMessage('Image uploaded and added to gallery successfully!');
+        setFile(null); // Clear file state
+        if (fileInputRef.current) {
+            fileInputRef.current.value = ''; // Reset the native file input element
+        }
+        // You can automatically close the modal here if desired:
+        setTimeout(onClose, 2000); 
+      }
+    });
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setFile(e.target.files[0]);
+    } else {
+      setFile(null);
+    }
+  };
+
+  return (
+    <>
+      {/* Overlay */}
+      <div
+        onClick={onClose}
+        className="fixed inset-0 bg-black opacity-50 z-40"
+      ></div>
+
+      {/* Modal Content */}
+      <div className="fixed inset-0 flex justify-center items-center z-50">
+        <div className="bg-[#11001C] p-6 rounded-lg shadow-2xl w-96 border border-gray-700">
+          <h3 className="text-xl font-bold text-[#00FFFF] mb-4">
+            Add New Gallery Image
+          </h3>
+
+          <form onSubmit={handleSubmit}>
+            {/* File Input */}
+            <div className="mb-4">
+              <label htmlFor="imageFile" className="block text-gray-300 mb-2 font-medium">
+                Select Image:
+              </label>
+              <input
+                ref={fileInputRef}
+                type="file"
+                id="imageFile"
+                accept="image/*"
+                onChange={handleFileChange}
+                disabled={isPending}
+                className="w-full text-gray-300 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-700 file:text-white hover:file:bg-gray-600 transition"
+              />
+            </div>
+
+            {/* Status Message */}
+            {message && (
+              <p className={`mb-4 text-sm font-semibold ${message.startsWith('Upload Failed') ? 'text-red-400' : 'text-[#00FFFF]'}`}>
+                {message}
+              </p>
+            )}
+
+            {/* Submission Button */}
+            <button
+              type="submit"
+              disabled={isPending || !file}
+              className={`w-full bg-[#00FFFF] text-[#11001C] py-2 rounded font-semibold transition ${
+                isPending || !file
+                  ? 'opacity-60 cursor-not-allowed'
+                  : 'hover:opacity-90'
+              }`}
+            >
+              {isPending ? 'Uploading...' : 'Upload & Add Image'}
+            </button>
+          </form>
+
+          {/* Close Button */}
+          <button
+            onClick={onClose}
+            disabled={isPending}
+            className={`w-full mt-3 bg-gray-700 text-gray-300 py-2 rounded font-semibold transition ${
+                isPending ? 'opacity-60 cursor-not-allowed' : 'hover:bg-gray-600'
+            }`}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </>
+  );
+}
