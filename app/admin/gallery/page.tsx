@@ -1,34 +1,57 @@
-'use client'; // <-- Must be a client component to use useState
+'use client'; // <-- Must be a client component to use useState and hooks
 
 import { getAllGalleryImages } from '@/app/_actions/gallery';
 import { GalleryImageDocument } from '@/app/_models/GalleryImage';
 import GalleryImageCard from '@/app/_components/GalleryImageCard';
-import AddImageModal from '@/app/_components/AddImageModal'; // <-- Import the new modal
-import { useEffect, useState } from 'react';
+import AddImageModal from '@/app/_components/AddImageModal';
+import { useEffect, useState, useCallback } from 'react';
 
-// Define a type for the initial server-fetched data
-interface AdminGalleryProps {
-    initialImages: GalleryImageDocument[];
-}
-
-// Separate component for rendering the page
-function AdminGalleryContent({ initialImages }: AdminGalleryProps) {
+export default function AdminGallery() {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [images, setImages] = useState(initialImages);
+    const [images, setImages] = useState<GalleryImageDocument[]>([]);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
     
-    // Function to re-fetch data after modal close/successful upload
-    // In a real application, you'd use revalidatePath or a key swapper, 
-    // but a full refetch is simpler for this example.
-    const refreshImages = async () => {
-        const newImages = await getAllGalleryImages();
-        setImages(newImages);
-    };
+    // Function to fetch all images, similar to getAllMessages
+    const getAllImages = useCallback(async () => {
+        setIsLoading(true);
+        try {
+            // Using the existing server action (will run client-side via RPC)
+            const fetchedImages: GalleryImageDocument[] = await getAllGalleryImages();
+            setImages(fetchedImages);
+        } catch (error) {
+            console.error("Error fetching gallery images:", error);
+            setImages([]);
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
+
+    // Initial data fetch on mount, similar to the messages component
+    useEffect(() => {
+        getAllImages();
+    }, [getAllImages]);
 
     const handleModalClose = () => {
         setIsModalOpen(false);
         // Refresh the list whenever the modal is closed (in case upload succeeded)
-        refreshImages(); 
+        getAllImages(); 
     };
+    
+    // The card component needs to trigger a refresh on delete completion
+    const refreshImages = () => {
+        getAllImages();
+    };
+
+
+    if(isLoading){
+        return(
+            <main className="p-6">
+                <h1 className="text-3xl font-bold mb-6 text-black">Gallery</h1>
+                <hr className="mb-6"/>
+                <p className='text-center py-10 text-gray-700'>Loading images...</p>
+            </main>
+        )
+    }
 
     return (
         <main className="p-6">
@@ -38,7 +61,7 @@ function AdminGalleryContent({ initialImages }: AdminGalleryProps) {
                 {/* Button to Open Modal */}
                 <button
                     onClick={() => setIsModalOpen(true)}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition"
+                   className="flex items-center bg-[#00FFFF] text-[#11001C] px-4 py-2 rounded-lg font-semibold hover:opacity-90 transition"
                 >
                     + Add New Image
                 </button>
@@ -54,7 +77,6 @@ function AdminGalleryContent({ initialImages }: AdminGalleryProps) {
                         <GalleryImageCard 
                             key={img._id.toString()}
                             imageDoc={img}
-                            // The card component needs to trigger a refresh on delete completion
                             onDeleteComplete={refreshImages} 
                         />
                     ))}
@@ -65,31 +87,4 @@ function AdminGalleryContent({ initialImages }: AdminGalleryProps) {
             {isModalOpen && <AddImageModal onClose={handleModalClose} />}
         </main>
     );
-}
-
-// Wrapper component to fetch initial data on the server
-export default function AdminGallery() {
-    // Initial fetch on the server
-    const [images, setImages] = useState([]);
-    const [isLoading, setIsLoading] = useState(true)
-
-    const getAllImages= async()=>{
-        const initialImages:any = await getAllGalleryImages();
-        setImages(initialImages);
-        setIsLoading(false);
-    }
-    
-
-    useEffect(()=>{
-        getAllImages()
-    }, []);
-    
-    if(isLoading){
-        return(
-            <main>Loading...</main>
-        )
-    }
-    
-    // Render the client component with the server-fetched data
-    return <AdminGalleryContent initialImages={images} />;
 }

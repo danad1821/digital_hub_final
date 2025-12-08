@@ -73,7 +73,7 @@ export default function AboutUs() {
     <>
       <Header />
       <main className="min-h-screen bg-gray-50 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto custom-container">
           {/* Header */}
           <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-center text-[#0A1C30] mb-4">
             Our Services
