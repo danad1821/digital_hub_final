@@ -237,3 +237,66 @@ export async function updatePageSectionImage(
     return { success: false, error: errorMessage };
   }
 }
+
+
+export async function getHomePageContent(): Promise<PageDocument | null> {
+  // Use a fixed slug for the homepage content
+  const HOMEPAGE_SLUG = 'home';
+  await connectToDatabase();
+
+  try {
+    // Attempt to find the page content
+    const page = await Page.findOne({ slug: HOMEPAGE_SLUG }).exec();
+    
+    if (!page) {
+        // If not found, return null (the admin component will handle creation if necessary)
+        return null;
+    }
+    
+    // Return a plain object
+    return JSON.parse(JSON.stringify(page));
+  } catch (error) {
+    console.error(`Error fetching home page content:`, error);
+    return null;
+  }
+}
+
+export async function updateHomePageContent(
+  title: string,
+  content: string,
+): Promise<{ success: boolean; error?: string }> {
+  const HOMEPAGE_SLUG = 'home';
+  await connectToDatabase();
+
+  if (!title || !content) {
+      return { success: false, error: "Title and content cannot be empty." };
+  }
+    
+  try {
+    // Find the existing document and update it.
+    const updateResult = await Page.findOneAndUpdate(
+      { slug: HOMEPAGE_SLUG },
+      { $set: { title: title, content: content, updatedAt: new Date() } },
+      { new: true } 
+    ).exec();
+
+    if (!updateResult) {
+      // If the document doesn't exist, create it (Upsert logic).
+      const newPage = new Page({ 
+          slug: HOMEPAGE_SLUG, 
+          title, 
+          content,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+      });
+      await newPage.save();
+      return { success: true };
+    }
+    return { success: true };
+  } catch (e) {
+    const errorMessage = (e as Error).message || "Failed to update home page content.";
+    console.error("Error updating home page content:", e);
+    return { success: false, error: errorMessage };
+  }
+}
+

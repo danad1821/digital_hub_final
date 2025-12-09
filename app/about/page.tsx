@@ -170,7 +170,6 @@ export default function AboutUs() {
           </div>
         </div>
 
-        <hr />
 
         {/* 2. VISION & MISSION SECTION - Dynamic Image Source */}
         <section className="flex items-center custom-container justify-between py-20 gap-x-10 flex-wrap lg:flex-nowrap">
@@ -178,7 +177,7 @@ export default function AboutUs() {
           <div className="relative lg:w-1/2 mt-12 lg:mt-0">
             <Image
               src={aboutImageSrc} // Dynamic or fallback source
-              alt="Team at work in a modern office"
+              alt="our company"
               width={500}
               height={500}
               unoptimized={!!aboutImageId} // Use true if using the dynamic API route
@@ -218,8 +217,6 @@ export default function AboutUs() {
             </div>
           </div>
         </section>
-
-        <hr />
 
         {/* 3. OUR VALUES SECTION - Dynamic Icons */}
         <section className="py-20 bg-gray-50">

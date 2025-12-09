@@ -322,8 +322,8 @@ export default function Home() {
             Ready to discuss your project? Contact us for a consultation and
             quote
           </p>
-          <div className="flex flex-wrap">
-            <div className="w-1/2">
+          <div className="flex flex-wrap justify-center items-center">
+            <div className="min-w-1/2">
               <div className="border-b border-gray-500">
                 <h3 className="font-bold text-2xl mb-4">Contact Information</h3>
                 <div className="flex items-start gap-3 mb-4">

@@ -23,7 +23,7 @@ export default function AdminHeader() {
               <Link href="/admin/services">Services</Link>
             </li>
             <li className="text-white hover:text-[#00FFFF] transition duration-200">
-              <Link href="/admin/about">About</Link>
+              <Link href="/admin/pages">Pages</Link>
             </li>
             <li className="text-white hover:text-[#00FFFF] transition duration-200">
               <Link href="/admin/gallery">Gallery</Link>
@@ -62,8 +62,8 @@ export default function AdminHeader() {
               </Link>
             </li>
             <li className="text-white hover:text-[#00FFFF] transition duration-200">
-              <Link href="/admin/about" onClick={() => setOpen(false)}>
-                About
+              <Link href="/admin/pages" onClick={() => setOpen(false)}>
+                Pages
               </Link>
             </li>
             <li className="text-white hover:text-[#00FFFF] transition duration-200">
