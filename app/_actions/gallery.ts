@@ -33,7 +33,6 @@ export async function addGalleryImage(
     return JSON.parse(JSON.stringify(newImage)); // Return plain object for client component use
   } catch (e) {
     // If the document creation fails, clean up the orphaned GridFS file
-    // NOTE: This step is crucial to prevent database clutter!
     await deleteGridFsFile(new Types.ObjectId(uploadResult.fileId));
     return { error: "Failed to create database entry." };
   }
@@ -121,3 +120,4 @@ export async function getGalleryImageById(
   // Return a plain object for client components
   return JSON.parse(JSON.stringify(image));
 }
+

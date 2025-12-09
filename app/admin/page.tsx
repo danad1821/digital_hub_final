@@ -2,7 +2,9 @@
 import { useState, useEffect, useCallback } from "react";
 import MetricCard from "@/app/_components/MetricCard";
 import PendingMessagesTable from "../_components/PendingMessagesTable";
-import MessageModal from "../_components/MessageModal"; // ⬅ IMPORT MODAL
+import MessageModal from "../_components/MessageModal";
+// ⬇ IMPORT NEW MODAL
+import AddServiceModal from "../_components/AddServiceModal"; 
 import {
   Mail,
   Clock,
@@ -13,6 +15,7 @@ import {
   XCircle,
 } from "lucide-react";
 import axios from "axios";
+import Link from "next/link"; // ⬅ Import Link for navigation
 
 const TEXT_POP_COLOR = "text-[#00FFFF]";
 const BG_POP_COLOR = "bg-[#00FFFF]";
@@ -23,6 +26,11 @@ export default function Admin() {
   const [pendingMessages, setPendingMessages] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedMessage, setSelectedMessage] = useState<any>(null);
+  
+  // ⬅ NEW STATE: Modal visibility for adding/editing services
+  const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
+
+  // --- API Functions ---
 
   const getAllMessages = useCallback(async () => {
     setIsLoading(true);
@@ -61,7 +69,19 @@ export default function Admin() {
     }
   };
 
+  // ⬅ NEW: Dummy save function for the service modal
+  // This is where your actual API call to POST a new service would go
+  const handleSaveNewService = (newServiceData: any) => {
+      console.log("Saving new service:", newServiceData);
+      // Add logic here to call axios.post("/api/services", newServiceData)
+      alert(`Service '${newServiceData.serviceName}' saved! (API call mocked)`);
+      setIsServiceModalOpen(false); // Close the modal after save
+  };
+
+
+  // --- Helper/Calculation Functions (kept as is) ---
   const getTotalWeeklyInqueries = (msgs: any[] = messages) => {
+    // ... (unchanged)
     if (!msgs || msgs.length === 0) {
       setTotalInquiries(0);
       return;
@@ -88,6 +108,7 @@ export default function Admin() {
   };
 
   const getPendingMessages = (msgs: any[] = messages) => {
+    // ... (unchanged)
     if (!msgs || msgs.length === 0) {
       setPendingMessages([]);
       return;
@@ -96,9 +117,10 @@ export default function Admin() {
     setPendingMessages(filteredMsgs);
   };
 
+  // --- Effects (kept as is) ---
   useEffect(() => {
     getAllMessages();
-  }, []);
+  }, [getAllMessages]);
 
   useEffect(() => {
     getTotalWeeklyInqueries(messages);
@@ -114,6 +136,7 @@ export default function Admin() {
     );
   }
 
+  // --- Render ---
   return (
     <main className="py-6">
       <h1 className="text-4xl sm:text-5xl font-bold my-8 tracking-tight text-center">
@@ -145,7 +168,7 @@ export default function Admin() {
           <PendingMessagesTable
             pendingMessages={pendingMessages}
             onToggleRead={toggleReadStatus}
-            onRowClick={(msg: any) => setSelectedMessage(msg)} // ⬅ NEW
+            onRowClick={(msg: any) => setSelectedMessage(msg)}
           />
         </div>
 
@@ -154,23 +177,38 @@ export default function Admin() {
             Manage Services
           </h3>
           <div className="space-y-4">
+            {/* ⬅ UPDATED: Add New Service button to open modal */}
             <button
+              onClick={() => setIsServiceModalOpen(true)}
               className={`w-full flex items-center justify-center px-4 py-3 ${BG_POP_COLOR} text-[#11001C] font-semibold rounded-lg shadow-lg hover:bg-[#00D1E6] transition duration-200`}
             >
               <Ship className="w-5 h-5 mr-2" /> Add New Service
             </button>
-            <button className="w-full flex items-center justify-center px-4 py-3 bg-gray-600 text-white font-semibold rounded-lg shadow-lg hover:bg-gray-500 transition duration-200">
+            
+            {/* ⬅ UPDATED: Edit Existing Service button using Link */}
+            <Link
+              href="/admin/services"
+              className="w-full flex items-center justify-center px-4 py-3 bg-gray-600 text-white font-semibold rounded-lg shadow-lg hover:bg-gray-500 transition duration-200"
+            >
               <Clock className="w-5 h-5 mr-2" /> Edit Existing Service
-            </button>
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* ⬇ NEW: Display modal */}
+      {/* Message Modal */}
       {selectedMessage && (
         <MessageModal
           message={selectedMessage}
           onClose={() => setSelectedMessage(null)}
+        />
+      )}
+      
+      {/* ⬇ NEW: Service Modal */}
+      {isServiceModalOpen && (
+        <AddServiceModal
+            onSave={handleSaveNewService}
+            onClose={() => setIsServiceModalOpen(false)}
         />
       )}
     </main>

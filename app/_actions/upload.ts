@@ -5,7 +5,7 @@ import mongoose, { Types } from 'mongoose';
 import { Readable } from 'stream';
 
 // Define the expected return type for the upload action
-interface UploadResult {
+export interface UploadResult {
   success: boolean;
   fileId?: string;
   error?: string;
@@ -44,20 +44,14 @@ export async function uploadImage(formData: FormData): Promise<UploadResult> {
       contentType: file.type || 'binary/octet-stream',
     });
 
-    // === DIAGNOSTIC LOG 1: ID Assigned ===
-    console.log(`[Upload] Uploading file: ${file.name}, GridFS ID assigned: ${uploadStream.id.toHexString()}`);
-
     const readStream = Readable.from(buffer);
 
     readStream
       .pipe(uploadStream)
       .on('finish', () => {
-         // === DIAGNOSTIC LOG 2: Success Confirmation ===
-         console.log(`[Upload] Stream finished successfully. Final GridFS ID: ${uploadStream.id.toHexString()}`);
          resolve(uploadStream.id);
       })
       .on('error', (error) => {
-         // === ERROR LOG: Stream Failure ===
          console.error("[Upload] Stream Error during upload:", error);
          reject(error);
       });
@@ -65,8 +59,6 @@ export async function uploadImage(formData: FormData): Promise<UploadResult> {
 
   try {
     const fileId = await uploadPromise;
-    // Note: The fileId is logged here if it saves successfully
-    console.log(`[Upload] Successfully saved GalleryImage entry with ID: ${fileId.toString()}`);
     return { success: true, fileId: fileId.toString() };
   } catch (error) {
     // Ensure we return a string error message
@@ -74,3 +66,4 @@ export async function uploadImage(formData: FormData): Promise<UploadResult> {
     return { success: false, error: errorMessage };
   }
 }
+

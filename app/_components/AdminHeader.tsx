@@ -23,6 +23,9 @@ export default function AdminHeader() {
               <Link href="/admin/services">Services</Link>
             </li>
             <li className="text-white hover:text-[#00FFFF] transition duration-200">
+              <Link href="/admin/about">About</Link>
+            </li>
+            <li className="text-white hover:text-[#00FFFF] transition duration-200">
               <Link href="/admin/gallery">Gallery</Link>
             </li>
             <li className="text-white hover:text-[#00FFFF] transition duration-200">
@@ -32,8 +35,10 @@ export default function AdminHeader() {
               <Link href="/admin/locations">Locations</Link>
             </li>
 
-            <li className="text-white font-medium border border-white py-1 px-4 rounded-md cursor-pointer 
-                hover:bg-[#00FFFF] hover:text-[#0A1C30] hover:border-[#00FFFF] transition duration-200">
+            <li
+              className="text-white font-medium border border-white py-1 px-4 rounded-md cursor-pointer 
+                hover:bg-[#00FFFF] hover:text-[#0A1C30] hover:border-[#00FFFF] transition duration-200"
+            >
               Logout
             </li>
           </ul>
@@ -57,18 +62,23 @@ export default function AdminHeader() {
               </Link>
             </li>
             <li className="text-white hover:text-[#00FFFF] transition duration-200">
+              <Link href="/admin/about" onClick={() => setOpen(false)}>
+                About
+              </Link>
+            </li>
+            <li className="text-white hover:text-[#00FFFF] transition duration-200">
               <Link href="/admin/gallery" onClick={() => setOpen(false)}>
                 Gallery
               </Link>
             </li>
             <li className="text-white hover:text-[#00FFFF] transition duration-200">
-              <Link href="/admin/messages" onClick={() => setOpen(false)}>
-                Messages
+              <Link href="/admin/locations" onClick={() => setOpen(false)}>
+                Locations
               </Link>
             </li>
             <li className="text-white hover:text-[#00FFFF] transition duration-200">
-              <Link href="/admin/locations" onClick={() => setOpen(false)}>
-                Locations
+              <Link href="/admin/messages" onClick={() => setOpen(false)}>
+                Messages
               </Link>
             </li>
 
