@@ -3,6 +3,9 @@ export default function GetQuotePage(){
     return(
         <>
         <Header/>
+        <main>
+            
+        </main>
         </>
     )
 }

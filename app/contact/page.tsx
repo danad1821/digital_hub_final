@@ -5,7 +5,7 @@ export default function ContactUs() {
   return (
     <>
       <Header />
-      <main className="container bg-gray-50 py-12">
+      <main className=" bg-gray-50 py-12 w-full">
         <div className="custom-container">
           <h1 className="text-4xl sm:text-5xl font-bold my-8 tracking-tight text-center">
             Contact Us

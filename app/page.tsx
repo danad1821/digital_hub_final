@@ -15,7 +15,7 @@ import {
   Shield,
   Globe,
   Anchor,
-  Globe2,
+  Loader2,
   Cog,
   Construction,
   Clock,
@@ -24,56 +24,42 @@ import {
   Pin,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { getAllGalleryImages } from "./_actions/gallery";
 
 export default function Home() {
   const router = useRouter();
-  const [services, setServices] = useState<any>([
-    {
-      icon: <Construction />,
-      serviceName: "Heavy Lift Cargo",
-      summary:
-        "Specialized equipment and expertise for oversized and heavy industrial cargo up to 1000+ tons.",
-    },
-    {
-      icon: <Box></Box>,
-      serviceName: "Break Bulk Shipping",
-      summary:
-        "Efficient break bulk solutions for cargo that cannot fit in standard containers.",
-    },
-    {
-      icon: <Globe></Globe>,
-      serviceName: "Project Logistics",
-      summary:
-        "End-to-end logistics management for complex industrial and infrastructure projects.",
-    },
-    {
-      icon: <Anchor />,
-      serviceName: "Port Operations",
-      summary:
-        "Comprehensive port services including loading, unloading, and storage.",
-    },
-    {
-      icon: <Cog />,
-      serviceName: "Machinery Relocation",
-      summary:
-        "Safe transport and installation of industrial machinery and manufacturing equipment.",
-    },
-    {
-      icon: <Ship />,
-      serviceName: "Cargo Chartering",
-      summary:
-        "Flexible vessel chartering options tailored to your specific cargo requirements.",
-    },
-  ]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [services, setServices] = useState<any>([]);
+  const icons = [
+    <Construction />,
+    <Box></Box>,
+    <Globe></Globe>,
+    <Anchor />,
+    <Cog />,
+    <Ship />,
+  ];
 
-  const [gallery, setGallery] = useState([
-    "/images/image1.jpeg",
-    "/images/image2.jpeg",
-    "/images/image3.jpeg",
-    "/images/image4.jpeg",
-    "/images/image5.jpeg",
-    "/images/image6.jpeg",
-  ]);
+  const [gallery, setGallery] = useState([]);
+
+  const getAllImages = async () => {
+    const allImages: any = await getAllGalleryImages();
+    setGallery(allImages);
+  };
+
+  const getAllServices = async () => {
+    try {
+      const response = await axios.get("/api/services");
+      setServices(response.data.services || response.data);
+    } catch (error) {
+      console.error("Error fetching services: ", error);
+    }
+  };
+
+  useEffect(() => {
+    getAllImages();
+    getAllServices();
+    setIsLoading(false);
+  }, []);
 
   const companyStrengths = [
     {
@@ -107,7 +93,6 @@ export default function Home() {
       summary: "Dedicated logistics professionals available 24/7",
     },
   ];
-
 
   return (
     <main className="min-h-screen">
@@ -160,7 +145,12 @@ export default function Home() {
             <span>delivering industrial cargo anywhere in the world.</span>
           </p>
           <div className="my-2 flex items-center gap-3 flex-wrap">
-            <button className="border border-[#00FFFF] bg-[#00FFFF] px-5 py-2 rounded-sm font-semibold whitespace-nowrap text-[#0A1C30] flex items-center gap-1" onClick={()=>{router.push("/services")}}>
+            <button
+              className="border border-[#00FFFF] bg-[#00FFFF] px-5 py-2 rounded-sm font-semibold whitespace-nowrap text-[#0A1C30] flex items-center gap-1"
+              onClick={() => {
+                router.push("/services");
+              }}
+            >
               Explore Services <ArrowRight className="text-md" />
             </button>
             <button
@@ -240,9 +230,14 @@ export default function Home() {
             Comprehensive maritime logisitcs solutions tailored for the complex
             industrial cargo
           </p>
+          {isLoading && (
+            <div className="flex justify-center items-center h-48">
+              <Loader2 className="w-10 h-10 text-[#00FFFF] animate-spin" />
+            </div>
+          )}
           <div className="flex flex-wrap gap-5 items-center justify-evenly">
-            {services.slice(0, 6).map((s: any) => (
-              <HomeInfoCard key={s.serviceName} service={s} />
+            {services.slice(0, 6).map((s: any, index: any) => (
+              <HomeInfoCard key={s.serviceName} service={s} icon={icons[index]} />
             ))}
           </div>
         </div>
@@ -256,20 +251,25 @@ export default function Home() {
           <p className="text-center mb-8 text-gray-400">
             See our capabilities in action across global maritime operations
           </p>
-          <div className="flex flex-wrap gap-5 items-center justify-evenly">
-            {gallery.slice(0, 6).map((s: any, index: any) => (
-              <Image
-                key={index}
-                src={s}
-                alt={s}
-                width={100}
-                height={100}
-                className="w-[300px] h-[220px] rounded-sm shadow-md 
-                            hover:shadow-xl 
-                            transition 
-                            duration-300 
-                            hover:-translate-y-1 "
-              />
+          {isLoading && (
+            <div className="flex justify-center items-center h-48">
+              <Loader2 className="w-10 h-10 text-[#00FFFF] animate-spin" />
+            </div>
+          )}
+          <div className="flex flex-wrap gap-10 items-center justify-evenly">
+            {gallery.slice(0, 6).map((img: any) => (
+              <div
+                key={img._id.toString()}
+                className="rounded-sm overflow-hidden shadow-lg hover:shadow-xl transition duration-300"
+              >
+                {/* 5. Image Display: Use the dedicated API route to stream the image */}
+                <img
+                  // The image reference is stored in the 'image' field of the Mongoose document
+                  src={`/api/images/${img.image.toString()}`}
+                  alt={`Gallery item ${img._id}`}
+                  className="w-74 h-48 object-cover bg-gray-200"
+                />
+              </div>
             ))}
           </div>
         </div>
@@ -285,7 +285,7 @@ export default function Home() {
           </p>
           <div className="flex flex-wrap gap-5 items-center justify-evenly">
             {companyStrengths.map((s: any) => (
-              <HomeInfoCard key={s.serviceName} service={s} />
+              <HomeInfoCard key={s.serviceName} service={s} icon={s.icon} />
             ))}
           </div>
         </div>
@@ -419,10 +419,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* <section className="py-6">
-        <ContactForm />
-      </section> */}
     </main>
   );
 }

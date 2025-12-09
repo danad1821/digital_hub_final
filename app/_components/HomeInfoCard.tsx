@@ -11,7 +11,7 @@ interface Service {
   summary: string;
 }
 
-export default function HomeInfoCard({ service }: { service: Service }) {
+export default function HomeInfoCard({ service, icon }: { service: Service, icon: any }) {
   const router = useRouter();
   return (
     <div
@@ -43,7 +43,7 @@ export default function HomeInfoCard({ service }: { service: Service }) {
         text-2xl
       "
       >
-        {service.icon}
+        {icon}
       </div>
       <h3 className="text-xl font-bold text-gray-800 mb-2">{service.serviceName}</h3>
       <p className="text-gray-600 leading-relaxed text-base">{service.summary}</p>
