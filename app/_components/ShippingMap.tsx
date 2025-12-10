@@ -1,72 +1,79 @@
 "use client";
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import L from 'leaflet';
+import L, { LatLngExpression } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import ShippingRoutes from './ShippingRoutes';
-import { useEffect } from 'react';
 
-// Fix for default Leaflet icon not showing up in React/Webpack environments
-// This is necessary to properly display the pin icon
-delete L.Icon.Default.prototype._getIconUrl;
+// Re-defining the types for clarity (or import them from InteractiveMap.tsx)
+type Destination = { lat: number; lng: number; name: string; };
+export type Location = { _id: string; name: string; address: string; lat: number; lng: number; destinations?: Destination[]; }; 
+
+type ShippingMapProps = {
+    center: LatLngExpression;
+    zoom: number;
+    locations: Location[];
+    activeLocation: Location;
+    setActiveLocation: (location: Location) => void; // Must accept the Location object
+}
+
+
+// ... (Leaflet Icon Fix and Custom Icon definitions remain the same) ...
+delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'leaflet/images/marker-icon-2x.png',
-  iconUrl: 'leaflet/images/marker-icon.png',
-  shadowUrl: 'leaflet/images/marker-shadow.png',
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
 
-// A custom icon for the active hub (optional but good for visibility)
 const activeIcon = new L.Icon({
-  iconUrl: 'leaflet/images/marker-icon-red.png', // Assuming you have a red version
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png', 
   iconSize: [25, 41],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
-  shadowSize: [41, 41]
+  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
 
-type ShippingMapProps = {
-    center: any;
-    zoom: Number;
-    locations: any;
-    activeLocation: any;
-    setActiveLocation: (activeLocation: any) => void;
-}
 
 export default function ShippingMap({ center, zoom, locations, activeLocation, setActiveLocation }: ShippingMapProps) {
   
-  // Optional: Pan to the active location when it changes
-  // We use a component wrapper for the MapContainer to access the map instance (MapHook)
-  // For simplicity, we skip MapHook here, but the effect remains a good idea.
-
-  // The map MUST have a defined height in CSS/style.
   return (
     <MapContainer 
       center={center} 
       zoom={zoom} 
       scrollWheelZoom={true}
-      className="h-full w-full" // Use Tailwind to set dimensions
+      className="h-full w-full items-center flex justify-center" 
+      maxZoom={10} 
+      minZoom={2} 
     >
+      
       <TileLayer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+        noWrap={true}
+        attribution='&copy; <a href=\"http://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors, &copy; <a href=\"https://carto.com/attributions\">CARTO</a>'
       />
 
-      {/* RENDER ALL LOCATION MARKERS */}
-      {locations?.map((loc: any) => (
+      {/* 📍 RENDER ALL LOCATION MARKERS */}
+      {locations.map((loc: Location) => (
         <Marker
-          key={loc.id}
+          // FIX 1: Use loc._id as the key
+          key={loc._id} 
           position={[loc.lat, loc.lng]}
-          icon={activeLocation && activeLocation.id === loc.id ? activeIcon : L.Icon.Default.prototype}
+          // FIX 2: Use loc._id for comparison to determine the active icon
+          icon={activeLocation && activeLocation._id === loc._id ? activeIcon : L.Icon.Default.prototype} 
           eventHandlers={{
+            // FIX 3: Pass the entire location object to the setter function
             click: () => setActiveLocation(loc),
           }}
         >
+          {/* Popup Content */}
           <Popup>
             <div className="font-bold">{loc.name}</div>
-            <div className="text-sm">{loc.address}</div>
+            <div className="text-sm text-gray-700">{loc.address}</div>
           </Popup>
         </Marker>
       ))}
-
-      {/* RENDER SHIPPING ROUTES (Arrows/Polylines) */}
+      
+      {/* 🌊 RENDER ROUTES */}
       <ShippingRoutes activeLocation={activeLocation} />
 
     </MapContainer>

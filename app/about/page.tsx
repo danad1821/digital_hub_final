@@ -8,7 +8,7 @@ import { Loader2, ArrowRight, ArrowLeft } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Header from "../_components/Header";
-import HomeInfoCard from "../_components/HomeInfoCard";
+import ValueCard from "../_components/ValueCard";
 
 // Import the Server Action
 import { getStaticPageContent } from "@/app/_actions/pages";
@@ -83,8 +83,7 @@ export default function AboutUs() {
       <>
         <Header />
         <main className="min-h-screen flex items-center justify-center p-8">
-          <Loader2 className="animate-spin w-8 h-8 mr-2 text-[#0A1C30]" />
-          <p className="text-[#0A1C30]">Loading content...</p>
+          <Loader2 className="animate-spin w-8 h-8 mr-2 text-[#00FFFF]" />
         </main>
       </>
     );
@@ -235,7 +234,7 @@ export default function AboutUs() {
                 const IconComponent = IconMap[v.icon] || ArrowRight;
 
                 return (
-                  <HomeInfoCard
+                  <ValueCard
                     key={v.key}
                     service={
                       {
@@ -244,7 +243,6 @@ export default function AboutUs() {
                         icon: <IconComponent />,
                       } as Service
                     }
-                    icon={<IconComponent />} // Render the dynamically selected icon
                   />
                 );
               })}

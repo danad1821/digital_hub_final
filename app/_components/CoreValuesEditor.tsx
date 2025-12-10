@@ -90,8 +90,6 @@ const CoreValuesEditor = ({ sectionIndex, pageData, setPageData }: any) => {
                     <label className='block text-xs font-medium text-gray-500 mt-2'>Description:</label>
                     <textarea value={val.description} onChange={(e) => handleValueItemChange(val.key, 'description', e.target.value)} className='w-full p-2 border rounded-sm text-sm min-h-[50px]' />
                     
-                    <label className='block text-xs font-medium text-gray-500 mt-2'>Icon Class/Ref:</label>
-                    <input type="text" value={val.icon} onChange={(e) => handleValueItemChange(val.key, 'icon', e.target.value)} className='w-full p-2 border rounded-sm text-sm' />
                 </div>
             ))}
         </div>

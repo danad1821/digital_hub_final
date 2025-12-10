@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { getAllGalleryImages } from "./_actions/gallery";
+import InteractiveMap from "./_components/InteractiveMap";
 
 export default function Home() {
   const router = useRouter();
@@ -301,15 +302,7 @@ export default function Home() {
             logistics needs worldwide
           </p>
 
-          <div className="flex items-center justify-center">
-            <Image
-              src="/images/world-map.jpg"
-              alt="map"
-              width={100}
-              height={100}
-              className="w-[70vw] h-[70vh] rounded-sm"
-            ></Image>
-          </div>
+          <InteractiveMap/>
         </div>
       </section>
 
