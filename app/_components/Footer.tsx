@@ -3,6 +3,7 @@ import { FaFacebook, FaLinkedin, FaTwitter } from "react-icons/fa";
 import { Anchor } from "lucide-react";
 import { MdOutlineEmail, MdOutlineLocalPhone } from "react-icons/md";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 // Helper function to convert a service name to a URL-safe slug
 // e.g., "Heavy Lift Cargo" -> "Heavy Lift Cargo" (assuming the service category matches)
@@ -26,14 +27,12 @@ const getServiceCategoryName = (slug: string) => {
 };
 
 export default function Footer() {
-  // 💡 CHANGE: The href should use the structure needed by the 'AboutUs' page
-  // to scroll, which is the exact name of the service category.
-  // The previous implementation used query params, but since your AboutUs page
-  // relies on the 'name' query param, we will use that.
-  // NOTE: If you wanted to use a hash (#) for pure scrolling, the format would be:
-  // { name: "Heavy Lift Cargo", href: "/services#Heavy%20Lift%20Cargo" }
-
-  // We stick to the query parameter approach as per your AboutUs component's setup.
+  const pathname = usePathname();
+  if(pathname === '/admin'){
+    return(
+      <></>
+    )
+  }
   const serviceLinks = [
     // ⚠️ The 'name' value here MUST exactly match the 'category' value in your database
     // for the scrolling functionality in AboutUs.tsx to work.

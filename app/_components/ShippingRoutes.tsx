@@ -1,7 +1,7 @@
 // components/ShippingRoutes.js
 import { Polyline, Popup } from 'react-leaflet';
 
-// --- NEW: Define a list of colors to use for the routes ---
+// --- Define a list of colors to use for the routes ---
 const ROUTE_COLORS = [
   "#FF5733", // Red-Orange
   "#33FF57", // Bright Green
@@ -14,8 +14,11 @@ const ROUTE_COLORS = [
 ];
 // ---------------------------------------------------------
 
-// Helper function to calculate a SMOOTH curved path (simple arc)
-const calculateCurvedPath = (start: number[], end: number[]) => {
+/**
+ * Calculates a SMOOTH curved path using Quadratic Bézier interpolation.
+ * The curve direction alternates based on the provided index.
+ */
+const calculateCurvedPath = (start: number[], end: number[], index: number) => {
   const [lat1, lng1] = start;
   const [lat2, lng2] = end;
 
@@ -24,26 +27,32 @@ const calculateCurvedPath = (start: number[], end: number[]) => {
   const midLng = (lng1 + lng2) / 2;
   const distance = Math.sqrt(Math.pow(lat2 - lat1, 2) + Math.pow(lng2 - lng1, 2));
 
-  // 2. Define an offset magnitude for the curve.
-  const offsetMagnitude = distance * 0.2; 
+  // 2. Define an offset magnitude for the curve. (Adjusted to 0.15 for tighter grouping)
+  const offsetMagnitude = distance * 0.15; 
+
+  // --- KEY CHANGE: Determine the direction of the curve ---
+  // If the index is even (0, 2, 4...), offset by +90 degrees (normal direction).
+  // If the index is odd (1, 3, 5...), offset by -90 degrees (opposite direction).
+  const directionMultiplier = index % 2 === 0 ? 1 : -1;
+  // --------------------------------------------------------
 
   // 3. Calculate the angle of the line and the perpendicular offset angle
   const angle = Math.atan2(lat2 - lat1, lng2 - lng1);
-  const offsetAngle = angle + Math.PI / 2; // Perpendicular offset (90 degrees)
+  // Apply the direction multiplier to get the alternating offset angle
+  const offsetAngle = angle + directionMultiplier * (Math.PI / 2); // +/- 90 degrees
 
-  // 4. Calculate the coordinates of the PEAK of the arc
+  // 4. Calculate the coordinates of the PEAK (Control Point) of the arc
   const peakLat = midLat + offsetMagnitude * Math.sin(offsetAngle);
   const peakLng = midLng + offsetMagnitude * Math.cos(offsetAngle);
 
-  // 5. Generate multiple points (e.g., 10 intermediate points) between start, peak, and end
+  // 5. Generate multiple points for the smooth Bézier curve
   const points: number[][] = [];
-  const numSegments = 10; // More segments = smoother curve
+  const numSegments = 10; 
 
   for (let i = 0; i <= numSegments; i++) {
-    // Interpolation factor (t) goes from 0 to 1
-    const t = i / numSegments; 
+    const t = i / numSegments; // Interpolation factor
 
-    // Use Quadratic Bezier interpolation for the curve
+    // Quadratic Bezier interpolation: P0=Start, P1=Peak (Control Point), P2=End
     const lat = 
       Math.pow(1 - t, 2) * lat1 + 
       2 * (1 - t) * t * peakLat + 
@@ -72,16 +81,16 @@ export default function ShippingRoutes({ activeLocation }: any) {
       {activeLocation?.destinations?.map((destination: any, index: number) => {
         const endPoint: number[] = [destination.lat, destination.lng];
         
-        // --- KEY CHANGE: Select a color based on the index ---
+        // Use index to select a unique color and determine curve direction
         const routeColor = ROUTE_COLORS[index % ROUTE_COLORS.length];
         
-        const curvedPath = calculateCurvedPath(startPoint, endPoint);
+        // Pass the index to calculateCurvedPath
+        const curvedPath = calculateCurvedPath(startPoint, endPoint, index);
 
         return (
           <Polyline
             key={index}
             positions={curvedPath}
-            // --- KEY CHANGE: Apply the unique color ---
             color={routeColor} 
             weight={4}
             opacity={0.8}

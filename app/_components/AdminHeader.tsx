@@ -2,10 +2,66 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogOut, Loader } from "lucide-react"; // Added LogOut and Loader icons
+import { usePathname, useRouter } from "next/navigation"; // Added useRouter
+import axios from "axios"; // Added axios
 
 export default function AdminHeader() {
   const [open, setOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false); // New state for loading indicator
+  const pathname = usePathname();
+  const router = useRouter(); // Initialize router
+
+  // Function to handle the logout process
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      // Make a GET request to the logout API route
+      await axios.get("/api/users/logout");
+
+      // On successful logout (cookie deleted by server), redirect to the login page
+      router.push("/admin"); // Assuming /admin is your admin login page
+    } catch (error) {
+      console.error("Logout failed:", error);
+      // Optional: Show an error notification to the user
+      alert("Logout failed. Please try again."); 
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
+
+  // Skip rendering the header on the admin base path (likely the login page)
+  if (pathname === "/admin") {
+    return <></>;
+  }
+
+  // Component for the Logout Button
+  const LogoutButton = ({ isMobile = false }) => (
+    <div
+      onClick={handleLogout}
+      className={`
+        flex items-center justify-center cursor-pointer font-medium border border-white py-1 px-4 rounded-md 
+        transition duration-200 
+        ${isMobile ? 'w-fit py-2' : ''}
+        ${isLoggingOut
+          ? 'bg-gray-500 text-white border-gray-500 disabled:cursor-not-allowed'
+          : 'text-white hover:bg-[#00FFFF] hover:text-[#0A1C30] hover:border-[#00FFFF]'
+        }
+      `}
+    >
+      {isLoggingOut ? (
+        <>
+          <Loader className="w-5 h-5 mr-2 animate-spin" />
+          Logging out...
+        </>
+      ) : (
+        <>
+          <LogOut className="w-5 h-5 mr-2" />
+          Logout
+        </>
+      )}
+    </div>
+  );
 
   return (
     <header className="bg-[#0A1C30] shadow-lg sticky top-0 z-10">
@@ -35,11 +91,8 @@ export default function AdminHeader() {
               <Link href="/admin/locations">Locations</Link>
             </li>
 
-            <li
-              className="text-white font-medium border border-white py-1 px-4 rounded-md cursor-pointer 
-                hover:bg-[#00FFFF] hover:text-[#0A1C30] hover:border-[#00FFFF] transition duration-200"
-            >
-              Logout
+            <li>
+              <LogoutButton />
             </li>
           </ul>
 
@@ -48,6 +101,7 @@ export default function AdminHeader() {
             className="md:hidden text-white"
             onClick={() => setOpen(!open)}
             aria-label="Toggle navigation"
+            disabled={isLoggingOut} // Disable while logging out
           >
             {open ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
           </button>
@@ -56,6 +110,7 @@ export default function AdminHeader() {
         {/* Mobile Dropdown Navigation */}
         {open && (
           <ul className="md:hidden flex flex-col space-y-4 pb-4 pt-2 border-t border-gray-700">
+            {/* Navigation links (kept as is) */}
             <li className="text-white hover:text-[#00FFFF] transition duration-200">
               <Link href="/admin/services" onClick={() => setOpen(false)}>
                 Services
@@ -82,11 +137,9 @@ export default function AdminHeader() {
               </Link>
             </li>
 
-            <li
-              className="text-white font-medium border border-white py-2 px-4 w-fit rounded-md cursor-pointer 
-                hover:bg-[#00FFFF] hover:text-[#0A1C30] hover:border-[#00FFFF] transition duration-200"
-            >
-              Logout
+            {/* Mobile Logout Button */}
+            <li>
+              <LogoutButton isMobile={true} />
             </li>
           </ul>
         )}
