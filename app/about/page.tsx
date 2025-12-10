@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react"; // Added useCallback
 // Import all necessary icons from Lucide
 import { Loader2, ArrowRight, ArrowLeft } from "lucide-react";
 import { useSearchParams } from "next/navigation";
@@ -28,12 +28,12 @@ const IconMap: { [key: string]: React.ElementType } = {
 
 // Reusable gradient title classes
 const gradientTitleClasses = `
- gradient-text
- font-black
- tracking-tight
- bg-gradient-to-r
- from-[#00FFFF]
- to-[#0A1C30] pb-2
+  gradient-text
+  font-black
+  tracking-tight
+  bg-gradient-to-r
+  from-[#00FFFF]
+  to-[#0A1C30] pb-2
 `;
 
 // Define the Service interface expected by HomeInfoCard
@@ -43,7 +43,7 @@ interface Service {
   icon: any;
 }
 
-// Utility to find section index by type
+// Utility to find section index by type (This is already stable since it's outside the component)
 const findSectionIndex = (data: PageDocument, type: string) =>
   data.sections.findIndex((s) => s.type === type);
 
@@ -54,30 +54,36 @@ export default function AboutUs() {
   const [error, setError] = useState<string | null>(null);
 
   // --- Data Fetching (Using Server Action) ---
-  useEffect(() => {
-    const fetchPageData = async () => {
-      try {
-        const fetchedData: any = await getStaticPageContent("about-us");
 
-        if (!fetchedData) {
-          throw new Error(
-            "Failed to fetch page data or page content is empty."
-          );
-        }
+  // OPTIMIZATION: Memoize the fetch function using useCallback
+  const fetchPageData = useCallback(async () => {
+    setLoading(true);
+    try {
+      // The parameter for getStaticPageContent is constant ("about-us")
+      const fetchedData: any = await getStaticPageContent("about-us");
 
-        setPageData(fetchedData);
-      } catch (err: any) {
-        console.error("Fetch Error:", err);
-        setError(`Failed to load page content: ${err.message}`);
-      } finally {
-        setLoading(false);
+      if (!fetchedData) {
+        throw new Error(
+          "Failed to fetch page data or page content is empty."
+        );
       }
-    };
 
+      setPageData(fetchedData);
+    } catch (err: any) {
+      console.error("Fetch Error:", err);
+      // Ensure error is a string
+      setError(`Failed to load page content: ${err.message || String(err)}`);
+    } finally {
+      setLoading(false);
+    }
+  }, []); // Empty dependency array because the function does not depend on component state/props.
+
+  // Use the memoized fetch function
+  useEffect(() => {
     fetchPageData();
-  }, []);
+  }, [fetchPageData]); // Dependency is now the stable function reference
 
-  // --- Loading and Error States ---
+  // --- Loading and Error States (Rest of the component remains the same) ---
   if (loading) {
     return (
       <>
@@ -103,6 +109,7 @@ export default function AboutUs() {
   }
 
   // 2. EXTRACT DYNAMIC DATA
+  // No useMemo needed here as findSectionIndex is cheap and run only on pageData change
   const heroIndex = findSectionIndex(pageData, "hero");
   const vmIndex = findSectionIndex(pageData, "vision_mission");
   const cvIndex = findSectionIndex(pageData, "core_values");
@@ -233,6 +240,9 @@ export default function AboutUs() {
                 // 🌟 ICON CHANGE: Look up the icon component from the map, defaulting to ArrowRight
                 const IconComponent = IconMap[v.icon] || ArrowRight;
 
+                // The Service object is re-created on every render, but since
+                // ValueCard likely consumes this small object and its children are simple,
+                // the performance gain from useMemo here would be negligible.
                 return (
                   <ValueCard
                     key={v.key}

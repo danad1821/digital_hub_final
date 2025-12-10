@@ -5,23 +5,32 @@ import {
   deleteGalleryImage,
 } from "@/app/_actions/gallery";
 import { Loader2 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react"; // Added useCallback
 
-// Make the component 'async' to enable server-side data fetching
 export default function GalleryPage() {
-  // 1. Fetch all images on the server side
+  // 1. STATE MANAGEMENT
   const [images, setImages] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const getAllImages = async () => {
-    const allImages: any = await getAllGalleryImages();
-    setImages(allImages);
-    setIsLoading(false);
-  };
+  // OPTIMIZATION: Memoize the fetch function using useCallback
+  const getAllImages = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const allImages: any = await getAllGalleryImages();
+      setImages(allImages);
+    } catch (error) {
+        console.error("Error fetching gallery images:", error);
+        setImages([]); // Set to empty array on error
+    } finally {
+      setIsLoading(false);
+    }
+  }, []); // Empty dependency array means the function is stable
 
+  // 2. Data Fetching Effect
   useEffect(() => {
+    // Call the stable function reference
     getAllImages();
-  }, []);
+  }, [getAllImages]); // Dependency array includes the stable getAllImages function
 
   return (
     <>
@@ -36,7 +45,7 @@ export default function GalleryPage() {
             Comprehensive maritime logisitcs solutions tailored for the complex
             industrial cargo
           </p>
-          {/* 3. Use a form to wrap the list, enabling deletion via Server Actions */}
+          {/* Content */}
           <div>
             {isLoading && (
               <div className="flex justify-center items-center h-48">

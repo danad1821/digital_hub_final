@@ -1,8 +1,7 @@
 "use client";
 import dynamic from 'next/dynamic';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react'; // Added useMemo
 import axios from 'axios'; 
-// import { shippingLocations, initialCenter } from '../../public/json/shipping_data'; // REMOVED
 
 // --- TYPES ---
 type Destination = {
@@ -24,7 +23,7 @@ export type Location = {
 // Map constants
 export const initialCenter: [number, number] = [35.5, 19.5]; 
 
-// FIX: Define a clean, empty initial state object using the new _id type.
+// Define a clean, empty initial state object using the new _id type.
 const initialActiveLocation: Location = { 
     _id: '', 
     name: '', 
@@ -44,11 +43,10 @@ const DynamicMap = dynamic(
 
 export default function InteractiveMap() {
   const [locations, setLocations] = useState<Location[]>([]); 
-  // FIX: Use the typed initial state
   const [activeLocation, setActiveLocation] = useState<Location>(initialActiveLocation);
   const [isLoading, setIsLoading] = useState(true); 
 
-  // Function to fetch the location data from the API
+  // Function to fetch the location data from the API (Memoized with useCallback)
   const fetchLocations = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -59,29 +57,34 @@ export default function InteractiveMap() {
     } finally {
         setIsLoading(false);
     }
-  }, []);
+  }, []); // Stable function
 
   useEffect(() => {
     fetchLocations();
   }, [fetchLocations]);
 
-  // FIX: Reset activeLocation to the typed initial state
-  const clearActiveLocation = () => setActiveLocation(initialActiveLocation);
+  // Memoized function for clearing the active location
+  const clearActiveLocation = useCallback(() => {
+      setActiveLocation(initialActiveLocation);
+  }, []); // Stable function
 
-  // FIX: Use the _id field to check if a location is actively selected
-  const isLocationActive = activeLocation && activeLocation._id; 
+  // OPTIMIZATION: Use useMemo to derive the active status based on activeLocation._id
+  // This ensures the value is only recalculated if activeLocation changes.
+  const isLocationActive = useMemo(() => {
+    return !!(activeLocation && activeLocation._id); 
+  }, [activeLocation]); 
 
   return (
     <div className="flex flex-col h-screen relative">
       <div className="bg-gray-800 absolute bottom-10 left-10 z-[1000] text-white p-4 shadow-md flex justify-between items-center rounded-sm">
-        {/* The condition now correctly checks the _id */}
+        {/* The condition now uses the memoized value */}
         {isLocationActive ? (
           <div className="flex items-center space-x-4">
             <span className="text-sm">
               <b>Active Hub:</b> {activeLocation.name}
             </span>
             <button
-              onClick={clearActiveLocation}
+              onClick={clearActiveLocation} // Uses memoized clear function
               className="px-3 py-1 text-xs bg-red-600 hover:bg-red-700 rounded transition duration-150 font-medium"
               aria-label="Clear active shipping route"
             >
@@ -105,7 +108,7 @@ export default function InteractiveMap() {
                 locations={locations} 
                 activeLocation={activeLocation}
                 // Ensure setActiveLocation is strongly typed
-                setActiveLocation={setActiveLocation as (loc: any) => void} 
+                setActiveLocation={setActiveLocation as (loc: Location) => void} 
             />
         ) : (
             <div className="flex items-center justify-center h-full text-gray-700">

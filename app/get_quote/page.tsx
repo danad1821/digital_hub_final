@@ -19,14 +19,13 @@ export default function GetQuotePage() {
                     <section className="quote-form-section lg:col-span-2">
                         <div className="mb-8">
                             <h1 className="text-4xl font-extrabold text-[#0A1C30] mb-2">
-                                📦 Get an Instant Shipping Quote
+                                Get an Instant Shipping Quote
                             </h1>
                             <p className="page-intro text-lg text-gray-600">
                                 Enter your shipment details below and receive a fast, accurate estimate.
                             </p>
                         </div>
                         
-                        {/* QuoteForm component is styled internally */}
                         <QuoteForm /> 
                         
                     </section>
@@ -42,12 +41,11 @@ export default function GetQuotePage() {
                             </h2>
                             <ul className="space-y-3 text-gray-700">
                                 <li className="flex items-center">
-                                    <span className="text-lg mr-2">📞</span> 
+                                   
                                     <span className="font-medium">Call us:</span> +1 (800) 555-1234
                                 </li>
                                 <li className="flex items-center">
-                                    <span className="text-lg mr-2">💬</span> 
-                                    <span className="font-medium">Live Chat Support:</span> Available 24/7 
+                                    <span className="font-medium">Live Chat Support: </span> Available 24/7 
                                 </li>
                                 <li className="text-sm text-gray-500 pt-2 italic">
                                     (For complex shipments, contact a specialist.)

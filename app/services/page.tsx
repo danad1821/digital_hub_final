@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react"; // Added useCallback
 import axios from "axios";
 import { Loader2 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
@@ -26,32 +26,37 @@ export default function ServicesPage() {
 
   const [services, setServices] = useState<Service[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  
-  // New state: Tracks which service category should be forced open/expanded
   const [expandedServiceName, setExpandedServiceName] = useState<string | null>(null);
 
   const serviceRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  const setRef = (element: HTMLDivElement | null, category: string) => {
+  // 1. Memoize setRef using useCallback
+  // This function is stable across renders, preventing ServiceClientCard from re-rendering
+  // just because the parent re-rendered, assuming ServiceClientCard also uses memoization.
+  const setRef = useCallback((element: HTMLDivElement | null, category: string) => {
     serviceRefs.current[category] = element;
-  };
+  }, []); // Empty dependency array means it's created only once
 
-  // Fetch Services
-  const getAllServices = async () => {
+  // 2. Memoize getAllServices using useCallback
+  // This ensures the function identity is stable, which is crucial for the dependency array
+  // in the first useEffect hook, guaranteeing it runs only once on mount.
+  const getAllServices = useCallback(async () => {
     setIsLoading(true);
     try {
       const response = await axios.get("/api/services");
+      // Use a functional update if setServices depended on 'services', but here it's fine.
       setServices(response.data.services || response.data); 
     } catch (error) {
       console.error("Error fetching services: ", error);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []); // Empty dependency array means it's created only once
 
+  // Fetch Services (Now depends on the stable getAllServices)
   useEffect(() => {
     getAllServices();
-  }, []);
+  }, [getAllServices]); // Dependency array includes getAllServices
 
   // Scroll and Expansion Effect
   useEffect(() => {
@@ -66,14 +71,13 @@ export default function ServicesPage() {
         });
         
         // 2. Set the state to force expansion of this service card
-        // Note: We use the 'name' parameter which is the category key
         setExpandedServiceName(name);
       }
     } else {
         // Clear expansion state if no service name is present in the URL
         setExpandedServiceName(null);
     }
-  }, [isLoading, name, services]); 
+  }, [isLoading, name, services]); // Dependencies remain the same
 
   return (
     <>
@@ -100,8 +104,9 @@ export default function ServicesPage() {
               <ServiceClientCard
                 key={s._id}
                 s={s}
-                // Pass the current service's category and the global expanded state
+                // Check if the current card should be expanded based on URL param
                 isInitiallyExpanded={s.category === expandedServiceName} 
+                // Pass the memoized setRef function. The category is closed over by the outer function.
                 ref={(el: HTMLDivElement | null) => setRef(el, s.category)}
               />
             ))}
