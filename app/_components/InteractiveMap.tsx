@@ -104,7 +104,7 @@ export default function InteractiveMap() {
         {!isLoading && locations.length > 0 ? (
             <DynamicMap
                 center={initialCenter}
-                zoom={2}
+                zoom={4}
                 locations={locations} 
                 activeLocation={activeLocation}
                 // Ensure setActiveLocation is strongly typed

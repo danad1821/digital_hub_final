@@ -6,7 +6,7 @@ import { Readable } from "stream";
 // The standard Next.js App Router function signature for dynamic parameters
 export async function GET(
   request: Request,
-  { params }: { params: { fileId: string } } // <-- Key Change here
+ { params }: { params: Promise<{ fileId: string }> }
 ) {
   const { fileId } = await params; // Safely access the dynamic segment from destructured params
 

@@ -2,7 +2,8 @@ import { connectToDatabase } from "@/app/_lib/db";
 import User from "@/app/_models/User";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import bcrypt from "bcryptjs"; // Assuming you have 'bcryptjs' installed
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken"; // 💡 JWT Library Import
 
 // Define the shape for the request body for type safety
 interface LoginBody {
@@ -10,13 +11,19 @@ interface LoginBody {
     password?: string;
 }
 
+// Define the shape for the JWT payload
+interface JwtPayload {
+    userId: string;
+    email: string;
+    role: string;
+}
+
 export async function POST(request: Request) {
-    // 1. Initialize Error Handling
     try {
         const body: LoginBody = await request.json();
         const { email, password } = body;
-
-        // 2. Simple Input Validation
+        
+        // 1. Simple Input Validation
         if (!email || !password) {
             return NextResponse.json(
                 { error: "Email and password are required." },
@@ -24,23 +31,31 @@ export async function POST(request: Request) {
             );
         }
         
-        // 3. Connect to Database
+        // 2. Database Connection and Secret Check
         await connectToDatabase();
+        
+        const jwtSecret = process.env.JWT_SECRET;
+        if (!jwtSecret) {
+            // Log for server admin, return generic error to client
+            console.error("Configuration Error: JWT_SECRET environment variable is not set.");
+            return NextResponse.json(
+                { error: "Server configuration error." },
+                { status: 500 }
+            );
+        }
 
-        // 4. Find the User
-        // Use select('+password') if your User model schema excludes the password by default
+        // 3. Find the User
         const user = await User.findOne({ email }).select('+password');
 
         if (!user) {
-            // Do not disclose whether it was the email or password that was wrong for security
+            // Security: Don't reveal if it's the email or password that is wrong
             return NextResponse.json(
                 { error: "Invalid credentials." },
                 { status: 401 } // Unauthorized
             );
         }
 
-        // 5. Compare Passwords
-        // 'user.password' is the stored HASH; 'password' is the plain text from the request
+        // 4. Compare Passwords
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) {
@@ -50,21 +65,34 @@ export async function POST(request: Request) {
             );
         }
 
+        // 5. 🔑 Generate the JWT
+        const payload: JwtPayload = {
+            userId: user._id.toString(), // Convert ObjectId to string for JWT
+            email: user.email,
+            role: user.role || "user", // Assuming user role is stored in the user document
+        };
+
+        const token = jwt.sign(
+            payload, 
+            jwtSecret, 
+            { expiresIn: '7d' } // Token expires in 7 days
+        );
         
-        const cookiesData: any = await cookies()
-        // 7. Successful Login - Set the Cookie
-        // The cookie can be simple or contain a JWT for more complex authentication
-        cookiesData.set("user-role", "admin", {
-            httpOnly: true, // Prevents client-side JS access
+
+        // 6. Set the Secure Cookie
+        const cookiesData = await cookies();
+        
+        cookiesData.set("auth-token", token, { // Set the JWT under the name 'auth-token'
+            httpOnly: true, // Prevents client-side JavaScript access (essential for security)
             secure: process.env.NODE_ENV === "production", // Only send over HTTPS in production
-            maxAge: 60 * 60 * 24 * 7, // 1 week
-            path: "/", // Available across the entire site
-            sameSite: 'strict', // Security against CSRF
+            maxAge: 60 * 60 * 24 * 7, // 1 week (matches token expiry)
+            path: "/", // Available across the entire domain
+            sameSite: 'strict', // Helps mitigate Cross-Site Request Forgery (CSRF)
         });
 
-        // 8. Return Success Response
+        // 7. Return Success Response
         return NextResponse.json(
-            { message: "Login successful.", role: "admin" },
+            { message: "Login successful.", role: payload.role },
             { status: 200 }
         );
 

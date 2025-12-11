@@ -31,6 +31,8 @@ export default function Home() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [services, setServices] = useState<any>([]);
+  const [pageData, setPageData] = useState<any>(null);
+
   const icons = [
     <Construction />,
     <Box></Box>,
@@ -55,6 +57,10 @@ export default function Home() {
       console.error("Error fetching services: ", error);
     }
   };
+
+  const getHomePageData = async()=>{
+
+  }
 
   useEffect(() => {
     getAllImages();

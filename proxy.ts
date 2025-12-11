@@ -1,20 +1,10 @@
+// /middleware.ts or /app/middleware.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 // ============================================================================
 // AUTHENTICATION MIDDLEWARE CONFIGURATION
 // ============================================================================
-// This middleware protects admin routes by enforcing authentication via cookies.
-// It redirects unauthenticated users to login and authenticated users away from
-// the login page to the dashboard.
-// ============================================================================
-
-/**
- * Routes that require authentication.
- * Any route starting with these paths will be protected.
- * Note: "/admin" (without trailing slash) is the login page and is public.
- */
-const PROTECTED_ROUTES = ["/admin/"];
 
 /**
  * The login page route - accessible only to unauthenticated users.
@@ -27,9 +17,9 @@ const LOGIN_ROUTE = "/admin";
 const DASHBOARD_ROUTE = "/admin/home";
 
 /**
- * Cookie key used to store authentication status.
+ * Cookie key used to store authentication status (Updated for JWT).
  */
-const AUTH_COOKIE_KEY = "user-role";
+const AUTH_COOKIE_KEY = "auth-token"; 
 
 // ============================================================================
 // MIDDLEWARE FUNCTION
@@ -37,65 +27,50 @@ const AUTH_COOKIE_KEY = "user-role";
 
 /**
  * Main middleware function that handles authentication and routing logic.
- * 
- * @param request - The incoming NextRequest object
- * @returns NextResponse with appropriate redirection or pass-through
- * 
- * Flow:
- * 1. Check if user has authentication cookie
- * 2. Determine if current route is protected
- * 3. Redirect based on auth status and route type:
- *    - Unauthenticated + Protected Route → Login Page
- *    - Authenticated + Login Page → Dashboard
- *    - Otherwise → Continue to requested page
  */
 export function proxy(request: NextRequest): NextResponse {
-  // Step 1: Extract authentication cookie
-  const authCookie = request.cookies.get(AUTH_COOKIE_KEY)?.value;
-  const isAuthenticated = Boolean(authCookie);
+    // Step 1: Extract authentication cookie
+    const authCookie = request.cookies.get(AUTH_COOKIE_KEY)?.value;
+    const isAuthenticated = Boolean(authCookie);
+    // Note: In a production-grade app, you might decode/verify the JWT here
+    // to ensure it hasn't expired, making the 'isAuthenticated' check more robust.
 
-  // Step 2: Check if requested route requires authentication
-  const isProtectedRoute = PROTECTED_ROUTES.some((route) =>
-    request.nextUrl.pathname.startsWith(route)
-  );
-
-  // Step 3: Handle unauthenticated access to protected routes
-  if (isProtectedRoute && !isAuthenticated) {
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = LOGIN_ROUTE;
+    const { pathname } = request.nextUrl;
     
-    return NextResponse.redirect(redirectUrl);
-  }
+    const isLoginPage = pathname === LOGIN_ROUTE;
+    // An Admin page is any page *inside* the admin area, but not the login page itself.
+    const isProtectedAdminRoute = pathname.startsWith(`${LOGIN_ROUTE}/`);
 
-  // Step 4: Handle authenticated access to login page
-  // (redirect to dashboard to prevent unnecessary login attempts)
-  const isLoginPage = request.nextUrl.pathname === LOGIN_ROUTE;
-  
-  if (isLoginPage && isAuthenticated) {
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = DASHBOARD_ROUTE;
-    
-    return NextResponse.redirect(redirectUrl);
-  }
+    // --- Logic Flow ---
 
-  // Step 5: Allow request to proceed normally
-  return NextResponse.next();
+    // 1. Unauthenticated user tries to access a protected route
+    if (isProtectedAdminRoute && !isAuthenticated) {
+        const redirectUrl = request.nextUrl.clone();
+        redirectUrl.pathname = LOGIN_ROUTE;
+        
+        // Redirect to login page
+        return NextResponse.redirect(redirectUrl);
+    }
+
+    // 2. Authenticated user tries to access the login page
+    if (isLoginPage && isAuthenticated) {
+        const redirectUrl = request.nextUrl.clone();
+        redirectUrl.pathname = DASHBOARD_ROUTE;
+        
+        // Redirect to dashboard
+        return NextResponse.redirect(redirectUrl);
+    }
+
+    // 3. Allow request to proceed normally (Authenticated user on protected page, 
+    //    or Unauthenticated user on public page, or any unhandled case)
+    return NextResponse.next();
 }
 
 // ============================================================================
 // MIDDLEWARE CONFIGURATION
 // ============================================================================
 
-/**
- * Matcher configuration determines which routes trigger this middleware.
- * The pattern "/admin/:path*" matches:
- *   - /admin (the login page)
- *   - /admin/home (dashboard)
- *   - /admin/services (protected admin page)
- *   - /admin/any/nested/route (any admin route)
- * 
- * This ensures all admin-related routes go through authentication checks.
- */
 export const config = {
-  matcher: ["/admin/:path*", "/admin"],
+    // Matches the login page (/admin) and all routes under it (/admin/*)
+    matcher: ["/admin/:path*", "/admin"], 
 };

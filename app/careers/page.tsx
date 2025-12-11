@@ -9,34 +9,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-
-// --- Mock Data for the page (Replace with actual data fetching/CMS) ---
-const companyValues = [
-  {
-    icon: <Ship className="w-8 h-8 text-[#00FFFF]" />,
-    title: "Expertise in Motion",
-    description:
-      "We handle the world's most complex projects, requiring continuous learning and technical excellence.",
-  },
-  {
-    icon: <Globe className="w-8 h-8 text-[#00FFFF]" />,
-    title: "Global Collaboration",
-    description:
-      "Work with diverse teams and clients across six continents, connecting the world's major ports.",
-  },
-  {
-    icon: <Users className="w-8 h-8 text-[#00FFFF]" />,
-    title: "Safety & Integrity",
-    description:
-      "Our zero-incident safety record is paramount, built on a foundation of trust, responsibility, and adherence to global standards.",
-  },
-  {
-    icon: <Anchor className="w-8 h-8 text-[#00FFFF]" />,
-    title: "Future-Forward",
-    description:
-      "We are investing in modern fleets and sustainable logistics solutions for the next era of maritime transport.",
-  },
-];
+import Image from "next/image";
 
 const openPositions = [
   {
@@ -70,16 +43,9 @@ export default function CareersPage() {
       <Header />
       <main className="min-h-screen">
         {/* 1. HERO SECTION - Career Focus */}
-        <section
-          className="relative h-[60vh] overflow-hidden flex items-center bg-[#0A1C30]"
-          style={{
-            backgroundImage: "url('/images/careers_bg.jpg')", // You'll need an image for this
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        >
+        <section className="relative h-[60vh] overflow-hidden flex items-center bg-[#0A1C30]">
           {/* Overlay */}
-          <div className="absolute inset-0 bg-black/60"></div>
+          <div className="absolute inset-0"></div>
 
           <div className="custom-container z-10 text-white pt-16 md:pt-20">
             <p className="bg-white/50 border border-white/50 w-fit px-2 py-1 rounded-sm text-sm">
@@ -94,34 +60,6 @@ export default function CareersPage() {
               We seek visionary professionals to help us navigate the future of
               heavy lift and project cargo logistics.
             </p>
-          </div>
-        </section>
-
-        {/* 2. CULTURE & MISSION SECTION */}
-        <section className="py-20">
-          <div className="custom-container text-center max-w-5xl mx-auto">
-            <h2 className="text-4xl font-extrabold mb-4">
-              Our Anchor: Vision, Values, & Impact
-            </h2>
-            <p className="text-xl text-gray-700 max-w-3xl mx-auto mb-10">
-              Alta Maritime is more than logistics; we are an essential partner
-              in global industry, driven by a commitment to excellence, safety,
-              and innovation.
-            </p>
-
-            {/* Values Grid */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {companyValues.map((v, index) => (
-                <div
-                  key={index}
-                  className="flex flex-col items-center p-6 border rounded-lg shadow-sm hover:shadow-lg transition duration-300"
-                >
-                  <div className="mb-4">{v.icon}</div>
-                  <h3 className="font-bold text-lg mb-2">{v.title}</h3>
-                  <p className="text-sm text-gray-600">{v.description}</p>
-                </div>
-              ))}
-            </div>
           </div>
         </section>
 
@@ -169,9 +107,13 @@ export default function CareersPage() {
 
               {/* Image/Visual Placeholder */}
               <div className="lg:w-1/2 flex items-center justify-center">
-                <div className="w-full h-80 bg-gray-600 rounded-lg flex items-center justify-center text-gray-200">
-                  [Image Placeholder: Team Collaboration / Modern Vessel]
-                </div>
+                <Image
+                  src="/images/image1.jpeg"
+                  alt="image"
+                  width={100}
+                  height={100}
+                  className="w-full h-80 rounded-sm"
+                ></Image>
               </div>
             </div>
           </div>
@@ -216,21 +158,6 @@ export default function CareersPage() {
                 soon!
               </p>
             )}
-
-            {/* General Application CTA */}
-            <div className="mt-10">
-              <p className="mb-4 text-lg text-gray-700">
-                Don't see your perfect fit?
-              </p>
-              <button
-                className="border border-[#0A1C30] bg-white px-6 py-3 rounded-sm font-semibold whitespace-nowrap text-[#0A1C30] flex items-center gap-1 mx-auto transition-all duration-300 hover:bg-gray-100"
-                onClick={() => {
-                  router.push("/contact");
-                }}
-              >
-                Submit General Application <ArrowRight className="w-5 h-5" />
-              </button>
-            </div>
           </div>
         </section>
 
