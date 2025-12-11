@@ -220,6 +220,7 @@ export default function AboutPageEditor() {
               pageData={pageData}
               setPageData={setPageData}
               isLarge={true}
+              slug="about-us"
             />
           )}
           {/* Visual Placeholder (if no image is set) */}
@@ -265,6 +266,7 @@ export default function AboutPageEditor() {
                 pageData={pageData}
                 setPageData={setPageData}
                 isLarge={false}
+                slug="about-us"
               />
             )}
             {/* Fallback image (or the dynamically loaded one) */}
