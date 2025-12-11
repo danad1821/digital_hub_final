@@ -1,5 +1,6 @@
 // components/ShippingRoutes.js
 import { Polyline, Popup } from 'react-leaflet';
+import { LatLngTuple } from 'leaflet'; // 👈 1. IMPORT LatLngTuple
 
 // --- Define a list of colors to use for the routes ---
 const ROUTE_COLORS = [
@@ -18,7 +19,8 @@ const ROUTE_COLORS = [
  * Calculates a SMOOTH curved path using Quadratic Bézier interpolation.
  * The curve direction alternates based on the provided index.
  */
-const calculateCurvedPath = (start: number[], end: number[], index: number) => {
+// 👈 2. UPDATE RETURN TYPE: Use LatLngTuple[] instead of number[][]
+const calculateCurvedPath = (start: number[], end: number[], index: number): LatLngTuple[] => {
   const [lat1, lng1] = start;
   const [lat2, lng2] = end;
 
@@ -46,7 +48,8 @@ const calculateCurvedPath = (start: number[], end: number[], index: number) => {
   const peakLng = midLng + offsetMagnitude * Math.cos(offsetAngle);
 
   // 5. Generate multiple points for the smooth Bézier curve
-  const points: number[][] = [];
+  // TypeScript will now correctly treat this array as LatLngTuple[]
+  const points: LatLngTuple[] = []; 
   const numSegments = 10; 
 
   for (let i = 0; i <= numSegments; i++) {
@@ -63,7 +66,8 @@ const calculateCurvedPath = (start: number[], end: number[], index: number) => {
       2 * (1 - t) * t * peakLng + 
       Math.pow(t, 2) * lng2;
 
-    points.push([lat, lng]);
+    // TypeScript now knows this is a tuple [number, number]
+    points.push([lat, lng]); 
   }
 
   return points;
@@ -84,13 +88,13 @@ export default function ShippingRoutes({ activeLocation }: any) {
         // Use index to select a unique color and determine curve direction
         const routeColor = ROUTE_COLORS[index % ROUTE_COLORS.length];
         
-        // Pass the index to calculateCurvedPath
+        // curvedPath now has the correct type LatLngTuple[]
         const curvedPath = calculateCurvedPath(startPoint, endPoint, index);
 
         return (
           <Polyline
             key={index}
-            positions={curvedPath}
+            positions={curvedPath} // This line will now satisfy the type checker
             color={routeColor} 
             weight={4}
             opacity={0.8}
