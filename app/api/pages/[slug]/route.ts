@@ -11,7 +11,7 @@ import { PageDocument, ApiResponse } from '@/app/_types/PageData';
  */
 export async function GET(
     request: NextRequest, 
-    { params }: { params: { slug: string } }
+    { params }: { params: Promise<{ slug: string }> }
 ) {
     await connectToDatabase();
     const { slug } = await params;
@@ -35,7 +35,7 @@ export async function GET(
  */
 export async function PUT(
   request: Request,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   const { slug } = await params;
 

@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 import Message from "@/app/_models/Message";
 
-export async function PUT(request: Request, { params }: { params: { id: string } }){
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }){
     try {
         await connectToDatabase();
         const { id } = await params;
@@ -39,7 +39,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     }
 }
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
         const {id} = await params; 
         await connectToDatabase();
