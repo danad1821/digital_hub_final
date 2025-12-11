@@ -38,6 +38,7 @@ export async function GET(
       return new NextResponse("File not found", { status: 404 });
     }
 
+    // `file` is of type GridFSFile (or similar)
     const file = files[0];
 
     // 4. Create a stream to read from GridFS by ID
@@ -54,7 +55,8 @@ export async function GET(
 
     return new NextResponse(stream as any, {
       headers: {
-        "Content-Type": file.contentType || "image/jpeg",
+        // 👇 FIX: Access the contentType from the metadata object
+        "Content-Type": file.metadata?.contentType || "image/jpeg", 
         "Content-Disposition": `filename="${file.filename}"`,
       },
     });
