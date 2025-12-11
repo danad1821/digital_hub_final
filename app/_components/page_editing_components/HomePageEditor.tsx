@@ -448,7 +448,7 @@ export default function HomePageEditor() {
               className={`flex items-center px-4 py-2 rounded-md font-semibold transition-colors ${Cyan} `}
             >
               <Ship className="w-5 h-5 mr-2" />
-              Edit Services (Separate Page)
+              Edit Services 
             </button>
           </section>
 
@@ -639,7 +639,7 @@ export default function HomePageEditor() {
               className={`flex items-center px-4 py-2 rounded-md font-semibold transition-colors ${Cyan} `}
             >
               <Plus className="w-5 h-5 mr-2" />
-              Edit Gallery (Separate Page)
+              Edit Gallery 
             </button>
           </section>
 
@@ -684,7 +684,7 @@ export default function HomePageEditor() {
               className={`flex items-center px-4 py-2 rounded-md font-semibold transition-colors ${Cyan} `}
             >
               <Globe className="w-5 h-5 mr-2" />
-              Edit Locations (Separate Page)
+              Edit Locations 
             </button>
           </section>
 
@@ -729,7 +729,7 @@ export default function HomePageEditor() {
               className={`flex items-center px-4 py-2 rounded-md font-semibold transition-colors ${Cyan} `}
             >
               <UserCheck className="w-5 h-5 mr-2" />
-              Edit Contact Details (Separate Page)
+              Edit Contact Details 
             </button>
           </section>
         </form>

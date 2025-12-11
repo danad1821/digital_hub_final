@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import AboutPageEditor from "@/app/_components/page_editing_components/AboutPageEditor";
 import axios from "axios";
 import HomePageEditor from "@/app/_components/page_editing_components/HomePageEditor";
+import ServicesPageEditor from "@/app/_components/page_editing_components/ServicesPageEditor";
+import GalleryPageEditor from "@/app/_components/page_editing_components/GalleryPageEditor";
 export default function AdminEditPages(){
     const [pages, setPages] = useState([]);
     const [selectedPage, setselectedPage] = useState('home')
@@ -39,7 +41,9 @@ export default function AdminEditPages(){
             <>
                 {
                     selectedPage === "home" ? <HomePageEditor/>:
-                         selectedPage === "about-us" ? (<AboutPageEditor/>):(<></>)
+                         selectedPage === "about-us" ? (<AboutPageEditor/>):
+                         selectedPage === "services"? (<ServicesPageEditor/>):
+                         selectedPage ==="gallery"?(<GalleryPageEditor/>):(<></>)
                     
                 
                 }

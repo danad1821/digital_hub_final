@@ -58,48 +58,33 @@ export default function Home() {
     }
   };
 
-  const getHomePageData = async()=>{
-
-  }
+  const getHomePageData = async () => {
+    setIsLoading(true);
+    try {
+      // Assuming 'home' is the slug for the homepage
+      const response = await axios.get(`/api/pages/home`);
+      setPageData(response.data.data);
+      console.log("Home: ", response);
+    } catch (error) {
+      console.error("Error fetching home page data:", error);
+    }
+  };
 
   useEffect(() => {
     getAllImages();
     getAllServices();
+    getHomePageData();
     setIsLoading(false);
   }, []);
 
-  const companyStrengths = [
-    {
-      icon: <Globe />,
-      serviceName: "Global Coverage",
-      summary: "Strategic presence in major ports across six continents",
-    },
-    {
-      icon: <Clock />,
-      serviceName: "On-Time Delivery",
-      summary: "98% on-time performance with real-time tracking",
-    },
-    {
-      icon: <Ship />,
-      serviceName: "Heavy Lift Expertise",
-      summary: "30+ years specialized in oversized cargo handling",
-    },
-    {
-      icon: <CloudLightning />,
-      serviceName: "Modern Fleet",
-      summary: "State-of-the-art vessels and handling equipment",
-    },
-    {
-      icon: <Shield />,
-      serviceName: "Safety Standards",
-      summary: "ISO certified with zero-incident safety record",
-    },
-    {
-      icon: <Cog />,
-      serviceName: "Expert Team",
-      summary: "Dedicated logistics professionals available 24/7",
-    },
-  ];
+  
+  if (isLoading && !pageData) {
+    return (
+      <div className="flex justify-center items-center w-full h-screen">
+        <Loader2 className="w-10 h-10 text-[#00FFFF] animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <main className="min-h-screen">
@@ -112,7 +97,7 @@ export default function Home() {
       >
         {/* Background Image with better Next/Image usage */}
         <Image
-          src={homeImage}
+          src={`/api/images/${pageData?.sections[0].data.image_ref}`}
           alt="Large cargo ship sailing on the sea"
           fill // Fill the parent container
           priority // Load first as it's the hero image
@@ -130,7 +115,11 @@ export default function Home() {
           </p>
           {/* Main Title: Bigger, bolder, and more distinct */}
           <h1 className="text-5xl sm:text-6xl font-bold mb-4 tracking-tight flex flex-col">
-            <span>Moving the World's </span>
+            <span>
+              {pageData
+                ? pageData.sections[0].title.split(" ").slice(0, 3).join(" ")
+                : ""}{" "}
+            </span>
             <span
               className="gradient-text 
                    font-black 
@@ -139,34 +128,51 @@ export default function Home() {
                    from-[#00FFFF] 
                    to-[#0A1C30] pb-2"
             >
-              Heaviest Cargo
+              {pageData
+                ? pageData.sections[0].title.split(" ").slice(3).join(" ")
+                : ""}
             </span>
           </h1>
 
           {/* Subtitle/Mission Statement: Readable and impactful */}
           <p className="max-w-3xl text-lg sm:text-xl font-light leading-relaxed flex flex-col">
             <span>
-              Expert heavy lift solutions, break bulk shipping, and project
-              logistics{" "}
+              {pageData
+                ? pageData.sections[0].subtitle
+                    .split(" ")
+                    .slice(0, 11)
+                    .join(" ")
+                : ""}
             </span>
-            <span>delivering industrial cargo anywhere in the world.</span>
+            <span>
+              {pageData
+                ? pageData.sections[0].subtitle.split(" ").slice(11).join(" ")
+                : ""}
+            </span>
           </p>
           <div className="my-2 flex items-center gap-3 flex-wrap">
             <button
               className="border border-[#00FFFF] bg-[#00FFFF] px-5 py-2 rounded-sm font-semibold whitespace-nowrap text-[#0A1C30] flex items-center gap-1"
               onClick={() => {
-                router.push("/services");
+                const link = pageData
+                  ? pageData.sections[0].data.button1_link
+                  : "/services";
+                router.push(link);
               }}
             >
-              Explore Services <ArrowRight className="text-md" />
+              {pageData ? pageData.sections[0].data.button1_text : ""}{" "}
+              <ArrowRight className="text-md" />
             </button>
             <button
               className="px-5 py-2 rounded-sm font-semibold whitespace-nowrap text-white border border-white"
               onClick={() => {
-                router.push("/contact");
+                const link = pageData
+                  ? pageData.sections[0].data.button2_link
+                  : "/contact";
+                router.push(link);
               }}
             >
-              Contact Us
+              {pageData ? pageData.sections[0].data.button2_text : ""}
             </button>
           </div>
         </div>
@@ -178,7 +184,9 @@ export default function Home() {
             Since 1994
           </p>
           <h2 className="text-4xl sm:text-5xl font-extrabold flex flex-col my-2">
-            <span>Industrial Cargo</span>
+            <span>
+              {pageData?.sections[1].title.split(" ").slice(0, 2).join(" ")}
+            </span>
             <span
               className="gradient-text 
                    font-black 
@@ -187,38 +195,29 @@ export default function Home() {
                    from-[#00FFFF] 
                    to-[#0A1C30] pb-2"
             >
-              Expertise
+              {pageData?.sections[1].title.split(" ").slice(2).join(" ")}
             </span>
           </h2>
           <p className="text-md text-gray-700 mb-4">
-            Alta Maritime has been a trusted partner in global maritime
-            logistics for over three decades. We specialize in moving the
-            world's most challenging cargo—from heavy industrial machinery to
-            complete manufacturing facilities.
+            {pageData?.sections[1].subtitle.split(".").slice(0, 2).join(". ")}.
           </p>
           <p className="text-md text-gray-700 mb-4">
-            Our comprehensive network spans major ports worldwide, supported by
-            cutting-edge equipment and a team of logistics professionals who
-            understand the complexity of break bulk and project cargo.
+            {pageData?.sections[1].subtitle.split(".").slice(2).join(". ")}
           </p>
           <div className="flex item-center gap-5">
-            <div className="py-3">
-              <h3 className="text-[#00FFFF] text-3xl font-medium">30+</h3>
-              <p className="text-md text-gray-500">Years Experience</p>
-            </div>
-            <div className="py-3">
-              <h3 className="text-[#00FFFF] text-3xl font-medium">2000+</h3>
-              <p className="text-md text-gray-500">Projects Delivered</p>
-            </div>
-            <div className="py-3">
-              <h3 className="text-[#00FFFF] text-3xl font-medium">45</h3>
-              <p className="text-md text-gray-500">Global Ports</p>
-            </div>
+            {pageData?.sections[1].data.stats_list.map((s: any) => (
+              <div className="py-3" key={s.label}>
+                <h3 className="text-[#00FFFF] text-3xl font-medium">
+                  {s.value}
+                </h3>
+                <p className="text-md text-gray-500">{s.label}</p>
+              </div>
+            ))}
           </div>
         </div>
         <div className="relative min-w-1/2 min-h-full">
           <Image
-            src="/images/image2.jpeg"
+            src={`/api/images/${pageData?.sections[1].data.image_ref}`}
             alt="industry"
             width={200}
             height={200}
@@ -231,11 +230,10 @@ export default function Home() {
       <section className=" py-20 bg-gray-50">
         <div className="custom-container">
           <h2 className="text-4xl lg:text-5xl font-bold text-center mb-4">
-            Our Services
+            {pageData?.sections[2].title}
           </h2>
           <p className="text-center mb-8 text-gray-400">
-            Comprehensive maritime logisitcs solutions tailored for the complex
-            industrial cargo
+            {pageData?.sections[2].subtitle}
           </p>
           {isLoading && (
             <div className="flex justify-center items-center h-48">
@@ -244,7 +242,11 @@ export default function Home() {
           )}
           <div className="flex flex-wrap gap-5 items-center justify-evenly">
             {services.slice(0, 6).map((s: any, index: any) => (
-              <HomeInfoCard key={s.serviceName} service={s} icon={icons[index]} />
+              <HomeInfoCard
+                key={s.serviceName}
+                service={s}
+                icon={icons[index]}
+              />
             ))}
           </div>
         </div>
@@ -253,10 +255,10 @@ export default function Home() {
       <section className=" py-20 ">
         <div className="custom-container">
           <h2 className="text-4xl lg:text-5xl font-bold text-center mb-4">
-            Operations Gallery
+            {pageData?.sections[4].title}
           </h2>
           <p className="text-center mb-8 text-gray-400">
-            See our capabilities in action across global maritime operations
+            {pageData?.sections[4].subtitle}
           </p>
           {isLoading && (
             <div className="flex justify-center items-center h-48">
@@ -285,14 +287,22 @@ export default function Home() {
       <section className=" py-20 bg-gray-50">
         <div className="custom-container">
           <h2 className="text-4xl lg:text-5xl font-bold text-center mb-4">
-            Why Choose Alta Maritime
+            {pageData?.sections[3].title}
           </h2>
           <p className="text-center mb-8 text-gray-400">
-            Industry-leading capabilities backed by decades of expertise
+            {pageData?.sections[3].subtitle}
           </p>
           <div className="flex flex-wrap gap-5 items-center justify-evenly">
-            {companyStrengths.map((s: any) => (
-              <HomeInfoCard key={s.serviceName} service={s} icon={s.icon} />
+            {pageData?.sections[3].data.cards.map((s: any) => (
+              <HomeInfoCard
+                key={s.name}
+                service={{
+                  serviceName: s.name,
+                  summary: s.description,
+                  icon: s.icon,
+                }}
+                icon={s.icon}
+              />
             ))}
           </div>
         </div>
@@ -301,25 +311,23 @@ export default function Home() {
       <section className=" py-20 bg-[#0A1C30]">
         <div className="custom-container">
           <h2 className="text-4xl lg:text-5xl font-bold text-center mb-4 text-white">
-            Global Coverage
+            {pageData?.sections[5].title}
           </h2>
           <p className="text-center mb-8 text-gray-400">
-            Strategically positioned across six continents to serve your
-            logistics needs worldwide
+            {pageData?.sections[5].subtitle}
           </p>
 
-          <InteractiveMap/>
+          <InteractiveMap />
         </div>
       </section>
 
       <section className="py-20 ">
         <div className="custom-container">
           <h2 className="text-4xl lg:text-5xl font-bold text-center mb-4">
-            Get In Touch
+            {pageData?.sections[6].title}
           </h2>
           <p className="text-center mb-8 text-gray-400">
-            Ready to discuss your project? Contact us for a consultation and
-            quote
+            {pageData?.sections[6].subtitle}
           </p>
           <div className="flex flex-wrap justify-center items-center">
             <div className="min-w-1/2">
