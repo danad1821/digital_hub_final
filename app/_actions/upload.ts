@@ -40,8 +40,14 @@ export async function uploadImage(formData: FormData): Promise<UploadResult> {
 
   // 5. Upload using a Promise wrapper
   const uploadPromise: Promise<Types.ObjectId> = new Promise((resolve, reject) => {
+    // ------------------------------------------------------------------
+    // 👇 CRITICAL FIX: Wrap 'contentType' inside a 'metadata' object.
+    // This satisfies the GridFSBucketWriteStreamOptions type check.
+    // ------------------------------------------------------------------
     const uploadStream = bucket.openUploadStream(file.name, {
-      contentType: file.type || 'binary/octet-stream',
+      metadata: { // Added metadata object
+        contentType: file.type || 'binary/octet-stream',
+      },
     });
 
     const readStream = Readable.from(buffer);
@@ -66,4 +72,3 @@ export async function uploadImage(formData: FormData): Promise<UploadResult> {
     return { success: false, error: errorMessage };
   }
 }
-
