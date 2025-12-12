@@ -10,10 +10,28 @@ import { ArrowRight, Loader2, Mail, Phone, Pin } from "lucide-react";
 import { LuShip } from "react-icons/lu";
 import { useRouter } from "next/navigation";
 import { getAllGalleryImages } from "./_actions/gallery";
-import InteractiveMap from "./_components/InteractiveMap";
+// REMOVED: import InteractiveMap from "./_components/InteractiveMap";
 import { IoCalendarClearOutline } from "react-icons/io5";
 
 import { motion, useScroll, useTransform } from "framer-motion";
+
+// --- START: Dynamic Import for InteractiveMap (THE FIX) ---
+import dynamic from "next/dynamic";
+
+const DynamicInteractiveMap = dynamic(
+  () => import('./_components/InteractiveMap'),
+  {
+    // THIS IS THE CRITICAL FIX: prevents the map component from running on the server
+    ssr: false, 
+    loading: () => (
+      <div className="flex justify-center items-center w-full h-96 bg-gray-100 rounded-sm">
+        <Loader2 className="w-8 h-8 text-[#0A1C30] animate-spin" />
+      </div>
+    ),
+  }
+);
+// --- END: Dynamic Import ---
+
 
 export default function Home() {
   const router = useRouter();
@@ -474,8 +492,8 @@ export default function Home() {
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            {/* Assuming InteractiveMap component handles its own responsive sizing */}
-            <InteractiveMap />
+            {/* CORRECTED: Use the dynamically imported component */}
+            <DynamicInteractiveMap />
           </motion.div>
         </div>
       </section>
