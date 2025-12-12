@@ -11,42 +11,59 @@ interface Service {
   summary: string;
 }
 
-export default function HomeInfoCard({ service, icon }: { service: Service, icon: any }) {
+export default function HomeInfoCard({
+  service,
+  icon,
+}: {
+  service: Service;
+  icon: any;
+}) {
   const router = useRouter();
   return (
     <div
       className="
+      text-grey-800
       bg-white 
       rounded-sm 
       p-6 
-      shadow-md 
-      hover:shadow-xl 
+      shadow-lg 
+      hover:shadow-2xl 
       transition 
       duration-300 
       hover:-translate-y-1 
-      h-full
+      w-[300px] h-[300px]
+
+      lg:w-[350px] lg:h-[300px]
+      
       flex flex-col
-      w-[300px]
+      hover:text-[#00D9FF]
     "
     >
       <div
         className="
         bg-gradient-to-br from-blue-300 to-indigo-600 
         text-white
-        w-12 
-        h-12 
+        w-18
+        h-18 
         flex 
         items-center 
         justify-center 
         rounded-sm 
         mb-4 
-        text-2xl
+        text-3xl
+        
+        transition duration-300 hover:rotate-6
       "
       >
         {icon}
       </div>
-      <h3 className="text-xl font-bold text-gray-800 mb-2">{service.serviceName}</h3>
-      <p className="text-gray-600 leading-relaxed text-base">{service.summary}</p>
+      <h3 className="text-2xl font-bold mb-4 ">
+        {service.serviceName}
+      </h3>
+      {/* Set the summary text to use remaining space and manage overflow */}
+      <p className=" text-lg text-gray-600 leading-relaxed text-base overflow-hidden text-ellipsis grow">
+        {service.summary}
+      </p>
     </div>
   );
 }

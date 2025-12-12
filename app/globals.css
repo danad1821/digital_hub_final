@@ -1,11 +1,12 @@
+@import 'leaflet/dist/leaflet.css';
 @import "tailwindcss";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root{
-    --primary-color: #0A1C30;
-    --secondary-color: #333333;
+    --cyan: #00D9FF;
+    --muted-blue: #4A6FA5;
     --tertiary-color: #FF6B00;
 }
 
@@ -27,12 +28,12 @@ footer{
 }
 
 .custom-container{
-  width: 75%;
+  width: 90%;
   margin: 0 auto;
 }
 
 header{
-    padding: 10px 0;
+    padding: 25px 0;
 }
 
 .service-card{
@@ -49,10 +50,11 @@ button{
 
 .gradient-text {
             /* This is equivalent to Tailwind's 'bg-clip-text' */
-            -webkit-background-clip: text;
-            background-clip: text;
-            /* Hide the actual text color so the gradient shows through */
-            color: transparent;
+            
+            background: linear-gradient(135deg, var(--cyan) 0%, var(--muted-blue) 100%);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+background-clip: text;
         }
 
 
@@ -60,4 +62,31 @@ button{
   .custom-container{
     width: 90%;
   }
+}
+
+/* --- Custom CSS for the Pulsing Wave Effect --- */
+
+/* 1. Define the animation */
+@keyframes pulse-wave {
+    0% {
+        transform: scale(0.8);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(2.2);
+        opacity: 0;
+    }
+}
+
+/* 2. Apply the animation with different delays for staggering */
+.animate-wave-1 {
+    animation: pulse-wave 2.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.animate-wave-2 {
+    animation: pulse-wave 2.5s cubic-bezier(0, 0, 0.2, 1) infinite 0.8s; /* 0.8s delay */
+}
+
+.animate-wave-3 {
+    animation: pulse-wave 2.5s cubic-bezier(0, 0, 0.2, 1) infinite 1.6s; /* 1.6s delay */
 }

@@ -3,7 +3,7 @@
 import axios from "axios";
 import PendingMessagesTable from "@/app/_components/PendingMessagesTable";
 import AllMessagesTable from "@/app/_components/AllMessagesTable";
-import MessageModal from "@/app/_components/MessageModal";
+import MessageModal from "@/app/_components/modals/MessageModal";
 
 import { useState, useEffect, useCallback } from "react";
 

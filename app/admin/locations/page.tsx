@@ -3,8 +3,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { Plus } from 'lucide-react';
 import axios from 'axios'; 
 
-import AddLocationModal from '@/app/_components/AddLocationModal';
-import LocationCard, { Location } from '@/app/_components/LocationCard'; // Import LocationCard and Location type
+import AddLocationModal from '@/app/_components/modals/AddLocationModal';
+
+import LocationCard, { Location } from '@/app/_components/cards/LocationCard'; // Import LocationCard and Location type
 
 export default function AdminLocations() {
     const [isModalOpen, setIsModalOpen] = useState(false);

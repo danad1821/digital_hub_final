@@ -2,8 +2,8 @@
 
 import { getAllGalleryImages } from '@/app/_actions/gallery';
 import { GalleryImageDocument } from '@/app/_models/GalleryImage';
-import GalleryImageCard from '@/app/_components/GalleryImageCard';
-import AddImageModal from '@/app/_components/AddImageModal';
+import GalleryImageCard from '@/app/_components/cards/GalleryImageCard';
+import AddImageModal from '@/app/_components/modals/AddImageModal';
 import { useEffect, useState, useCallback } from 'react';
 
 export default function AdminGallery() {

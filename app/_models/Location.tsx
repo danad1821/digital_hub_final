@@ -37,12 +37,6 @@ const locationSchema = new mongoose.Schema({
     required: true,
   },
 
-  // An array of destinations this location connects to.
-  // This uses the nested destinationSchema.
-  destinations: {
-    type: [destinationSchema],
-    default: [], // Default to an empty array if no routes are defined
-  },
 
 }, { 
   timestamps: true // Adds createdAt and updatedAt fields

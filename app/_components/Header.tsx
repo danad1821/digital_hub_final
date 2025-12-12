@@ -47,7 +47,7 @@ const MobileSidebar = ({
             {NAV_LINKS.map((link) => (
               <li
                 key={link.name}
-                className="text-lg font-medium py-2 border-b border-gray-100"
+                className="text-lg py-2 border-b border-gray-100"
               >
                 <Link
                   href={link.href}
@@ -94,10 +94,10 @@ export default function Header() {
 
   // --- Dynamic Classes Configuration ---
   const baseClasses =
-    "py-4 flex items-center w-full px-0 sticky top-0 z-50 transition-all duration-300 ease-in-out ";
+    "py-15 flex items-center w-full px-0 sticky top-0 z-50 transition-all duration-300 ease-in-out ";
 
   // State 1 (Transparent): Transparent BG, White Text
-  const transparentStateClasses = "bg-transparent text-black shadow-none";
+  const transparentStateClasses = "bg-transparent text-white shadow-none";
 
   // State 2 (Scrolled): White BG, Dark Text, Shadow
   const solidStateClasses = "bg-white shadow-md text-black";
@@ -110,7 +110,7 @@ export default function Header() {
         <ul className="list-none w-full flex justify-between items-center">
           {/* Logo/Site Title */}
           <li
-            className={`text-2xl font-medium transition-colors duration-300 ${scrolled ? "text-black" : "text-black"}`}
+            className={`text-2xl font-medium transition-colors duration-300 ${scrolled ? "text-black" : "text-white"}`}
           >
             ALTA MARITIME
           </li>
@@ -122,16 +122,16 @@ export default function Header() {
               const isCTA = link.name === 'Get Quote';
 
               // 1. Define base classes for regular links (depends on scroll state)
-              const regularLinkClasses = `font-medium transition duration-150 ${
-                scrolled ? "text-gray-700 hover:text-blue-600" : "text-black hover:text-gray-300"
+              const regularLinkClasses = `transition duration-150 ${
+                scrolled ? "text-gray-700 hover:text-[#00D9FF]" : "text-white hover:text-[#00D9FF]"
               }`;
               
               // 2. Define classes for the CTA button (always solid, but colors might adjust slightly)
               const ctaClasses = `
-                px-5 py-2 rounded-sm font-semibold whitespace-nowrap
+                px-5 py-2 rounded-sm whitespace-nowrap
                 ${scrolled 
-                  ? 'bg-[#00FFFF] text-black hover:bg-[#00FFFF]' // Darker blue on white background
-                  : 'bg-[#00FFFF] text-black hover:bg-[#00FFFF]' // Same button, but add a slight border when transparent
+                  ? 'bg-[#00D9FF] text-black hover:bg-[#00D9FF]' // Darker blue on white background
+                  : 'bg-[#00D9FF] text-black hover:bg-[#00D9FF]' // Same button, but add a slight border when transparent
                 }
               `;
 

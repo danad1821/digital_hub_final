@@ -4,6 +4,7 @@ const galleryImageSchema = new mongoose.Schema(
   {
     // This is the reference to the file stored in GridFS
     image: { type: mongoose.Schema.Types.ObjectId, required: true },
+    title: {type: String, required: true}
   },
   {
     timestamps: true,

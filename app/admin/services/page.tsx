@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect, useMemo, useCallback } from "react";
-import AddServiceModal from "@/app/_components/AddServiceModal";
-import ServiceCard from "@/app/_components/ServiceCard";
+import AddServiceModal from "@/app/_components/modals/AddServiceModal";
+import ServiceCard from "@/app/_components/cards/ServiceCard";
 import { Plus, Search } from "lucide-react";
 import axios from "axios";
 

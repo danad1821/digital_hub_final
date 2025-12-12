@@ -16,7 +16,14 @@ export async function addGalleryImage(
 ): Promise<GalleryImageDocument | { error: string }> {
   await connectToDatabase();
 
-  // 1. Upload the file to GridFS first
+  // 1. Extract and Validate the Title
+  const title = formData.get('title') as string;
+
+  if (!title || typeof title !== 'string' || !title.trim()) {
+    return { error: "A valid title is required." };
+  }
+
+  // 2. Upload the file to GridFS first
   const uploadResult = await uploadImage(formData);
 
   if (!uploadResult.success || !uploadResult.fileId) {
@@ -24,16 +31,18 @@ export async function addGalleryImage(
   }
 
   try {
-    // 2. Create the Mongoose document referencing the new GridFS file ID
+    // 3. Create the Mongoose document referencing the new GridFS file ID AND the Title
     const newImage = await GalleryImage.create({
+      title: title, // <--- Save the title here
       image: new Types.ObjectId(uploadResult.fileId),
     });
 
     // The document is now created and linked to the image data
-    return JSON.parse(JSON.stringify(newImage)); // Return plain object for client component use
+    return JSON.parse(JSON.stringify(newImage)); 
   } catch (e) {
     // If the document creation fails, clean up the orphaned GridFS file
     await deleteGridFsFile(new Types.ObjectId(uploadResult.fileId));
+    console.error("Database creation error:", e); // Helpful for debugging
     return { error: "Failed to create database entry." };
   }
 }

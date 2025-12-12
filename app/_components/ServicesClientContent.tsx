@@ -5,7 +5,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import axios from "axios";
 // Remove Loader2 and Header imports as they are used by the wrapper
 import { useSearchParams } from "next/navigation";
-import ServiceClientCard from "../_components/ServiceClientCard";
+import ServiceClientCard from "./cards/ServiceClientCard";
 
 interface ServiceItem {
   name: string;

@@ -77,7 +77,7 @@ const CoreValuesEditor = ({ sectionIndex, pageData, setPageData }: any) => {
             </button>
             
             {coreValuesData.values.map((val: CoreValue) => (
-                <div key={val.key} className='border border-gray-300 p-4 mb-4 rounded-sm bg-white shadow-sm'>
+                <div key={val.key} className='border border-gray-300 p-4 mb-4 rounded-sm bg-white shadow-sm text-black'>
                     <div className='flex justify-between items-center mb-2'>
                         <h5 className='text-base font-bold text-gray-800'>{val.name || 'Untitled Value'}</h5>
                         <button type="button" onClick={() => removeCoreValue(val.key)} className='text-red-600 text-sm hover:text-red-800 transition-colors'>

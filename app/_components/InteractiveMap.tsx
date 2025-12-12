@@ -1,52 +1,19 @@
+// components/InteractiveMap.tsx
 "use client";
-import dynamic from 'next/dynamic';
-import { useState, useEffect, useCallback, useMemo } from 'react'; // Added useMemo
-import axios from 'axios'; 
+import { useState, useEffect, useCallback } from 'react';
+import axios from 'axios';
+import DynamicShippingMap from './DynamicShippingMap';
+import { Location } from './PortMarker'; // Import Location type from the PortMarker file
 
-// --- TYPES ---
-type Destination = {
-  lat: number;
-  lng: number;
-  name: string;
-};
-
-// Define a common Location type for consistency
-export type Location = {
-  _id: string; // Crucial: Use string for MongoDB ID
-  name: string;
-  address: string;
-  lat: number;
-  lng: number;
-  destinations?: Destination[];
-};
-
-// Map constants
-export const initialCenter: [number, number] = [35.5, 19.5]; 
-
-// Define a clean, empty initial state object using the new _id type.
-const initialActiveLocation: Location = { 
-    _id: '', 
-    name: '', 
-    address: '', 
-    lat: 0, 
-    lng: 0,
-    destinations: [] 
-};
-// --- END TYPES ---
-
-
-const DynamicMap = dynamic(
-  () => import('./ShippingMap'),
-  { ssr: false } 
-);
-
+// Note: Removed initialActiveLocation
+// Note: Removed type export for Location if it was here
 
 export default function InteractiveMap() {
   const [locations, setLocations] = useState<Location[]>([]); 
-  const [activeLocation, setActiveLocation] = useState<Location>(initialActiveLocation);
+  // REMOVED: activeLocation state
   const [isLoading, setIsLoading] = useState(true); 
 
-  // Function to fetch the location data from the API (Memoized with useCallback)
+  // Data fetching logic remains the same
   const fetchLocations = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -57,58 +24,36 @@ export default function InteractiveMap() {
     } finally {
         setIsLoading(false);
     }
-  }, []); // Stable function
+  }, []); 
 
   useEffect(() => {
     fetchLocations();
   }, [fetchLocations]);
 
-  // Memoized function for clearing the active location
-  const clearActiveLocation = useCallback(() => {
-      setActiveLocation(initialActiveLocation);
-  }, []); // Stable function
+  // REMOVED: changeActiveLocation and clearActiveLocation functions entirely
 
-  // OPTIMIZATION: Use useMemo to derive the active status based on activeLocation._id
-  // This ensures the value is only recalculated if activeLocation changes.
-  const isLocationActive = useMemo(() => {
-    return !!(activeLocation && activeLocation._id); 
-  }, [activeLocation]); 
+  const globalPortsCount = locations.length;
 
   return (
-    <div className="flex flex-col h-screen relative">
-      <div className="bg-gray-800 absolute bottom-10 left-10 z-[1000] text-white p-4 shadow-md flex justify-between items-center rounded-sm">
-        {/* The condition now uses the memoized value */}
-        {isLocationActive ? (
-          <div className="flex items-center space-x-4">
-            <span className="text-sm">
-              <b>Active Hub:</b> {activeLocation.name}
-            </span>
-            <button
-              onClick={clearActiveLocation} // Uses memoized clear function
-              className="px-3 py-1 text-xs bg-red-600 hover:bg-red-700 rounded transition duration-150 font-medium"
-              aria-label="Clear active shipping route"
-            >
-              Clear Route
-            </button>
-          </div>
-        ) : (
-          <span className="text-sm text-gray-400">
-            {isLoading 
-                ? 'Loading map data...' 
-                : 'Click a pin on the map to view its global shipping routes.'}
-          </span>
-        )}
+    <div className="flex flex-col relative w-full aspect-[2/1] bg-gray-900 rounded-sm overflow-hidden">
+      
+      {/* 🚢 GLOBAL PORTS COUNT & LIVE TRACKING LABEL */}
+      <div className="absolute top-4 left-4 z-10 text-white p-2">
+        <span className="text-gray-400 text-sm">Global Ports</span>
+        <div className="text-4xl font-light text-[#00D9FF]">{globalPortsCount}</div>
       </div>
+      
+      <div className="absolute top-4 right-4 z-10 text-white p-2 flex items-center">
+        <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
+        <span className="text-xs uppercase">Live Tracking</span>
+      </div>
+
 
       <div className="flex-grow z-2">
         {!isLoading && locations.length > 0 ? (
-            <DynamicMap
-                center={initialCenter}
-                zoom={4}
+            <DynamicShippingMap
                 locations={locations} 
-                activeLocation={activeLocation}
-                // Ensure setActiveLocation is strongly typed
-                setActiveLocation={setActiveLocation as (loc: Location) => void} 
+                // REMOVED: activeLocation, setActiveLocation, clearActiveLocation props
             />
         ) : (
             <div className="flex items-center justify-center h-full text-gray-700">

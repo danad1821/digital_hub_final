@@ -2,7 +2,7 @@
 "use client";
 import { useState } from 'react';
 import { Edit, Trash2, MapPin, Anchor, ChevronDown, ChevronUp, Loader } from 'lucide-react';
-import EditLocationModal from './EditLocationModal'; // Will create this next
+import EditLocationModal from '../modals/EditLocationModal';
 
 // Define the shape of the data for better type safety
 interface Destination {

@@ -9,8 +9,9 @@ interface AddImageModalProps {
 }
 
 export default function AddImageModal({ onClose }: AddImageModalProps) {
-  // State for managing the file input and messages
+  // State for managing inputs and messages
   const [file, setFile] = useState<File | null>(null);
+  const [title, setTitle] = useState<string>(''); // <--- New Title State
   const [message, setMessage] = useState<string>('');
   const [isPending, startTransition] = useTransition();
   
@@ -21,14 +22,20 @@ export default function AddImageModal({ onClose }: AddImageModalProps) {
     e.preventDefault();
     setMessage('');
 
+    // Validation: Check for both File and Title
     if (!file) {
       setMessage('Please select an image file to upload.');
       return;
     }
+    if (!title.trim()) {
+      setMessage('Please enter a title for the image.');
+      return;
+    }
 
-    // Create FormData object and append the file
+    // Create FormData object and append data
     const formData = new FormData();
     formData.append('image', file);
+    formData.append('title', title); // <--- Append Title to FormData
     
     // Start the server action
     startTransition(async () => {
@@ -38,11 +45,14 @@ export default function AddImageModal({ onClose }: AddImageModalProps) {
         setMessage(`Upload Failed: ${result.error}`);
       } else {
         setMessage('Image uploaded and added to gallery successfully!');
-        setFile(null); // Clear file state
+        
+        // Reset states
+        setFile(null);
+        setTitle(''); // <--- Clear Title
         if (fileInputRef.current) {
-            fileInputRef.current.value = ''; // Reset the native file input element
+            fileInputRef.current.value = '';
         }
-        // You can automatically close the modal here if desired:
+        
         setTimeout(onClose, 2000); 
       }
     });
@@ -72,6 +82,23 @@ export default function AddImageModal({ onClose }: AddImageModalProps) {
           </h3>
 
           <form onSubmit={handleSubmit}>
+            
+            {/* New Title Input */}
+            <div className="mb-4">
+              <label htmlFor="imageTitle" className="block text-gray-300 mb-2 font-medium">
+                Image Title:
+              </label>
+              <input
+                type="text"
+                id="imageTitle"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                disabled={isPending}
+                placeholder="Enter a title..."
+                className="w-full bg-gray-700 text-white placeholder-gray-400 border border-gray-600 rounded px-3 py-2 focus:outline-none focus:border-[#00FFFF] transition"
+              />
+            </div>
+
             {/* File Input */}
             <div className="mb-4">
               <label htmlFor="imageFile" className="block text-gray-300 mb-2 font-medium">
@@ -90,7 +117,7 @@ export default function AddImageModal({ onClose }: AddImageModalProps) {
 
             {/* Status Message */}
             {message && (
-              <p className={`mb-4 text-sm font-semibold ${message.startsWith('Upload Failed') ? 'text-red-400' : 'text-[#00FFFF]'}`}>
+              <p className={`mb-4 text-sm font-semibold ${message.startsWith('Upload Failed') || message.startsWith('Please') ? 'text-red-400' : 'text-[#00FFFF]'}`}>
                 {message}
               </p>
             )}
@@ -98,9 +125,9 @@ export default function AddImageModal({ onClose }: AddImageModalProps) {
             {/* Submission Button */}
             <button
               type="submit"
-              disabled={isPending || !file}
+              disabled={isPending || !file || !title.trim()} 
               className={`w-full bg-[#00FFFF] text-[#11001C] py-2 rounded font-semibold transition ${
-                isPending || !file
+                isPending || !file || !title.trim()
                   ? 'opacity-60 cursor-not-allowed'
                   : 'hover:opacity-90'
               }`}
@@ -114,7 +141,7 @@ export default function AddImageModal({ onClose }: AddImageModalProps) {
             onClick={onClose}
             disabled={isPending}
             className={`w-full mt-3 bg-gray-700 text-gray-300 py-2 rounded font-semibold transition ${
-                isPending ? 'opacity-60 cursor-not-allowed' : 'hover:bg-gray-600'
+              isPending ? 'opacity-60 cursor-not-allowed' : 'hover:bg-gray-600'
             }`}
           >
             Cancel

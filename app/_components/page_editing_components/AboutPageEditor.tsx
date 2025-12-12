@@ -2,42 +2,51 @@
 
 "use client";
 
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { Loader2, ArrowRight, Trash2, Upload, X } from "lucide-react";
+import {
+  Loader2,
+  Save, // Use Save from lucide-react, like in HomePageEditor
+  Anchor, // Use a relevant icon for the header
+  Eye, // Placeholder icon for Vision/Mission
+  Layers3, // Placeholder icon for Core Values
+} from "lucide-react";
 import Image from "next/image";
+// NOTE: Make sure the paths below are correct in your project structure
 import ImageEditor from "@/app/_components/ImageEditor";
 import CoreValuesEditor from "@/app/_components/CoreValuesEditor";
-import ValueCard from "../ValueCard";
+// NOTE: You must ensure ValueCard is imported correctly or re-implemented
+// import ValueCard from "../ValueCard"; 
 
-// Assuming the correct path to your types and HomeInfoCard
+// Assuming the correct path to your types
 import {
   PageDocument,
   CoreValue,
   ApiResponse,
   PageSection,
 } from "@/app/_types/PageData";
-// import HomeInfoCard from "@/app/_components/HomeInfoCard";
 
 // --- Utility Functions (Keep these the same) ---
 const findSectionIndex = (data: PageDocument, type: string) =>
-  data.sections.findIndex((s) => s.type === type);
-
-// Utility for creating the gradient title class (replicated from client)
-const gradientTitleClasses = `
-    gradient-text
-    font-black
-    tracking-tight
-    bg-gradient-to-r
-    from-[#00FFFF]
-    to-[#0A1C30] pb-2
-`;
+  data?.sections.findIndex((s) => s.type === type);
 
 export default function AboutPageEditor() {
-  const [pageData, setPageData] = useState<PageDocument | null>(null);
+  const [pageData, setPageData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+
+  // --- Theme/Style Variables from HomePageEditor ---
+  const Navy = "bg-gray-800 text-white";
+  const Cyan = "bg-cyan-600 hover:bg-cyan-700 text-white";
+  const InputStyle =
+    "p-2 mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md focus:ring-cyan-500 focus:border-cyan-500 transition duration-150 text-white"; // Added text-white
+  const SectionHeaderStyle =
+    "text-2xl font-bold border-b border-cyan-600/50 pb-2 mb-4 text-cyan-400";
+  const CardStyle =
+    "p-6 bg-gray-700 rounded-lg shadow-xl border border-gray-600"; // Increased padding/shadow for better look
+
+  // --- State Update Handlers (Centralized for consistency) ---
 
   const handleSectionDataChange = (
     sectionIndex: number,
@@ -47,37 +56,52 @@ export default function AboutPageEditor() {
     setPageData((prevData: any) => {
       if (!prevData) return null;
       const newSections = [...prevData.sections];
-      newSections[sectionIndex] = {
-        ...newSections[sectionIndex],
-        data: { ...newSections[sectionIndex].data, [key]: value },
-      };
+      const targetSection = newSections[sectionIndex];
+      
+      if (!targetSection) return prevData;
+
+      // Check if it's a direct section property (like title/subtitle in HomePageEditor)
+      if (key === "title" || key === "subtitle") {
+        (targetSection as any)[key] = value;
+      } else {
+        // Assume it's a property of the 'data' object
+        targetSection.data = { ...targetSection.data, [key]: value };
+      }
+
       return { ...prevData, sections: newSections };
     });
   };
 
+
   const handleNestedSectionChange = (
     sectionIndex: number,
-    primaryKey: string,
-    subKey: string,
+    primaryKey: string, // e.g., 'vision' or 'mission'
+    subKey: string, // e.g., 'title' or 'text'
     value: string
   ) => {
     setPageData((prevData: any) => {
       if (!prevData) return null;
-      const newSections = [...prevData.sections];
+      const newSections = [...prevData?.sections];
       const section = newSections[sectionIndex];
+
+      // Deep copy and update the nested object (vision or mission)
+      const newNestedItem = {
+        ...section.data[primaryKey],
+        [subKey]: value,
+      };
 
       newSections[sectionIndex] = {
         ...section,
         data: {
           ...section.data,
-          [primaryKey]: { ...section.data[primaryKey], [subKey]: value },
+          [primaryKey]: newNestedItem,
         },
       };
       return { ...prevData, sections: newSections };
     });
   };
 
-  // --- Data Fetching and Saving (Unmodified) ---
+  // --- Data Fetching and Saving (Unmodified logic) ---
   useEffect(() => {
     const fetchPageData = async () => {
       try {
@@ -91,7 +115,7 @@ export default function AboutPageEditor() {
         const dataWithKeys = ensureKeys(result.data);
         setPageData(dataWithKeys);
       } catch (err: any) {
-        setMessage(`Error loading content: ${err.message}`);
+        setMessage(`❌ Error loading content: ${err.message}`);
       } finally {
         setLoading(false);
       }
@@ -143,104 +167,116 @@ export default function AboutPageEditor() {
   };
 
   // --- Render Logic Setup ---
-  if (loading)
-    return (
-      <main className="p-8">
-        <Loader2 className="animate-spin w-8 h-8 mr-2 inline-block" /> Loading
-        editable content...
-      </main>
-    );
-  if (!pageData)
-    return (
-      <main className="p-8">
-        <p>No page data found.</p>
-      </main>
-    );
+  const heroIndex = findSectionIndex(pageData as PageDocument, "hero");
+  const vmIndex = findSectionIndex(
+    pageData as PageDocument,
+    "vision_mission"
+  );
+  const cvIndex = findSectionIndex(pageData as PageDocument, "core_values");
 
-  const heroIndex = findSectionIndex(pageData, "hero");
-  const vmIndex = findSectionIndex(pageData, "vision_mission");
-  const cvIndex = findSectionIndex(pageData, "core_values");
-
-  // Default values if section is missing (to prevent crashes)
-  const heroData = heroIndex !== -1 ? pageData.sections[heroIndex].data : {};
+  // Default values for safety
+  const heroData =
+    heroIndex !== -1 ? (pageData?.sections[heroIndex].data || {}) : {};
   const vmData =
     vmIndex !== -1
-      ? pageData.sections[vmIndex].data
+      ? (pageData?.sections[vmIndex].data || { vision: {}, mission: {} })
       : { vision: {}, mission: {} };
   const cvData =
     cvIndex !== -1
-      ? pageData.sections[cvIndex].data
+      ? (pageData?.sections[cvIndex].data || {
+          title: "",
+          intro_text: "",
+          values: [],
+        })
       : { title: "", intro_text: "", values: [] };
 
-  // Determine preview image sources
-  const heroImageSrc =
-    heroData.image_ref && !heroData.image_ref.startsWith("/images/")
-      ? `/api/files/${heroData.image_ref}`
-      : "/images/image4.jpeg"; // Fallback static image path
+  const getSectionTitle = (index: number) => {
+    if (!pageData || index === -1) return "Section Title Missing";
+    return (pageData.sections[index].title || pageData.sections[index].type)
+      .replace(/_/g, ' ')
+      .toUpperCase();
+  };
 
-  const vmImageSrc =
-    vmData.image_ref && !vmData.image_ref.startsWith("/images/")
-      ? `/api/files/${vmData.image_ref}`
-      : "/images/image6.jpeg"; // Fallback static image path
+
+  if (loading)
+    return (
+      <div className={`min-h-screen p-8 ${Navy}`}>
+        <div className="flex justify-center items-center h-96">
+          <Loader2 className="animate-spin w-10 h-10 text-cyan-500" />
+          <span className="ml-3 text-lg text-cyan-300">
+            Loading Page Data...
+          </span>
+        </div>
+      </div>
+    );
+  if (!pageData)
+    return (
+      <div className={`min-h-screen p-8 ${Navy}`}>
+        <div className="text-center p-12 text-lg text-red-400">
+          Failed to load about page data. Please check the console for errors.
+        </div>
+      </div>
+    );
 
   return (
-    <form onSubmit={handleSave} className="min-h-screen font-sans">
-      <div className="p-4 border-b border-gray-200 bg-white shadow-md sticky top-0 z-50">
-        <div className="custom-container flex justify-between items-center">
-          <button
-            type="submit"
-            disabled={isSaving}
-            className={`px-6 py-2 rounded-md transition-colors ${isSaving ? "bg-gray-400" : "bg-[#007bff] hover:bg-[#0066cc] text-white"}`}
-          >
-            {isSaving ? (
-              <>
-                <Loader2 className="animate-spin w-4 h-4 mr-2 inline-block" />{" "}
-                Saving...
-              </>
-            ) : (
-              "Save All Changes"
-            )}
-          </button>
-        </div>
-        <p
-          className={`mt-2 text-sm text-center ${message.startsWith("✅") ? "text-green-600" : message.startsWith("❌") ? "text-red-600" : "text-orange-500"}`}
+    <div className={`min-h-screen p-8 ${Navy}`}>
+      <header className="flex justify-between items-center mb-8">
+        <h1 className="text-4xl font-extrabold text-white">
+          <Anchor className="inline-block w-8 h-8 mr-2 text-cyan-400" />
+          About Page Editor
+        </h1>
+        <button
+          onClick={handleSave}
+          disabled={isSaving || loading || !pageData}
+          className={`flex items-center px-6 py-3 rounded-full font-semibold transition-transform duration-200 transform ${Cyan} disabled:bg-gray-500 disabled:cursor-not-allowed`}
         >
-          {message}
-        </p>
-      </div>
-
-      <section>
-        {/* --- 1. HERO SECTION (Editable with ImageEditor) --- */}
-        <div className="relative h-[50vh] overflow-hidden flex items-center justify-center border-4 border-dashed border-gray-500/50">
-          {/* Background Image Placeholder/Editor */}
-          {heroIndex !== -1 && (
-            <ImageEditor
-              sectionIndex={heroIndex}
-              imageKey={"image_ref"}
-              pageData={pageData}
-              setPageData={setPageData}
-              isLarge={true}
-              slug="about-us"
-            />
+          {isSaving ? (
+            <Loader2 className="animate-spin w-5 h-5 mr-2" />
+          ) : (
+            <Save className="w-5 h-5 mr-2" />
           )}
-          {/* Visual Placeholder (if no image is set) */}
-          {!heroData.image_ref && (
-            <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
-              No Hero Image Set
+          {isSaving ? "Saving..." : "Save All Changes"}
+        </button>
+      </header>
+
+      {/* Save Message (Moved into the main form structure) */}
+      <p
+        className={`my-4 text-center text-lg font-semibold ${
+          message.startsWith("✅") ? "text-green-400" : message.startsWith("❌") ? "text-red-400" : "text-orange-400"
+        }`}
+      >
+        {message}
+      </p>
+
+      <form onSubmit={handleSave} className="space-y-12">
+        {/* --- 1. HERO SECTION --- */}
+        {heroIndex !== -1 && (
+          <section className={CardStyle}>
+            <h2 className={SectionHeaderStyle}>
+              {getSectionTitle(heroIndex)}
+            </h2>
+            <div className="relative mb-6 h-96">
+              <ImageEditor
+                sectionIndex={heroIndex}
+                imageKey={"image_ref"}
+                pageData={pageData}
+                setPageData={setPageData}
+                isLarge={true}
+                slug="about-us"
+              />
             </div>
-          )}
-
-          {/* Content Layer (unchanged text editing) */}
-          <div className="absolute inset-0 flex flex-col justify-center custom-container z-10 text-white pt-16 md:pt-20 pointer-events-none">
-            <p className="bg-gray-300/50 border border-gray-300 w-fit px-2 py-1 rounded-sm text-sm pointer-events-auto">
-              OUR COMPANY STORY
-            </p>
-
-            <h1 className="text-5xl sm:text-6xl font-bold mb-4 tracking-tight flex flex-col mt-2">
-              <span>Leading Maritime </span>
-              <span className={gradientTitleClasses}>
+            <div className="space-y-4">
+              <div>
+                <label
+                  htmlFor="hero-headline"
+                  className="font-medium text-cyan-300"
+                >
+                  Headline Text
+                </label>
                 <textarea
-                  value={heroData.headline || "Solutions Provider"}
+                  id="hero-headline"
+                  className={`${InputStyle} min-h-[80px]`}
+                  value={heroData.headline || ""}
                   onChange={(e) =>
                     handleSectionDataChange(
                       heroIndex,
@@ -248,53 +284,37 @@ export default function AboutPageEditor() {
                       e.target.value
                     )
                   }
-                  className="w-full bg-transparent text-white border-b-2 border-white/50 resize-none overflow-hidden h-20 pointer-events-auto"
                 />
-              </span>
-            </h1>
-          </div>
-        </div>
+              </div>
+            </div>
+          </section>
+        )}
 
-        {/* --- 2. VISION & MISSION SECTION (Editable with ImageEditor) --- */}
-        <section className="flex items-center custom-container justify-between py-20 gap-x-10 flex-wrap lg:flex-nowrap border-b border-gray-200">
-          {/* Image Placeholder/Editor */}
-          <div className="relative lg:w-1/2 min-h-[300px] mt-12 lg:mt-0 p-4 border-2 border-dashed border-blue-400/50">
-            {vmIndex !== -1 && (
-              <ImageEditor
-                sectionIndex={vmIndex}
-                imageKey={"image_ref"}
-                pageData={pageData}
-                setPageData={setPageData}
-                isLarge={false}
-                slug="about-us"
-              />
-            )}
-            {/* Fallback image (or the dynamically loaded one) */}
-            {vmImageSrc && (
-              <Image
-                src={vmImageSrc}
-                alt="Team at work in a modern office"
-                width={500}
-                height={500}
-                className="z-[20] w-full h-auto rounded-sm object-cover"
-              />
-            )}
-            <div className="z-[-1] rounded-sm bg-[#00FFFF]/15 w-full absolute inset-0 rotate-3"></div>
-          </div>
-
-          <div className="lg:w-1/2 mt-8 lg:mt-0">
-            <h2 className="text-4xl sm:text-5xl font-extrabold flex flex-col my-2 text-[#0A1C30]">
-              <span>Our Vision &</span>
-              <span className={gradientTitleClasses}>Mission</span>
+        {/* --- 2. VISION & MISSION SECTION --- */}
+        {vmIndex !== -1 && (
+          <section className={CardStyle}>
+            <h2 className={SectionHeaderStyle}>
+              {getSectionTitle(vmIndex)}
             </h2>
 
-            <div className="mt-8 space-y-8">
-              {/* Vision Block (Editable) */}
-              <div className="p-6 border-l-4 border-[#00FFFF] bg-gray-50 rounded-sm hover:shadow-lg transition-shadow">
-                <h3 className="text-2xl font-bold text-[#0A1C30] mb-2">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+              {/* Vision Block */}
+              <div className="p-4 bg-gray-800 rounded-md border border-gray-600 space-y-3">
+                <h4 className="text-xl font-semibold mb-3 text-cyan-400 flex items-center">
+                  <Eye className="w-5 h-5 mr-2" /> Our Vision
+                </h4>
+                <div>
+                  <label
+                    htmlFor="vision-title"
+                    className="font-medium text-cyan-300"
+                  >
+                    Title
+                  </label>
                   <input
                     type="text"
-                    value={vmData.vision?.title || "Our Vision"}
+                    id="vision-title"
+                    className={InputStyle}
+                    value={vmData.vision?.title || ""}
                     onChange={(e) =>
                       handleNestedSectionChange(
                         vmIndex,
@@ -303,29 +323,48 @@ export default function AboutPageEditor() {
                         e.target.value
                       )
                     }
-                    className="w-full bg-transparent border-b border-gray-300"
                   />
-                </h3>
-                <textarea
-                  value={vmData.vision?.text || "To be the global leader..."}
-                  onChange={(e) =>
-                    handleNestedSectionChange(
-                      vmIndex,
-                      "vision",
-                      "text",
-                      e.target.value
-                    )
-                  }
-                  className="w-full text-gray-700 bg-white p-2 border rounded-sm min-h-[100px]"
-                />
+                </div>
+                <div>
+                  <label
+                    htmlFor="vision-text"
+                    className="font-medium text-cyan-300"
+                  >
+                    Text
+                  </label>
+                  <textarea
+                    id="vision-text"
+                    className={`${InputStyle} min-h-[100px]`}
+                    value={vmData.vision?.text || ""}
+                    onChange={(e) =>
+                      handleNestedSectionChange(
+                        vmIndex,
+                        "vision",
+                        "text",
+                        e.target.value
+                      )
+                    }
+                  />
+                </div>
               </div>
 
-              {/* Mission Block (Editable) */}
-              <div className="p-6 border-l-4 border-[#00FFFF] bg-gray-50 rounded-sm hover:shadow-lg transition-shadow">
-                <h3 className="text-2xl font-bold text-[#0A1C30] mb-2">
+              {/* Mission Block */}
+              <div className="p-4 bg-gray-800 rounded-md border border-gray-600 space-y-3">
+                <h4 className="text-xl font-semibold mb-3 text-cyan-400 flex items-center">
+                  <Layers3 className="w-5 h-5 mr-2" /> Our Mission
+                </h4>
+                <div>
+                  <label
+                    htmlFor="mission-title"
+                    className="font-medium text-cyan-300"
+                  >
+                    Title
+                  </label>
                   <input
                     type="text"
-                    value={vmData.mission?.title || "Our Mission"}
+                    id="mission-title"
+                    className={InputStyle}
+                    value={vmData.mission?.title || ""}
                     onChange={(e) =>
                       handleNestedSectionChange(
                         vmIndex,
@@ -334,96 +373,119 @@ export default function AboutPageEditor() {
                         e.target.value
                       )
                     }
-                    className="w-full bg-transparent border-b border-gray-300"
                   />
-                </h3>
-                <textarea
-                  value={
-                    vmData.mission?.text ||
-                    "We commit to delivering tailored..."
-                  }
+                </div>
+                <div>
+                  <label
+                    htmlFor="mission-text"
+                    className="font-medium text-cyan-300"
+                  >
+                    Text
+                  </label>
+                  <textarea
+                    id="mission-text"
+                    className={`${InputStyle} min-h-[100px]`}
+                    value={vmData.mission?.text || ""}
+                    onChange={(e) =>
+                      handleNestedSectionChange(
+                        vmIndex,
+                        "mission",
+                        "text",
+                        e.target.value
+                      )
+                    }
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Image Editor for Vision/Mission Section */}
+            <div className="relative mb-6 mt-6 h-64 border border-gray-600 rounded-lg">
+                <ImageEditor
+                  sectionIndex={vmIndex}
+                  imageKey={"image_ref"}
+                  pageData={pageData}
+                  setPageData={setPageData}
+                  isLarge={false}
+                  slug="about-us"
+                />
+            </div>
+          </section>
+        )}
+
+        {/* --- 3. CORE VALUES SECTION --- */}
+        {cvIndex !== -1 && (
+          <section className={CardStyle}>
+            <h2 className={SectionHeaderStyle}>
+              {getSectionTitle(cvIndex)}
+            </h2>
+            <div className="space-y-4 mb-6">
+              {/* Title Input */}
+              <div>
+                <label
+                  htmlFor="cv-title"
+                  className="font-medium text-cyan-300"
+                >
+                  Section Title
+                </label>
+                <input
+                  type="text"
+                  id="cv-title"
+                  className={InputStyle}
+                  value={cvData.title || ""}
                   onChange={(e) =>
-                    handleNestedSectionChange(
-                      vmIndex,
-                      "mission",
-                      "text",
+                    handleSectionDataChange(cvIndex, "title", e.target.value)
+                  }
+                />
+              </div>
+              {/* Intro Text Input */}
+              <div>
+                <label
+                  htmlFor="cv-intro-text"
+                  className="font-medium text-cyan-300"
+                >
+                  Introduction Text
+                </label>
+                <textarea
+                  id="cv-intro-text"
+                  className={`${InputStyle} min-h-[70px]`}
+                  value={cvData.intro_text || ""}
+                  onChange={(e) =>
+                    handleSectionDataChange(
+                      cvIndex,
+                      "intro_text",
                       e.target.value
                     )
                   }
-                  className="w-full text-gray-700 bg-white p-2 border rounded-sm min-h-[100px]"
                 />
               </div>
             </div>
-          </div>
-        </section>
 
-        {/* --- 3. OUR CORE VALUES SECTION (Combined Editing/Viewing) --- */}
-        <section className="py-20 bg-gray-50 border-b border-gray-200">
-          <div className="custom-container">
-            {/* Title (Editable) */}
-            <h2 className="text-4xl lg:text-5xl font-bold text-center mb-4 text-[#0A1C30]">
-              <input
-                type="text"
-                value={cvData.title || "Our Core Values"}
-                onChange={(e) =>
-                  handleSectionDataChange(cvIndex, "title", e.target.value)
-                }
-                className="w-full text-center bg-transparent border-b border-gray-300 p-1"
-              />
-            </h2>
-
-            {/* Intro Text (Editable) */}
-            <textarea
-              value={
-                cvData.intro_text ||
-                "The principles that guide our decisions..."
-              }
-              onChange={(e) =>
-                handleSectionDataChange(cvIndex, "intro_text", e.target.value)
-              }
-              className="w-full text-center mb-12 text-gray-400 max-w-2xl mx-auto block bg-white p-2 border rounded-sm min-h-[50px]"
-            />
-
-            {/* Visual Display of Current Values */}
-            <h3 className="text-center text-xl font-semibold mb-4">
-              Live Preview:
-            </h3>
-            <div className="flex flex-wrap gap-5 items-stretch justify-evenly border-b-2 border-gray-300 pb-8 mb-8">
-              {/* Map over the live data for the visual preview */}
-              {cvData.values.map((v: CoreValue) => (
-                <ValueCard
-                  key={v.key}
-                  service={{
-                    serviceName: v.name,
-                    summary: v.description,
-                    icon: <ArrowRight />,
-                  }}
-                />
-              ))}
+            <div className="p-4 bg-gray-800 rounded-md border border-gray-600">
+                <h4 className="text-xl font-semibold mb-4 text-cyan-400">
+                  Value Array Management
+                </h4>
+                {/* Note: The live preview part from the original file is removed
+                    to simplify, as CoreValuesEditor handles the data array.
+                    You would need to ensure the imported `CoreValuesEditor`
+                    component visually aligns with the dark theme. */}
+                <div className="max-w-full mx-auto">
+                    <CoreValuesEditor
+                    sectionIndex={cvIndex}
+                    pageData={pageData}
+                    setPageData={setPageData}
+                    />
+                </div>
             </div>
-
-            {/* Array Editor Component */}
-            <h3 className="text-center text-xl font-semibold mb-4">
-              Value Array Management:
-            </h3>
-            {cvIndex !== -1 && (
-              <div className="max-w-4xl mx-auto">
-                <CoreValuesEditor
-                  sectionIndex={cvIndex}
-                  pageData={pageData}
-                  setPageData={setPageData}
-                />
-              </div>
-            )}
-          </div>
-        </section>
+          </section>
+        )}
 
         {/* Save button at the bottom for convenience */}
-        <div className="custom-container py-10">
+        <div className="py-10">
           <button
             type="submit"
             disabled={isSaving}
-            className={`w-full py-3 text-xl rounded-md transition-colors ${isSaving ? "bg-gray-400" : "bg-[#007bff] hover:bg-[#0066cc] text-white"}`}
+            className={`w-full py-3 text-xl rounded-md transition-colors ${Cyan} disabled:bg-gray-500 disabled:cursor-not-allowed`}
           >
             {isSaving ? (
               <>
@@ -435,7 +497,7 @@ export default function AboutPageEditor() {
             )}
           </button>
         </div>
-      </section>
-    </form>
+      </form>
+    </div>
   );
 }

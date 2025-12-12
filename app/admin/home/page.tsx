@@ -1,10 +1,10 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
-import MetricCard from "@/app/_components/MetricCard";
+import MetricCard from "@/app/_components/cards/MetricCard";
 import PendingMessagesTable from "@/app/_components/PendingMessagesTable";
-import MessageModal from "@/app/_components/MessageModal";
+import MessageModal from "@/app/_components/modals/MessageModal";
 // ⬇ IMPORT NEW MODAL
-import AddServiceModal from "@/app/_components/AddServiceModal";
+import AddServiceModal from "@/app/_components/modals/AddServiceModal";
 import {
   Mail,
   Clock,

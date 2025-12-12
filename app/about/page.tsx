@@ -8,7 +8,7 @@ import { Loader2, ArrowRight, ArrowLeft } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Header from "../_components/Header";
-import ValueCard from "../_components/ValueCard";
+import ValueCard from "../_components/cards/ValueCard";
 
 // Import the Server Action
 import { getStaticPageContent } from "@/app/_actions/pages";
@@ -168,9 +168,10 @@ export default function AboutUs() {
               OUR COMPANY STORY
             </p>
             <h1 className="text-5xl sm:text-6xl font-bold mb-4 tracking-tight flex flex-col">
-              <span>Leading Maritime </span>
+              <span>
+                {heroData.headline.split(" ").slice(0, 2).join(" ") } </span>
               <span className={gradientTitleClasses}>
-                {heroData.headline || "Solutions Provider"}
+                {heroData.headline.split(" ").slice(2).join(" ") }
               </span>
             </h1>
           </div>
@@ -240,9 +241,6 @@ export default function AboutUs() {
                 // 🌟 ICON CHANGE: Look up the icon component from the map, defaulting to ArrowRight
                 const IconComponent = IconMap[v.icon] || ArrowRight;
 
-                // The Service object is re-created on every render, but since
-                // ValueCard likely consumes this small object and its children are simple,
-                // the performance gain from useMemo here would be negligible.
                 return (
                   <ValueCard
                     key={v.key}
