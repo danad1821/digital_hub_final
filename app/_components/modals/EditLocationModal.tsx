@@ -1,17 +1,19 @@
-// app/_components/EditLocationModal.tsx
 "use client";
 import { useState, useEffect } from "react";
-import { X, Save, MapPin, Anchor, Loader } from "lucide-react";
-import { Location } from './LocationCard'; // Import the type definition
+import { X, Save, MapPin, Anchor, Loader, Globe, Truck, CheckCircle } from "lucide-react";
 
 interface EditLocationModalProps {
   isOpen: boolean;
   onClose: () => void;
-  locationToEdit: Location;
-  shippingLocations: Location[]; 
+  locationToEdit: any;
+  shippingLocations: any[]; 
   // onSave now accepts the ID and the new data, and returns a promise
   onSave: (id: string, updateData: any) => Promise<boolean>; 
 }
+
+// Enum values for the Status field, mirroring the backend schema
+const STATUS_OPTIONS = ['Active Operations', 'Planned Operations', 'Maintenance'];
+
 
 export default function EditLocationModal({
   isOpen,
@@ -20,9 +22,15 @@ export default function EditLocationModal({
   shippingLocations,
   onSave,
 }: EditLocationModalProps) {
+  // --- EXISTING STATE ---
   const [name, setName] = useState(locationToEdit.name);
   const [address, setAddress] = useState(locationToEdit.address);
-  const [selectedDestinations, setSelectedDestinations] = useState<Location[]>([]);
+
+  // --- NEW STATE FIELDS (initialized from locationToEdit) ---
+  const [country, setCountry] = useState(locationToEdit.country);
+  const [description, setDescription] = useState(locationToEdit.description);
+  const [status, setStatus] = useState(locationToEdit.status);
+
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -31,26 +39,18 @@ export default function EditLocationModal({
     if (isOpen) {
         setName(locationToEdit.name);
         setAddress(locationToEdit.address);
-        // Find the full location objects for the destinations by matching names/IDs
-        const initialDestinations = locationToEdit.destinations.map(d => 
-            shippingLocations.find(loc => loc.name === d.name)
-        ).filter((loc): loc is Location => loc !== undefined);
+        // NEW: Initialize new fields
+        setCountry(locationToEdit.country);
+        setDescription(locationToEdit.description);
+        setStatus(locationToEdit.status);
+
         
-        setSelectedDestinations(initialDestinations);
         setError(null);
     }
   }, [isOpen, locationToEdit, shippingLocations]);
 
   if (!isOpen) return null;
 
-  // Toggle selection of a destination. Use _id for comparison.
-  const handleDestinationToggle = (location: Location) => {
-    setSelectedDestinations((prev) =>
-      prev.some((dest) => dest._id === location._id)
-        ? prev.filter((dest) => dest._id !== location._id)
-        : [...prev, location]
-    );
-  };
   
   const existingLocations = shippingLocations.filter(loc => loc._id !== locationToEdit._id);
 
@@ -58,27 +58,27 @@ export default function EditLocationModal({
     e.preventDefault();
     setError(null);
 
-    if (!name.trim() || !address.trim()) {
-      setError("Port Name and Address are required.");
+    // UPDATED Client-side Validation for required fields
+    if (!name.trim() || !address.trim() || !country.trim() || !description.trim() || !status.trim()) {
+      setError("Port Name, Address, Country, Description, and Status are required.");
       return;
     }
 
     setIsSaving(true);
     
-    // Construct the update object. Only include changed fields.
+    // Construct the update object. ONLY include fields that have CHANGED.
     const updateData: any = {};
     if (name !== locationToEdit.name) updateData.name = name;
     if (address !== locationToEdit.address) updateData.address = address;
     
-    // Always send the current set of destinations, as it's a full array replacement
-    const newDestinations = selectedDestinations.map(dest => ({
-        name: dest.name,
-        lat: dest.lat,
-        lng: dest.lng
-    }));
-    updateData.destinations = newDestinations;
+    // NEW: Check and include the new fields if they have changed
+    if (country !== locationToEdit.country) updateData.country = country;
+    if (description !== locationToEdit.description) updateData.description = description;
+    if (status !== locationToEdit.status) updateData.status = status;
+    
 
-    // Check if any actual data has changed (simple check for name/address, destinations are always included)
+
+    // Final Check: If the updateData object is empty (and destinations didn't change), stop.
     if (Object.keys(updateData).length === 0) {
         setError("No changes detected.");
         setIsSaving(false);
@@ -86,6 +86,7 @@ export default function EditLocationModal({
     }
 
     try {
+        // The PUT API handler will automatically re-geocode if 'address' is present in updateData.
         const success = await onSave(locationToEdit._id, updateData);
 
         if (success) {
@@ -126,10 +127,10 @@ export default function EditLocationModal({
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Location Name */}
+            {/* 1. Location Name */}
             <div className="space-y-1">
               <label htmlFor="name" className="text-sm font-medium text-gray-700 flex items-center">
-                <Anchor className="w-4 h-4 mr-2" /> Port/Location Name
+                <Anchor className="w-4 h-4 mr-2 text-blue-600" /> Port/Location Name
               </label>
               <input
                 type="text"
@@ -142,10 +143,10 @@ export default function EditLocationModal({
               />
             </div>
 
-            {/* Address (for Geocoding) */}
+            {/* 2. Address (for Geocoding) */}
             <div className="space-y-1">
               <label htmlFor="address" className="text-sm font-medium text-gray-700 flex items-center">
-                <MapPin className="w-4 h-4 mr-2" /> Full Address
+                <MapPin className="w-4 h-4 mr-2 text-red-600" /> Full Address
               </label>
               <input
                 type="text"
@@ -157,47 +158,74 @@ export default function EditLocationModal({
                 className="w-full p-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#00FFFF] focus:border-transparent outline-none"
               />
               <p className="text-xs text-gray-500 mt-1">
-                Changing the address will trigger **re-geocoding** on save.
+                Changing the address will trigger **re-geocoding** (updates Lat/Lng, and Country).
               </p>
             </div>
-          </div>
-
-
-          {/* Destination Selection */}
-          <div className="space-y-3">
-            <h4 className="text-lg font-semibold text-[#0A1C30] border-b pb-2">
-              Select Destinations (Ports this location ships *to*)
-            </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-48 overflow-y-auto p-2 border border-gray-200 rounded-sm">
-              {existingLocations.map((loc:any) => (
-                <div key={loc._id} className="flex items-center">
-                  <input
-                    id={`edit-dest-${loc._id}`}
-                    type="checkbox"
-                    checked={selectedDestinations.some(
-                      (dest) => dest._id === loc._id
-                    )}
-                    onChange={() => handleDestinationToggle(loc)}
-                    className="w-4 h-4 text-[#00FFFF] border-gray-300 rounded focus:ring-[#00FFFF]"
-                  />
-                  <label htmlFor={`edit-dest-${loc._id}`} className="ml-2 text-sm font-medium text-gray-700">
-                    {loc.name}
-                  </label>
-                </div>
-              ))}
+            
+            {/* NEW: 3. Country */}
+            <div className="space-y-1">
+              <label htmlFor="country" className="text-sm font-medium text-gray-700 flex items-center">
+                <Globe className="w-4 h-4 mr-2 text-green-600" /> Country
+              </label>
+              <input
+                type="text"
+                id="country"
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+                placeholder="Lebanon"
+                required
+                className="w-full p-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#00FFFF] focus:border-transparent outline-none"
+              />
             </div>
-            {existingLocations.length === 0 && (
-                <p className="text-sm text-gray-500">No other locations available to select as a destination.</p>
-            )}
+
+            {/* NEW: 4. Status (using select based on schema enum) */}
+            <div className="space-y-1">
+              <label htmlFor="status" className="text-sm font-medium text-gray-700 flex items-center">
+                <CheckCircle className="w-4 h-4 mr-2 text-indigo-600" /> Operational Status
+              </label>
+              <select
+                id="status"
+                value={status}
+                onChange={(e) => setStatus(e.target.value as 'Active Operations' | 'Planned Operations' | 'Maintenance')}
+                required
+                className="w-full p-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#00FFFF] focus:border-transparent outline-none bg-white"
+              >
+                {STATUS_OPTIONS.map(option => (
+                    <option key={option} value={option}>{option}</option>
+                ))}
+              </select>
+            </div>
           </div>
+          
+          {/* NEW: 5. Description (Full width textarea) */}
+          <div className="space-y-1">
+            <label htmlFor="description" className="text-sm font-medium text-gray-700 flex items-center">
+              <Truck className="w-4 h-4 mr-2 text-yellow-600" /> Operational Description
+            </label>
+            <textarea
+              id="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="E.g., Major transshipment hub for the Eastern Mediterranean, specializing in container and bulk cargo."
+              rows={3}
+              required
+              className="w-full p-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#00FFFF] focus:border-transparent outline-none resize-none"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+                This description appears in the map popup.
+            </p>
+          </div>
+
+        
         </form>
 
-        {/* Modal Footer */}
+        {/* Modal Footer (No change, but the disabled logic is critical) */}
         <div className="p-5 border-t flex justify-end">
           <button
             type="submit"
             onClick={handleSave}
-            disabled={isSaving || !name.trim() || !address.trim()}
+            // Disabled check now includes the new required fields
+            disabled={isSaving || !name.trim() || !address.trim() || !country.trim() || !description.trim() || !status.trim()}
             className="flex items-center px-6 py-3 border cursor-pointer border-transparent text-base font-medium rounded-sm text-[#0A1C30] bg-[#00FFFF] hover:bg-[#00FFFF]/50 transition duration-300 shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {isSaving ? (

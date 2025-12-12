@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { X, Save, MapPin, Anchor, Loader } from "lucide-react";
+import { X, Save, MapPin, Anchor, Loader, Globe, Truck, CheckCircle } from "lucide-react";
 
 // Define the shape of the data for better type safety
 interface Destination {
@@ -16,6 +16,19 @@ interface Location {
   lat: number;
   lng: number;
   address: string;
+  country: string; // NEW: Required by schema
+  description: string; // NEW: Required by schema
+  status: 'Active Operations' | 'Planned Operations' | 'Maintenance'; // NEW: Required by schema (using enum values)
+  destinations: Destination[];
+}
+
+// Define the shape of the data that the client sends to the server
+interface NewLocationDataPayload {
+  name: string;
+  address: string;
+  country: string; // NEW
+  description: string; // NEW
+  status: string; // NEW
   destinations: Destination[];
 }
 
@@ -23,13 +36,13 @@ interface AddLocationModalProps {
   isOpen: boolean;
   onClose: () => void;
   // Updated onSave signature: accepts raw data and returns a promise for error handling
-  onSave: (newLocationData: {
-    name: string;
-    address: string;
-    destinations: Location[];
-  }) => Promise<boolean>; // Return boolean for success/failure
+  onSave: (newLocationData: NewLocationDataPayload) => Promise<boolean>; // Return boolean for success/failure
   shippingLocations: Location[]; // Use the new Location interface
 }
+
+// Enum values for the Status field, mirroring the backend schema
+const STATUS_OPTIONS = ['Active Operations', 'Planned Operations', 'Maintenance'];
+
 
 export default function AddLocationModal({
   isOpen,
@@ -37,11 +50,18 @@ export default function AddLocationModal({
   onSave,
   shippingLocations,
 }: AddLocationModalProps) {
+  // Existing state fields
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
   const [selectedDestinations, setSelectedDestinations] = useState<Location[]>(
     []
   );
+  
+  // NEW state fields
+  const [country, setCountry] = useState("");
+  const [description, setDescription] = useState("");
+  const [status, setStatus] = useState<string>(STATUS_OPTIONS[0]); // Default to first option
+
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null); // State for modal-level error
 
@@ -60,20 +80,22 @@ export default function AddLocationModal({
     e.preventDefault();
     setError(null);
 
-    // Basic client-side validation
-    if (!name.trim() || !address.trim()) {
-      setError("Port Name and Address are required.");
+    // UPDATED client-side validation
+    if (!name.trim() || !address.trim() || !country.trim() || !description.trim() || !status.trim()) {
+      setError("Port Name, Address, Country, Description, and Status are required.");
       return;
     }
 
     setIsSaving(true);
     
     // The data structure to be sent to the server for processing
-    const newLocationData :any = {
+    const newLocationData: NewLocationDataPayload = {
         name,
         address,
-        // The server will extract the name, lat, and lng from the selected locations
-        // We ensure we only pass the necessary destination fields for a clean POST
+        country, // NEW
+        description, // NEW
+        status, // NEW
+        // Only pass the necessary destination fields (name, lat, lng)
         destinations: selectedDestinations.map(dest => ({
             name: dest.name,
             lat: dest.lat,
@@ -82,13 +104,15 @@ export default function AddLocationModal({
     }
 
     try {
-        // Call the parent's onSave function, which handles the API call and geocoding
         const success = await onSave(newLocationData);
 
         if (success) {
             // Reset form and close modal on success
             setName("");
             setAddress("");
+            setCountry(""); // NEW: Reset
+            setDescription(""); // NEW: Reset
+            setStatus(STATUS_OPTIONS[0]); // NEW: Reset
             setSelectedDestinations([]);
             onClose();
         }
@@ -102,13 +126,12 @@ export default function AddLocationModal({
   };
   
   // Filter out the current location being added from the destination options
-  const existingLocations = shippingLocations.filter((loc:any) => loc.name !== name);
+  const existingLocations = shippingLocations.filter((loc) => loc.name !== name);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-75 p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
         {/* Modal Header */}
-        {/* ... (Modal Header remains the same) ... */}
         <div className="flex justify-between items-center p-5 border-b">
           <h3 className="text-2xl font-bold text-[#0A1C30]">
             Add New Shipping Location
@@ -128,16 +151,16 @@ export default function AddLocationModal({
           {/* Display Error Message */}
           {error && (
             <div className="p-3 text-sm text-red-700 bg-red-100 rounded-lg">
-                <strong>Error:</strong> {error}
+              <strong>Error:</strong> {error}
             </div>
           )}
 
-          {/* ... (Input fields remain the same) ... */}
+          {/* New Grid Layout: Two columns for general info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Location Name */}
+            {/* 1. Location Name */}
             <div className="space-y-1">
               <label htmlFor="name" className="text-sm font-medium text-gray-700 flex items-center">
-                <Anchor className="w-4 h-4 mr-2" /> Port/Location Name
+                <Anchor className="w-4 h-4 mr-2 text-blue-600" /> Port/Location Name
               </label>
               <input
                 type="text"
@@ -150,10 +173,10 @@ export default function AddLocationModal({
               />
             </div>
 
-            {/* Address (for Geocoding) */}
+            {/* 2. Address (for Geocoding) */}
             <div className="space-y-1">
               <label htmlFor="address" className="text-sm font-medium text-gray-700 flex items-center">
-                <MapPin className="w-4 h-4 mr-2" /> Full Address
+                <MapPin className="w-4 h-4 mr-2 text-red-600" /> Full Address
               </label>
               <input
                 type="text"
@@ -165,47 +188,74 @@ export default function AddLocationModal({
                 className="w-full p-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#00FFFF] focus:border-transparent outline-none"
               />
               <p className="text-xs text-gray-500 mt-1">
-                Latitude and Longitude will be automatically determined using LocationIQ.
+                Used for automatic Geo-location (lat/lng).
               </p>
             </div>
-          </div>
-
-
-          {/* Destination Selection */}
-          <div className="space-y-3">
-            <h4 className="text-lg font-semibold text-[#0A1C30] border-b pb-2">
-              Select Destinations (Ports this location ships *to*)
-            </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-48 overflow-y-auto p-2 border border-gray-200 rounded-sm">
-              {existingLocations.map((loc:any) => (
-                <div key={loc._id} className="flex items-center"> {/* Use _id here */}
-                  <input
-                    id={`dest-${loc._id}`}
-                    type="checkbox"
-                    checked={selectedDestinations.some(
-                      (dest) => dest._id === loc._id
-                    )}
-                    onChange={() => handleDestinationToggle(loc)}
-                    className="w-4 h-4 text-[#00FFFF] border-gray-300 rounded focus:ring-[#00FFFF]"
-                  />
-                  <label htmlFor={`dest-${loc._id}`} className="ml-2 text-sm font-medium text-gray-700">
-                    {loc.name}
-                  </label>
-                </div>
-              ))}
+            
+            {/* NEW: 3. Country */}
+            <div className="space-y-1">
+              <label htmlFor="country" className="text-sm font-medium text-gray-700 flex items-center">
+                <Globe className="w-4 h-4 mr-2 text-green-600" /> Country
+              </label>
+              <input
+                type="text"
+                id="country"
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+                placeholder="Lebanon"
+                required
+                className="w-full p-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#00FFFF] focus:border-transparent outline-none"
+              />
             </div>
-            {existingLocations.length === 0 && (
-                <p className="text-sm text-gray-500">No other locations available to select as a destination.</p>
-            )}
+
+            {/* NEW: 4. Status (using select based on schema enum) */}
+            <div className="space-y-1">
+              <label htmlFor="status" className="text-sm font-medium text-gray-700 flex items-center">
+                <CheckCircle className="w-4 h-4 mr-2 text-indigo-600" /> Operational Status
+              </label>
+              <select
+                id="status"
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
+                required
+                className="w-full p-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#00FFFF] focus:border-transparent outline-none bg-white"
+              >
+                {STATUS_OPTIONS.map(option => (
+                    <option key={option} value={option}>{option}</option>
+                ))}
+              </select>
+            </div>
           </div>
+          
+          {/* NEW: 5. Description (Full width textarea) */}
+          <div className="space-y-1">
+            <label htmlFor="description" className="text-sm font-medium text-gray-700 flex items-center">
+              <Truck className="w-4 h-4 mr-2 text-yellow-600" /> Operational Description
+            </label>
+            <textarea
+              id="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="E.g., Major transshipment hub for the Eastern Mediterranean, specializing in container and bulk cargo."
+              rows={3}
+              required
+              className="w-full p-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#00FFFF] focus:border-transparent outline-none resize-none"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+                This description appears in the map popup.
+            </p>
+          </div>
+
+         
+            
         </form>
 
-        {/* Modal Footer */}
+        {/* Modal Footer (Remains the same) */}
         <div className="p-5 border-t flex justify-end">
           <button
             type="submit"
             onClick={handleSave}
-            disabled={isSaving || !name.trim() || !address.trim()}
+            disabled={isSaving || !name.trim() || !address.trim() || !country.trim() || !description.trim() || !status.trim()}
             className="flex items-center px-6 py-3 border cursor-pointer border-transparent text-base font-medium rounded-sm text-[#0A1C30] bg-[#00FFFF] hover:bg-[#00FFFF]/50 transition duration-300 shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {isSaving ? (

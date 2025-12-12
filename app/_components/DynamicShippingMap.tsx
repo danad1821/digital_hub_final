@@ -20,12 +20,9 @@ L.Icon.Default.mergeOptions({
 });
 
 
-// --- 2. TYPES (Simplified props, no longer needs external state) ---
-type Destination = { lat: number; lng: number; name: string; };
-export type Location = { _id: string; name: string; address: string; lat: number; lng: number; destinations?: Destination[]; }; 
 
 type DynamicShippingMapProps = {
-    locations: Location[];
+    locations: any[];
     // Removed: activeLocation, setActiveLocation, clearActiveLocation
 }
 
@@ -47,7 +44,7 @@ const PortPinContent = () => {
 };
 
 // --- 4. PORT PIN WRAPPER (Now uses Popup and Ref) ---
-const PortPinWrapper = ({ loc }: { loc: Location }) => { // Removed state props
+const PortPinWrapper = ({ loc }: { loc: any }) => { // Removed state props
 
     // useRef to get direct access to the Leaflet Marker instance
     const markerRef = useRef<L.Marker>(null); 
@@ -99,7 +96,7 @@ const PortPinWrapper = ({ loc }: { loc: Location }) => { // Removed state props
                 {/* 📌 Info Card Content (Your original HTML structure) */}
                 <div className="p-1 text-gray-800">
                     <h3 className="font-bold text-lg mb-1">{loc.name}</h3>
-                    <p className="text-sm text-gray-600 mb-2">{loc.address || 'Location Details'}</p>
+                    <p className="text-sm text-gray-600 mb-2">{loc.description || 'Location Details'}</p>
                     <hr className="my-2 border-gray-200" />
                     <div className="flex items-center text-sm text-green-600">
                         <div className="w-2 h-2 bg-green-600 rounded-full mr-2"></div>
@@ -118,7 +115,7 @@ export default function DynamicShippingMap({ locations }: DynamicShippingMapProp
     const zoom = 4; 
     
     const markers = useMemo(() => {
-        return locations.map((loc: Location) => (
+        return locations.map((loc: any) => (
             <PortPinWrapper
                 key={loc._id}
                 loc={loc}

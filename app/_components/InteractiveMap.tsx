@@ -3,13 +3,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import DynamicShippingMap from './DynamicShippingMap';
-import { Location } from './PortMarker'; // Import Location type from the PortMarker file
 
-// Note: Removed initialActiveLocation
-// Note: Removed type export for Location if it was here
 
 export default function InteractiveMap() {
-  const [locations, setLocations] = useState<Location[]>([]); 
+  const [locations, setLocations] = useState<any[]>([]); 
   // REMOVED: activeLocation state
   const [isLoading, setIsLoading] = useState(true); 
 

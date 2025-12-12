@@ -6,6 +6,22 @@ import { ObjectId } from "mongodb";
 // Your LocationIQ Key (Needs to be defined if not already in the file)
 const locationIQKey = process.env.LOCATIONIQ_API_KEY; 
 
+// Helper function to extract the country from LocationIQ data
+// This is needed if the address is updated
+function getCountryFromGeocodeData(geocodeData: any): string | undefined {
+    // Check if the first result has the expected 'address' object
+    if (geocodeData && geocodeData.length > 0 && geocodeData[0].address) {
+        return geocodeData[0].address.country;
+    }
+    // Fallback: Attempt to extract from the display name 
+    const displayNameParts = geocodeData[0]?.display_name?.split(',');
+    if (displayNameParts && displayNameParts.length > 1) {
+        return displayNameParts[displayNameParts.length - 1].trim();
+    }
+    return undefined; // Country could not be determined
+}
+
+
 export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -28,13 +44,13 @@ export async function PUT(
       }
       
       const encodedAddress = encodeURIComponent(finalUpdateData.address);
-      const geocodeUrl = `https://us1.locationiq.com/v1/search?key=${locationIQKey}&q=${encodedAddress}&format=json&limit=1`;
+      // ADDED &addressdetails=1 to geocoding URL
+      const geocodeUrl = `https://us1.locationiq.com/v1/search?key=${locationIQKey}&q=${encodedAddress}&format=json&limit=1&addressdetails=1`; 
       
       const geocodeResponse = await fetch(geocodeUrl);
       const geocodeData = await geocodeResponse.json();
 
       if (!geocodeResponse.ok || geocodeData.length === 0) {
-        // If geocoding fails, return an error and stop the update process
         return NextResponse.json(
           { 
             message: `Failed to geocode new address: "${finalUpdateData.address}". Please try again.`
@@ -50,14 +66,26 @@ export async function PUT(
       finalUpdateData.lat = parseFloat(lat);
       finalUpdateData.lng = parseFloat(lon);
       finalUpdateData.address = display_name;
+
+      // NEW: Extract and update the country if the address changed
+      const verifiedCountry = getCountryFromGeocodeData(geocodeData);
+      if (verifiedCountry) {
+          finalUpdateData.country = verifiedCountry;
+      }
     }
     // --- END GEOCODING LOGIC ---
+    
+    // NOTE ON REQUIRED FIELDS:
+    // If the client does NOT send a required field (like 'country'), Mongoose 
+    // will assume the client isn't changing it and leave the existing value.
+    // If the client sends an empty value (like { country: '' }), Mongoose validation will fail.
+    // The `{ runValidators: true }` option below handles this robustly.
 
     // Perform the update using the potentially updated `finalUpdateData`
     const updatedLocation = await Location.findByIdAndUpdate(
       new ObjectId(id),
       finalUpdateData,
-      { new: true, runValidators: true } // { new: true } returns the updated document. { runValidators: true } ensures Mongoose validates the incoming data.
+      { new: true, runValidators: true } // { runValidators: true } is essential here
     );
 
     if (!updatedLocation) {
@@ -68,7 +96,7 @@ export async function PUT(
   } catch (error: any) {
     console.error("Error updating Location:", error);
     
-    // Mongoose Validation Error
+    // Mongoose Validation Error (will catch if 'country', 'description', or 'status' are updated to empty strings/invalid enum values)
     if (error.name === "ValidationError") {
         return NextResponse.json(
             { message: "Update validation failed. Check required fields and data types." },
@@ -94,8 +122,9 @@ export async function PUT(
   }
 }
 
-// DELETE function for the Location API route
-
+// ---------------------------
+// 🗑️ DELETE (REMAINS UNCHANGED)
+// ---------------------------
 export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -115,7 +144,7 @@ export async function DELETE(
     // Use the name for comparison as that's what's stored in the destination sub-document
     await Location.updateMany(
       {}, // Target all documents
-      { $pull: { destinations: { name: deletedLocation.name } } } // Remove any destination where the name matches the deleted location's name
+      { $pull: { destinations: { name: deletedLocation.name } } } 
     );
 
     return NextResponse.json(
