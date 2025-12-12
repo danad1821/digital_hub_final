@@ -22,8 +22,6 @@ interface ContactData {
 
 // Regex for international phone numbers (flexible) and email
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-// Allows for various international formats: +1 (555) 123-4567 or 0044 1234567890 etc.
-
 
 export default function ContactForm() {
   const [contactData, setContactData] = useState<ContactData>({
@@ -76,31 +74,23 @@ export default function ContactForm() {
     setStatus("loading");
 
     try {
-      // Axios automatically handles JSON serialization of the data
       const response = await axios.post("/api/messages", contactData);
 
-      // Axios throws for 4xx/5xx status codes, so if we reach here, it's a 2xx success.
-      // We check for 201 (Created) or 200 (OK)
       if (response.status >= 200 && response.status < 300) {
         setStatus("success");
-        // Clear the form on successful submission
         setContactData({ fullName: "", email: "", company: "", message: "" });
-        // Automatically clear success message after a few seconds
         setTimeout(() => setStatus("idle"), 5000);
       } else {
-        // This block is technically unreachable if the server returns 4xx/5xx because Axios throws
         setError("Unexpected response status from server.");
         setStatus("error");
       }
     } catch (err) {
-      // This is where 4xx/5xx status codes (like the 500 error you saw) will land.
       console.error(err);
 
       let errorMessage =
         "A network error occurred or the server is unavailable.";
 
       if (axios.isAxiosError(err) && err.response) {
-        // Attempt to get the detailed error message from the server response body
         const serverError = err.response.data as {
           details?: string;
           error?: string;
@@ -126,10 +116,10 @@ export default function ContactForm() {
     placeholder: string = label,
     required: boolean = true
   ) => (
-    <div className="relative mb-6">
+    <div className="relative mb-4 sm:mb-6"> {/* Reduced margin on mobile */}
       <label
         htmlFor={id}
-        className=" text-sm font-medium text-gray-700"
+        className="text-sm font-medium text-gray-700"
       >
         {label}
       </label>
@@ -141,7 +131,7 @@ export default function ContactForm() {
           onChange={handleChange}
           placeholder={placeholder}
           required={required}
-          className="flex-1 p-3 bg-transparent outline-none text-gray-800 placeholder-gray-500 rounded-sm"
+          className="flex-1 p-2 sm:p-3 bg-transparent outline-none text-gray-800 placeholder-gray-500 rounded-sm text-sm sm:text-base" // Responsive padding and text size
         />
       </div>
     </div>
@@ -153,7 +143,7 @@ export default function ContactForm() {
     placeholder: string = label,
     required: boolean = true
   ) => (
-    <div className="relative mb-6">
+    <div className="relative mb-4 sm:mb-6"> {/* Reduced margin on mobile */}
       <label
         htmlFor={id}
         className="text-sm font-medium text-gray-700"
@@ -168,15 +158,15 @@ export default function ContactForm() {
           placeholder={placeholder}
           required={required}
           rows={4}
-          className="flex-1 p-3 bg-transparent outline-none text-gray-800 placeholder-gray-500 rounded-sm resize-none"
+          className="flex-1 p-2 sm:p-3 bg-transparent outline-none text-gray-800 placeholder-gray-500 rounded-sm resize-none text-sm sm:text-base" // Responsive padding and text size
         />
       </div>
     </div>
   );
 
   return (
-    <div className="bg-white rounded-sm my-4 min-w-[45%] p-6">
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="bg-white rounded-sm my-4 w-full p-4 sm:p-6"> {/* Changed min-w-[45%] to w-full and responsive padding/shadow */}
+      <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4"> {/* Reduced spacing on mobile */}
         {renderInput("Full Name", "fullName", "text", "John Smith")}
         {renderInput("Email Address", "email", "email", "john@company.com")}
         {renderInput(
@@ -194,15 +184,15 @@ export default function ContactForm() {
 
         {/* Status/Error Messages */}
         {(status === "error" || error) && (
-          <div className="flex items-center p-3 text-sm text-red-700 bg-red-100 rounded-lg">
-            <XCircle className="w-5 h-5 mr-2" />
+          <div className="flex items-start p-3 text-sm text-red-700 bg-red-100 rounded-lg"> {/* items-start for long messages */}
+            <XCircle className="w-5 h-5 mr-2 flex-shrink-0" />
             <span>{error || "Submission failed due to a server error."}</span>
           </div>
         )}
 
         {status === "success" && (
-          <div className="flex items-center p-3 text-sm text-green-700 bg-green-100 rounded-lg">
-            <CheckCircle className="w-5 h-5 mr-2" />
+          <div className="flex items-start p-3 text-sm text-green-700 bg-green-100 rounded-lg"> {/* items-start for long messages */}
+            <CheckCircle className="w-5 h-5 mr-2 flex-shrink-0" />
             <span>Message sent successfully! We will be in touch shortly.</span>
           </div>
         )}
@@ -211,7 +201,7 @@ export default function ContactForm() {
         <button
           type="submit"
           disabled={status === "loading"}
-          className="w-fit flex items-center justify-center px-8 py-4 border cursor-pointer border-transparent text-base font-medium rounded-sm text-[#0A1C30] bg-[#00FFFF] hover:bg-[#00FFFF]/50 transition duration-300 shadow-md disabled:opacity-60 disabled:cursor-not-allowed hover:brightness-70 transition duration-300 hover:scale-105"
+          className="w-full sm:w-fit flex items-center justify-center px-6 py-3 sm:px-8 sm:py-4 border cursor-pointer border-transparent text-sm sm:text-base font-medium rounded-sm text-[#0A1C30] bg-[#00FFFF] hover:bg-[#00FFFF]/50 transition duration-300 disabled:opacity-60 disabled:cursor-not-allowed hover:brightness-70 hover:scale-105" // Full width on mobile, responsive padding/text size
         >
           {status === "loading" ? (
             <>

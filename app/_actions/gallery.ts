@@ -130,3 +130,42 @@ export async function getGalleryImageById(
   return JSON.parse(JSON.stringify(image));
 }
 
+/**
+ * Updates the title of an existing GalleryImage document.
+ * Note: Changing the image file itself would require a different action flow.
+ * @param id The Mongoose document ID of the GalleryImage to update.
+ * @param formData The FormData containing the new title ('title').
+ */
+export async function editGalleryImage(
+  id: string,
+  formData: FormData
+): Promise<{ success: boolean; error?: string }> {
+  await connectToDatabase();
+
+  // 1. Extract and Validate the Title
+  const newTitle = formData.get('title') as string;
+
+  if (!newTitle || typeof newTitle !== 'string' || !newTitle.trim()) {
+    return { success: false, error: "A valid title is required." };
+  }
+
+  try {
+    // 2. Find and Update the Mongoose document
+    const result = await GalleryImage.updateOne(
+      { _id: id },
+      { $set: { title: newTitle } }
+    );
+
+    if (result.matchedCount === 0) {
+        return { success: false, error: "GalleryImage not found." };
+    }
+
+    return { success: true };
+  } catch (e) {
+    console.error("Database update error:", e);
+    return {
+      success: false,
+      error: (e as Error).message || "Failed to update database entry.",
+    };
+  }
+}

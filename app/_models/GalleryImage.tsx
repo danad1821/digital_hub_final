@@ -14,6 +14,7 @@ const galleryImageSchema = new mongoose.Schema(
 // Define a type for the GalleryImage document for TypeScript
 export type GalleryImageDocument = mongoose.Document & {
   image: mongoose.Types.ObjectId;
+  title: String;
   createdAt: Date;
   updatedAt: Date;
 };

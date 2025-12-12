@@ -17,54 +17,6 @@ const NAV_LINKS = [
   { name: "Get Quote", href: "/get_quote" },
 ];
 
-const MobileSidebar = ({
-  isOpen,
-  onClose,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-}) => {
-  // ... (MobileSidebar component remains the same) ...
-  return (
-    <>
-      {isOpen && (
-        <div
-          className="fixed inset-0 bg-gray-500 opacity-50 z-40 lg:hidden"
-          onClick={onClose}
-        ></div>
-      )}
-
-      <div
-        className={`fixed top-0 right-0 h-full w-64 bg-white shadow-xl transform transition-transform duration-300 ease-in-out z-50 lg:hidden
-                    ${isOpen ? "translate-x-0" : "translate-x-full"}`}
-      >
-        <div className="p-4 flex flex-col h-full">
-          <button onClick={onClose} className="self-end p-2 mb-4">
-            <IoClose className="text-3xl text-black" />
-          </button>
-
-          <ul className="list-none flex flex-col gap-4">
-            {NAV_LINKS.map((link) => (
-              <li
-                key={link.name}
-                className="text-lg py-2 border-b border-gray-100"
-              >
-                <Link
-                  href={link.href}
-                  onClick={onClose}
-                  className="text-black hover:text-blue-600"
-                >
-                  {link.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    </>
-  );
-};
-
 export default function Header() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
@@ -74,7 +26,6 @@ export default function Header() {
 
   useEffect(() => {
     const handleScroll = () => {
-      // Set threshold to 100px
       const isScrolled = window.scrollY > 50;
       if (isScrolled !== scrolled) {
         setScrolled(isScrolled);
@@ -86,9 +37,10 @@ export default function Header() {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [scrolled]); // FIX: Dependency should be 'scrolled' to prevent constant re-rendering/bugs.
+  }, [scrolled]); 
 
-  if (pathname === "/admin") {
+  // Prevent rendering the header on the admin path
+  if (pathname && pathname.startsWith("/admin")) {
     return <></>;
   }
 
@@ -102,18 +54,28 @@ export default function Header() {
   // State 2 (Scrolled): White BG, Dark Text, Shadow
   const solidStateClasses = "bg-white shadow-md text-black";
 
-  const dynamicClasses = scrolled ? solidStateClasses : transparentStateClasses;
+  const dynamicClasses = scrolled || isOpen ? solidStateClasses : transparentStateClasses;
+  
+  // Mobile menu links need to handle closing the menu on click
+  const handleLinkClick = () => {
+      if (isOpen) {
+          setIsOpen(false);
+      }
+  };
 
   return (
     <header className={`${baseClasses} ${dynamicClasses}`}>
-      <nav className="flex flex-nowrap w-full custom-container">
-        <ul className="list-none w-full flex justify-between items-center">
+      <nav className="flex flex-col w-full custom-container">
+        
+        {/* Top Bar (Logo and Hamburger) */}
+        <div className="flex flex-nowrap w-full justify-between items-center h-16 sm:h-20">
+          
           {/* Logo/Site Title */}
-          <li
-            className={`text-2xl font-medium transition-colors duration-300 ${scrolled ? "text-black" : "text-white"}`}
+          <Link href="/" onClick={() => setIsOpen(false)}
+            className={`text-2xl font-medium transition-colors duration-300 ${scrolled || isOpen ? "text-black" : "text-white"}`}
           >
             ALTA MARITIME
-          </li>
+          </Link>
 
           {/* Desktop Navigation Links */}
           <div className="hidden lg:flex items-center justify-center gap-6">
@@ -123,20 +85,17 @@ export default function Header() {
 
               // 1. Define base classes for regular links (depends on scroll state)
               const regularLinkClasses = `transition duration-150 ${
-                scrolled ? "text-gray-700 hover:text-[#00D9FF]" : "text-white hover:text-[#00D9FF]"
+                scrolled || isOpen ? "text-gray-700 hover:text-[#00D9FF]" : "text-white hover:text-[#00D9FF]"
               }`;
               
-              // 2. Define classes for the CTA button (always solid, but colors might adjust slightly)
+              // 2. Define classes for the CTA button (always solid)
               const ctaClasses = `
-                px-5 py-2 rounded-sm whitespace-nowrap
-                ${scrolled 
-                  ? 'bg-[#00D9FF] text-black hover:bg-[#00D9FF]' // Darker blue on white background
-                  : 'bg-[#00D9FF] text-black hover:bg-[#00D9FF]' // Same button, but add a slight border when transparent
-                }
+                py-2 px-4 rounded-sm whitespace-nowrap text-black
+                bg-[#00D9FF] hover:bg-[#00FFFF]/80
               `;
 
               return (
-                <li key={link.name}>
+                <li key={link.name} className="list-none">
                   <Link 
                     href={link.href} 
                     className={isCTA ? ctaClasses : regularLinkClasses}
@@ -148,18 +107,52 @@ export default function Header() {
             })}
           </div>
 
-          {/* Hamburger Button (No change needed here, color logic is already fine) */}
+          {/* Hamburger/Close Button */}
           <div className="lg:hidden">
-            <button onClick={toggleSidebar} className="p-2">
-              <RxHamburgerMenu
-                className={`text-3xl transition-colors duration-300 ${scrolled ? "text-black" : "text-black"}`}
-              />
+            <button onClick={toggleSidebar} className="py-2 text-white">
+              {isOpen ? (
+                // Always black when open for contrast against the white dropdown
+                <IoClose className={`text-3xl text-black`} /> 
+              ) : (
+                // Color changes based on scroll state when closed
+                <RxHamburgerMenu className={`text-3xl ${scrolled || isOpen ? "text-black" : "text-white"}`} />
+              )}
             </button>
           </div>
-        </ul>
-      </nav>
+        </div>
+        
+        {/* ⭐️ MODIFIED: Mobile Dropdown Navigation (Fixed White/Black Colors) ⭐️ */}
+        {isOpen && (
+          <ul 
+            // FIXED white background and dark text, matching the original sidebar
+            className={`lg:hidden flex flex-col space-y-2 pb-4 pt-2 bg-white text-black border-t border-gray-200`}
+          >
+            {NAV_LINKS.map((link) => {
+                const isCTA = link.name === 'Get Quote';
+                
+                return (
+                    <li key={link.name}>
+                        <Link 
+                            href={link.href} 
+                            onClick={handleLinkClick}
+                            // Styling for regular links and CTA in the mobile dropdown
+                            className={`block py-2 transition duration-200 text-base
+                                ${isCTA 
+                                    ? 'bg-[#00D9FF] text-black font-medium w-full text-center rounded-sm mt-2 hover:bg-[#00FFFF]/80' 
+                                    // Use gray-700 text and bright blue hover for regular links on white background
+                                    : 'text-gray-700 hover:text-[#00D9FF] hover:bg-gray-100' 
+                                }
+                            `}
+                        >
+                            {link.name}
+                        </Link>
+                    </li>
+                );
+            })}
+          </ul>
+        )}
 
-      <MobileSidebar isOpen={isOpen} onClose={toggleSidebar} />
+      </nav>
     </header>
   );
 }
