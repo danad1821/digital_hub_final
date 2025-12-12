@@ -106,7 +106,7 @@ export default function Footer() {
 
   return (
     <footer className={`${footerBg} ${textColor} font-sans`}>
-      <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8 custom-container">
+      <div className="max-w-7xl py-16 custom-container">
         {/* Main 4-Column Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
           {/* Column 1: Logo, Slogan, and Socials */}
