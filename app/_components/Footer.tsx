@@ -36,18 +36,18 @@ export default function Footer() {
   const serviceLinks = [
     // ⚠️ The 'name' value here MUST exactly match the 'category' value in your database
     // for the scrolling functionality in AboutUs.tsx to work.
-    { name: "Heavy Lift Cargo", href: "/services?name=Heavy%20Lift%20Cargo" },
+    { name: "Heavy Lift Cargo", href: "/" },
     {
       name: "Break Bulk Shipping",
-      href: "/services?name=Break%20Bulk%20Shipping",
+      href: "/",
     },
-    { name: "Project Logistics", href: "/services?name=Project%20Logistics" },
-    { name: "Port Operations", href: "/services?name=Port%20Operations" },
+    { name: "Project Logistics", href: "/" },
+    { name: "Port Operations", href: "/" },
     {
       name: "Machinery Relocation",
-      href: "/services?name=Machinery%20Relocation",
+      href: "/",
     },
-    { name: "Cargo Chartering", href: "/services?name=Cargo%20Chartering" },
+    { name: "Cargo Chartering", href: "/" },
   ];
 
   const companyLinks = [
