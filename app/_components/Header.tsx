@@ -7,17 +7,25 @@ import { IoClose } from "react-icons/io5";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+// ⭐ NEW: Interface for the prop passed from page.tsx
+interface HeaderProps {
+    // Function passed from page.tsx to handle the smooth scroll
+    scrollToSection: (sectionId: string) => void; 
+}
+
 // Define the navigation links
 const NAV_LINKS = [
-  { name: "Services", href: "/services" },
-  { name: "About", href: "/about" },
-  { name: "Gallery", href: "/gallery" },
-  { name: "Locations", href: "/locations" },
-  { name: "Contact", href: "/contact" },
-  { name: "Get Quote", href: "/get_quote" },
+  // ⭐ UPDATED: Using 'id' instead of 'href' for internal use
+  { name: "Services", id: "services" },
+  { name: "About", id: "about" },
+  { name: "Gallery", id: "gallery" },
+  { name: "Locations", id: "locations" }, // Corresponds to global map section
+  { name: "Contact", id: "contact" },
+  { name: "Get Quote", id: "contact" }, // Get Quote references the contact section
 ];
 
-export default function Header() {
+// ⭐ UPDATED: Accept scrollToSection as a prop
+export default function Header({ scrollToSection }: HeaderProps) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -56,8 +64,10 @@ export default function Header() {
 
   const dynamicClasses = scrolled || isOpen ? solidStateClasses : transparentStateClasses;
   
-  // Mobile menu links need to handle closing the menu on click
-  const handleLinkClick = () => {
+  // Mobile menu links need to handle closing the menu on click AND scrolling
+  const handleLinkClick = (id: string) => {
+      // ⭐ NEW: Call the scroll function passed from the parent page
+      scrollToSection(id);
       if (isOpen) {
           setIsOpen(false);
       }
@@ -70,7 +80,7 @@ export default function Header() {
         {/* Top Bar (Logo and Hamburger) */}
         <div className="flex flex-nowrap w-full justify-between items-center h-16 sm:h-20">
           
-          {/* Logo/Site Title */}
+          {/* Logo/Site Title - Remains a Next.js Link to the homepage */}
           <Link href="/" onClick={() => setIsOpen(false)}
             className={`text-2xl font-medium transition-colors duration-300 ${scrolled || isOpen ? "text-black" : "text-white"}`}
           >
@@ -84,24 +94,25 @@ export default function Header() {
               const isCTA = link.name === 'Get Quote';
 
               // 1. Define base classes for regular links (depends on scroll state)
-              const regularLinkClasses = `transition duration-150 ${
+              const regularLinkClasses = `transition duration-150 cursor-pointer ${
                 scrolled || isOpen ? "text-gray-700 hover:text-[#00D9FF]" : "text-white hover:text-[#00D9FF]"
               }`;
               
               // 2. Define classes for the CTA button (always solid)
               const ctaClasses = `
-                py-2 px-4 rounded-sm whitespace-nowrap text-black
+                py-2 px-4 rounded-sm whitespace-nowrap text-black cursor-pointer
                 bg-[#00D9FF] hover:bg-[#00FFFF]/80
               `;
 
               return (
                 <li key={link.name} className="list-none">
-                  <Link 
-                    href={link.href} 
+                  {/* ⭐ UPDATED: Use a button with onClick for programmatic smooth scroll */}
+                  <button 
+                    onClick={() => handleLinkClick(link.id)} 
                     className={isCTA ? ctaClasses : regularLinkClasses}
                   >
                     {link.name}
-                  </Link>
+                  </button>
                 </li>
               );
             })}
@@ -121,7 +132,7 @@ export default function Header() {
           </div>
         </div>
         
-        {/* ⭐️ MODIFIED: Mobile Dropdown Navigation (Fixed White/Black Colors) ⭐️ */}
+        {/* Mobile Dropdown Navigation */}
         {isOpen && (
           <ul 
             // FIXED white background and dark text, matching the original sidebar
@@ -131,21 +142,22 @@ export default function Header() {
                 const isCTA = link.name === 'Get Quote';
                 
                 return (
+                    // ⭐ UPDATED: key is now link.id
                     <li key={link.name}>
-                        <Link 
-                            href={link.href} 
-                            onClick={handleLinkClick}
+                        {/* ⭐ UPDATED: Use a button with onClick for programmatic smooth scroll */}
+                        <button 
+                            onClick={() => handleLinkClick(link.id)} 
                             // Styling for regular links and CTA in the mobile dropdown
-                            className={`block py-2 transition duration-200 text-base
+                            className={`block py-2 transition duration-200 text-base w-full text-left
                                 ${isCTA 
                                     ? 'bg-[#00D9FF] text-black font-medium w-full text-center rounded-sm mt-2 hover:bg-[#00FFFF]/80' 
                                     // Use gray-700 text and bright blue hover for regular links on white background
-                                    : 'text-gray-700 hover:text-[#00D9FF] hover:bg-gray-100' 
+                                    : 'text-gray-700 hover:text-[#00D9FF] hover:bg-gray-100 px-4'
                                 }
                             `}
                         >
                             {link.name}
-                        </Link>
+                        </button>
                     </li>
                 );
             })}

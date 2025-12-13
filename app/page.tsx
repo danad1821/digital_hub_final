@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import Image from "next/image";
 import { BsBoxSeam } from "react-icons/bs";
 import HomeInfoCard from "./_components/cards/HomeInfoCard";
@@ -20,10 +20,10 @@ import { getCurrentSchedule } from "./_actions/uploadFile";
 import dynamic from "next/dynamic";
 
 const DynamicInteractiveMap = dynamic(
-  () => import('./_components/InteractiveMap'),
+  () => import("./_components/InteractiveMap"),
   {
     // THIS IS THE CRITICAL FIX: prevents the map component from running on the server
-    ssr: false, 
+    ssr: false,
     loading: () => (
       <div className="flex justify-center items-center w-full h-96 bg-gray-100 rounded-sm">
         <Loader2 className="w-8 h-8 text-[#0A1C30] animate-spin" />
@@ -33,7 +33,6 @@ const DynamicInteractiveMap = dynamic(
 );
 // --- END: Dynamic Import ---
 
-
 export default function Home() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
@@ -41,6 +40,38 @@ export default function Home() {
   const [pageData, setPageData] = useState<any>(null);
   const [locations, setLocations] = useState<any>([]);
   const [scheduleFileId, setScheduleFileId] = useState<string | null>(null);
+
+  // ⭐ NEW: CREATE REFS FOR EACH SECTION
+  const servicesRef = useRef<HTMLDivElement>(null);
+  const aboutRef = useRef<HTMLDivElement>(null);
+  const galleryRef = useRef<HTMLDivElement>(null);
+  const locationsRef = useRef<HTMLDivElement>(null);
+  const contactRef = useRef<HTMLDivElement>(null);
+
+  // ⭐ NEW: SCROLL HANDLER FUNCTION
+  const scrollToSection = (sectionId: string) => {
+    // A map to look up the correct ref based on the ID string
+    const sectionRefs: { [key: string]: React.RefObject<HTMLDivElement> } = {
+        services: servicesRef,
+        about: aboutRef,
+        gallery: galleryRef,
+        locations: locationsRef,
+        contact: contactRef,
+    };
+    
+    const ref = sectionRefs[sectionId];
+    if (ref && ref.current) {
+      // Offset to account for the fixed header (adjust as needed for accurate positioning)
+      const HEADER_HEIGHT_OFFSET = 96; 
+      const topOffset = ref.current.offsetTop - HEADER_HEIGHT_OFFSET;
+      
+      window.scrollTo({
+        top: topOffset,
+        behavior: "smooth",
+      });
+    }
+  };
+
 
   // --- SCROLL HOOKS FOR HERO SECTION (NEW PARALLAX LOGIC) ---
   const { scrollY } = useScroll();
@@ -102,7 +133,12 @@ export default function Home() {
 
       // 2. Fetch auxiliary data (can be parallelized)
       // Call the memoized helper functions
-      await Promise.all([getAllImages(), getAllServices(), getAllLocations(), fetchCurrentSchedule()]);
+      await Promise.all([
+        getAllImages(),
+        getAllServices(),
+        getAllLocations(),
+        fetchCurrentSchedule(),
+      ]);
     } catch (error) {
       console.error("Error fetching initial page data:", error);
     } finally {
@@ -133,15 +169,26 @@ export default function Home() {
     const title = pageData?.sections[1]?.title || "";
     const subtitle = pageData?.sections[1]?.subtitle || "";
 
-    if (!title || !subtitle) return { titleFirstPart: "", titleSecondPart: "", subtitlePart1: "", subtitlePart2: "" };
+    if (!title || !subtitle)
+      return {
+        titleFirstPart: "",
+        titleSecondPart: "",
+        subtitlePart1: "",
+        subtitlePart2: "",
+      };
 
     const titleWords = title.split(" ");
     const subtitleSentences = subtitle.split(".");
 
     // Reconstruct the first subtitle part and ensure it ends with a period if it was present
     const sub1 = subtitleSentences.slice(0, 2).join(". ");
-    const subtitlePart1 = sub1 ? sub1 + (subtitleSentences.length > 2 ? "." : "") : "";
-    const subtitlePart2 = subtitleSentences.slice(2).filter((s:any) => s.trim().length > 0).join(". ");
+    const subtitlePart1 = sub1
+      ? sub1 + (subtitleSentences.length > 2 ? "." : "")
+      : "";
+    const subtitlePart2 = subtitleSentences
+      .slice(2)
+      .filter((s: any) => s.trim().length > 0)
+      .join(". ");
 
     return {
       titleFirstPart: titleWords.slice(0, 2).join(" "),
@@ -176,7 +223,8 @@ export default function Home() {
   return (
     <main className="min-h-screen">
       {/* 2. HEADER: Rendered at the top. */}
-      <Header />
+      {/* ⭐ UPDATED: Pass the scroll handler */}
+      <Header scrollToSection={scrollToSection} />
 
       {/* --- HERO SECTION (NEW PARALLAX AND FADE EFFECT) --- */}
       {/* ADDED: min-h-screen and responsive font sizes */}
@@ -225,8 +273,9 @@ export default function Home() {
               <h1 className="text-white text-4xl sm:text-6xl lg:text-7xl font-bold mb-4 tracking-tight max-w-2xl ">
                 {" "}
                 {/* Responsive font sizes */}
-                {heroTitleParts.firstPart}{" "}
-                <br className="block sm:hidden" />{" "}
+                {
+                  heroTitleParts.firstPart
+                } <br className="block sm:hidden" />{" "}
                 {/* Line break on small screens */}
                 <span className="gradient-text font-black tracking-tight pb-3">
                   {heroTitleParts.secondPart}
@@ -303,8 +352,12 @@ export default function Home() {
       </section>
 
       {/* 4. ABOUT SECTION (Sections[1]) */}
-      {/* CHANGED: flex-col on small screens, adjust padding and gaps */}
-      <section className="flex items-center custom-container justify-between py-16 md:py-24 gap-y-12 gap-x-10 flex-col lg:flex-row">
+      {/* ⭐ ADDED: ref={aboutRef} */}
+      <section 
+        ref={aboutRef}
+        id="about" // Keeping the ID for general web use
+        className="flex items-center custom-container justify-between py-16 md:py-24 gap-y-12 gap-x-10 flex-col lg:flex-row"
+      >
         <motion.div
           initial={{ opacity: 0, x: -40 }}
           whileInView={{ opacity: 1, x: 0 }}
@@ -319,9 +372,7 @@ export default function Home() {
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold flex flex-col my-2">
             {" "}
             {/* Responsive font size */}
-            <span>
-              {aboutSectionParts.titleFirstPart}
-            </span>
+            <span>{aboutSectionParts.titleFirstPart}</span>
             <span className="gradient-text font-black tracking-tight pb-2">
               {aboutSectionParts.titleSecondPart}
             </span>
@@ -371,7 +422,12 @@ export default function Home() {
       </section>
 
       {/* 5. SERVICES SECTION (Sections[2]) */}
-      <section className="py-16 md:py-20 bg-gray-50">
+      {/* ⭐ ADDED: ref={servicesRef} */}
+      <section 
+        ref={servicesRef} 
+        id="services" // Keeping the ID for general web use
+        className="py-16 md:py-20 bg-gray-50"
+      >
         {" "}
         {/* Responsive padding */}
         <div className="custom-container">
@@ -398,42 +454,50 @@ export default function Home() {
           <div className="flex flex-wrap lg:flex-nowrap items-center gap-2 justify-center">
             {services.slice(0, 6).map((s: any, index: any) => {
               const isScheduleCard = index === 2;
-               return isScheduleCard ? (<motion.a // Changed to motion.a for a clickable link
-                    key={s.serviceName}
-                    href={`/api/schedule/${scheduleFileId}`}
-                    target="_blank" // Open in new window
-                    rel="noopener noreferrer" // Security best practice for target="_blank"
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                    className="w-full flex items-center justify-center cursor-pointer"
-                  >
-                    <HomeInfoCard
-                  service={s}
-                  icon={icons[index % icons.length]} // Using modulo for safety
-                />
-                  </motion.a>)
-              : (<motion.div
-                key={s.serviceName}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="w-full flex items-center justify-center" // HomeInfoCard should handle its own width
-              >
-                <HomeInfoCard
-                  service={s}
-                  icon={icons[index % icons.length]} // Using modulo for safety
-                />
-              </motion.div>
-            )})}
+              return isScheduleCard ? (
+                <motion.a // Changed to motion.a for a clickable link
+                  key={s.serviceName}
+                  href={`/api/schedule/${scheduleFileId}`}
+                  target="_blank" // Open in new window
+                  rel="noopener noreferrer" // Security best practice for target="_blank"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className="w-full flex items-center justify-center cursor-pointer"
+                >
+                  <HomeInfoCard
+                    service={s}
+                    icon={icons[index % icons.length]} // Using modulo for safety
+                  />
+                </motion.a>
+              ) : (
+                <motion.div
+                  key={s.serviceName}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className="w-full flex items-center justify-center" // HomeInfoCard should handle its own width
+                >
+                  <HomeInfoCard
+                    service={s}
+                    icon={icons[index % icons.length]} // Using modulo for safety
+                  />
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
 
       {/* 6. GALLERY SECTION (Sections[4]) */}
-      <section className="py-16 md:py-20">
+      {/* ⭐ ADDED: ref={galleryRef} */}
+      <section 
+        ref={galleryRef}
+        id="gallery" // Keeping the ID for general web use
+        className="py-16 md:py-20"
+      >
         {" "}
         {/* Responsive padding */}
         <div className="custom-container">
@@ -483,7 +547,12 @@ export default function Home() {
       </section>
 
       {/* 7. INTERACTIVE MAP SECTION (Sections[5]) */}
-      <section className="py-16 md:py-20 bg-[#0A1628]">
+      {/* ⭐ ADDED: ref={locationsRef} */}
+      <section 
+        ref={locationsRef}
+        id="locations" // Keeping the ID for general web use
+        className="py-16 md:py-20 bg-[#0A1628]"
+      >
         {" "}
         {/* Responsive padding */}
         <div className="custom-container">
@@ -519,7 +588,12 @@ export default function Home() {
       </section>
 
       {/* 8. CONTACT SECTION (Sections[6]) */}
-      <section className="py-16 md:py-20">
+      {/* ⭐ ADDED: ref={contactRef} */}
+      <section 
+        ref={contactRef}
+        id="contact" // Keeping the ID for general web use
+        className="py-16 md:py-20"
+      >
         {" "}
         {/* Responsive padding */}
         <div className="custom-container">
