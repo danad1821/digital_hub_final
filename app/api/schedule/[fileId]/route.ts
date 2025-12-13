@@ -13,7 +13,7 @@ async function getBucket() {
 
 export async function GET(
   request: Request,
-  { params }: { params: { fileId: string } }
+  { params }: { params: Promise<{ fileId: string }> }
 ) {
   try {
     const bucket = await getBucket();
