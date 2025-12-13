@@ -31,7 +31,7 @@ export default function InteractiveMap() {
   return (
     // ADJUSTED: Changed aspect ratio for better vertical space on small screens
     // aspect-[2/1] is fine for desktop, but aspect-[5/3] or a fixed height is better for mobile
-    <div className="flex flex-col relative w-full aspect-[5/3] md:aspect-[2/1] bg-gray-900 rounded-sm overflow-hidden shadow-2xl">
+    <div className="flex flex-col relative w-full min-h-[400px] aspect-[5/3] md:aspect-[2/1] bg-gray-900 rounded-sm overflow-hidden shadow-2xl">
       
       {/* 🚢 GLOBAL PORTS COUNT LABEL */}
       {/* ADJUSTED: Smaller padding, top position, and responsive font size */}

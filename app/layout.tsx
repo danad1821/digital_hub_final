@@ -18,7 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className="font-sans antialiased bg-white text-gray-800"
+        className="font-sans antialiased bg-white text-gray-800 overflow-x-none"
       >
         {/* <Header/> */}
         {children}

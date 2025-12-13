@@ -98,3 +98,25 @@ background-clip: text;
     animation: pulse-wave 2.5s cubic-bezier(0, 0, 0.2, 1) infinite 1.6s; /* 1.6s delay */
     background-color: #00d9ff14;
 }
+
+/* In your global CSS file (e.g., globals.css) */
+
+/* Styles the entire popup wrapper */
+.custom-popup {
+  padding: 0; /* Remove default padding to let the inner div control spacing */
+  border-radius: 8px; /* Match the rounded corners in the image */
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15); /* Add a subtle shadow */
+  background: white; /* Ensure white background */
+}
+
+/* Styles the content area inside the wrapper */
+.leaflet-popup-content {
+  margin: 0; /* Remove default margin */
+}
+
+/* Styles the bottom pointer/tip of the popup */
+.leaflet-popup-tip {
+  background: white; /* Make the pointer white */
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15); /* Apply shadow to the tip for consistency */
+  border: none;
+}

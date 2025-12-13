@@ -14,6 +14,7 @@ import { getAllGalleryImages } from "./_actions/gallery";
 import { IoCalendarClearOutline } from "react-icons/io5";
 
 import { motion, useScroll, useTransform } from "framer-motion";
+import { getCurrentSchedule } from "./_actions/uploadFile";
 
 // --- START: Dynamic Import for InteractiveMap (THE FIX) ---
 import dynamic from "next/dynamic";
@@ -39,6 +40,7 @@ export default function Home() {
   const [services, setServices] = useState<any>([]);
   const [pageData, setPageData] = useState<any>(null);
   const [locations, setLocations] = useState<any>([]);
+  const [scheduleFileId, setScheduleFileId] = useState<string | null>(null);
 
   // --- SCROLL HOOKS FOR HERO SECTION (NEW PARALLAX LOGIC) ---
   const { scrollY } = useScroll();
@@ -78,6 +80,17 @@ export default function Home() {
     }
   }, []); // Dependencies: None (setLocations is a stable setter)
 
+  const fetchCurrentSchedule = useCallback(async () => {
+    try {
+      const current = await getCurrentSchedule();
+      if (current) {
+        setScheduleFileId(current.id);
+      }
+    } catch (error) {
+      console.error("Error fetching current schedule ID:", error);
+    }
+  }, []);
+
   // 1. COMBINE FETCHING LOGIC INTO A SINGLE ASYNC FUNCTION (Memoized)
   const initDataFetch = useCallback(async () => {
     setIsLoading(true);
@@ -89,7 +102,7 @@ export default function Home() {
 
       // 2. Fetch auxiliary data (can be parallelized)
       // Call the memoized helper functions
-      await Promise.all([getAllImages(), getAllServices(), getAllLocations()]);
+      await Promise.all([getAllImages(), getAllServices(), getAllLocations(), fetchCurrentSchedule()]);
     } catch (error) {
       console.error("Error fetching initial page data:", error);
     } finally {
@@ -381,15 +394,27 @@ export default function Home() {
             </p>
           </motion.div>
 
-          {isLoading && (
-            <div className="flex justify-center items-center h-48">
-              <Loader2 className="w-10 h-10 text-[#00D9FF] animate-spin" />
-            </div>
-          )}
           {/* CHANGED: grid layout for better service card responsiveness */}
           <div className="flex flex-wrap lg:flex-nowrap items-center gap-2 justify-center">
-            {services.slice(0, 6).map((s: any, index: any) => (
-              <motion.div
+            {services.slice(0, 6).map((s: any, index: any) => {
+              const isScheduleCard = index === 2;
+               return isScheduleCard ? (<motion.a // Changed to motion.a for a clickable link
+                    key={s.serviceName}
+                    href={`/api/schedule/${scheduleFileId}`}
+                    target="_blank" // Open in new window
+                    rel="noopener noreferrer" // Security best practice for target="_blank"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    className="w-full flex items-center justify-center cursor-pointer"
+                  >
+                    <HomeInfoCard
+                  service={s}
+                  icon={icons[index % icons.length]} // Using modulo for safety
+                />
+                  </motion.a>)
+              : (<motion.div
                 key={s.serviceName}
                 initial={{ opacity: 0, scale: 0.9 }}
                 whileInView={{ opacity: 1, scale: 1 }}
@@ -402,7 +427,7 @@ export default function Home() {
                   icon={icons[index % icons.length]} // Using modulo for safety
                 />
               </motion.div>
-            ))}
+            )})}
           </div>
         </div>
       </section>
@@ -430,11 +455,6 @@ export default function Home() {
               {pageData?.sections[4].subtitle}
             </p>
           </motion.div>
-          {isLoading && (
-            <div className="flex justify-center items-center h-48">
-              <Loader2 className="w-10 h-10 text-[#00D9FF] animate-spin" />
-            </div>
-          )}
           {/* Grid layout is already good, but ensured gap is responsive */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {gallery.slice(0, 6).map((img: any, index: number) => (
@@ -448,7 +468,7 @@ export default function Home() {
                 className="relative overflow-hidden rounded-sm shadow-lg group cursor-pointer h-60 sm:h-80" // Responsive height
               >
                 <img
-                  src={`/api/images/${img.image.toString()}`}
+                  src={`/api/images/${img.image}`}
                   alt={`Gallery item ${img.title}`}
                   className="w-full h-full object-cover bg-gray-200"
                 />
