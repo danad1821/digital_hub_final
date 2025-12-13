@@ -17,9 +17,6 @@ export default function ServiceCard({
       </div>
 
       <p className="text-gray-300 text-sm mb-2">{service.summary}</p>
-      <p className="text-gray-400 text-xs mt-2 line-clamp-2">
-        {service.description}
-      </p>
 
       <div className="flex justify-end gap-3 mt-4">
         <button

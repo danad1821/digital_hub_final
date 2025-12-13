@@ -14,9 +14,6 @@ export default function AddServiceModal({
     initialService?.serviceName || ""
   );
   const [summary, setSummary] = useState(initialService?.summary || "");
-  const [description, setDescription] = useState(
-    initialService?.description || ""
-  );
 
   return (
     <>
@@ -40,17 +37,10 @@ export default function AddServiceModal({
             />
 
             <input
-              placeholder="Summary"
+              placeholder="Description"
               value={summary}
               onChange={(e) => setSummary(e.target.value)}
               className="w-full p-2 rounded bg-gray-900 text-gray-200 border border-gray-700"
-            />
-
-            <textarea
-              placeholder="Description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="w-full p-2 rounded bg-gray-900 text-gray-200 border border-gray-700 h-28"
             />
           </div>
 
@@ -62,12 +52,10 @@ export default function AddServiceModal({
                       _id: initialService._id,
                       serviceName,
                       summary,
-                      description,
                     }
                   : {
                       serviceName,
                       summary,
-                      description,
                     }
               )
             }

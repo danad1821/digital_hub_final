@@ -5,17 +5,13 @@ import { FaChevronRight } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 
 // 1. IMPROVEMENT: Define a strong TypeScript Interface
-interface Service {
-  icon: any;
-  serviceName: string;
-  summary: string;
-}
+
 
 export default function HomeInfoCard({
   service,
   icon,
 }: {
-  service: Service;
+  service: any;
   icon: any;
 }) {
   const router = useRouter();
@@ -41,7 +37,7 @@ export default function HomeInfoCard({
     >
       <div
         className="
-        bg-gradient-to-br from-blue-300 to-indigo-600 
+        gradient-icon
         text-white
         w-18
         h-18 

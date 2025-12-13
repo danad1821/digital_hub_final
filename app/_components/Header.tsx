@@ -1,7 +1,7 @@
 // Header.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { IoClose } from "react-icons/io5";
 import Link from "next/link";
@@ -9,8 +9,8 @@ import { usePathname } from "next/navigation";
 
 // ⭐ NEW: Interface for the prop passed from page.tsx
 interface HeaderProps {
-    // Function passed from page.tsx to handle the smooth scroll
-    scrollToSection: (sectionId: string) => void; 
+  // Function passed from page.tsx to handle the smooth scroll
+  scrollToSection: (sectionId: string) => void;
 }
 
 // Define the navigation links
@@ -32,12 +32,14 @@ export default function Header({ scrollToSection }: HeaderProps) {
 
   const toggleSidebar = () => setIsOpen(!isOpen);
 
+  // --- FIX: Optimized useEffect for scroll handling ---
   useEffect(() => {
     const handleScroll = () => {
+      // Functional update check for 'scrolled' to prevent stale state issues,
+      // although checking against 50 is sufficient for this simple logic.
+      // We'll rely on the simple check and correct dependency array [].
       const isScrolled = window.scrollY > 50;
-      if (isScrolled !== scrolled) {
-        setScrolled(isScrolled);
-      }
+      setScrolled(isScrolled);
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -45,12 +47,24 @@ export default function Header({ scrollToSection }: HeaderProps) {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [scrolled]); 
+  }, []); // ⭐ FIX: Dependency array is now empty ([]), ensuring listener is added once.
+          // The component will re-render when setScrolled updates, but the effect logic is stable.
 
   // Prevent rendering the header on the admin path
   if (pathname && pathname.startsWith("/admin")) {
     return <></>;
   }
+
+  // Mobile menu links need to handle closing the menu on click AND scrolling
+  const handleLinkClick = useCallback((id: string) => {
+      // ⭐ NEW: Call the scroll function passed from the parent page
+      scrollToSection(id);
+      if (isOpen) {
+        setIsOpen(false);
+      }
+    },
+    [scrollToSection, isOpen] // Dependencies: scrollToSection (stable from parent) and isOpen
+  );
 
   // --- Dynamic Classes Configuration ---
   const baseClasses =
@@ -63,15 +77,6 @@ export default function Header({ scrollToSection }: HeaderProps) {
   const solidStateClasses = "bg-white shadow-md text-black";
 
   const dynamicClasses = scrolled || isOpen ? solidStateClasses : transparentStateClasses;
-  
-  // Mobile menu links need to handle closing the menu on click AND scrolling
-  const handleLinkClick = (id: string) => {
-      // ⭐ NEW: Call the scroll function passed from the parent page
-      scrollToSection(id);
-      if (isOpen) {
-          setIsOpen(false);
-      }
-  };
 
   return (
     <header className={`${baseClasses} ${dynamicClasses}`}>
@@ -139,27 +144,27 @@ export default function Header({ scrollToSection }: HeaderProps) {
             className={`lg:hidden flex flex-col space-y-2 pb-4 pt-2 bg-white text-black border-t border-gray-200`}
           >
             {NAV_LINKS.map((link) => {
-                const isCTA = link.name === 'Get Quote';
-                
-                return (
-                    // ⭐ UPDATED: key is now link.id
-                    <li key={link.name}>
-                        {/* ⭐ UPDATED: Use a button with onClick for programmatic smooth scroll */}
-                        <button 
-                            onClick={() => handleLinkClick(link.id)} 
-                            // Styling for regular links and CTA in the mobile dropdown
-                            className={`block py-2 transition duration-200 text-base w-full text-left
-                                ${isCTA 
-                                    ? 'bg-[#00D9FF] text-black font-medium w-full text-center rounded-sm mt-2 hover:bg-[#00FFFF]/80' 
-                                    // Use gray-700 text and bright blue hover for regular links on white background
-                                    : 'text-gray-700 hover:text-[#00D9FF] hover:bg-gray-100 px-4'
-                                }
-                            `}
-                        >
-                            {link.name}
-                        </button>
-                    </li>
-                );
+              const isCTA = link.name === 'Get Quote';
+              
+              return (
+                // ⭐ UPDATED: key is now link.id
+                <li key={link.name}>
+                  {/* ⭐ UPDATED: Use a button with onClick for programmatic smooth scroll */}
+                  <button 
+                    onClick={() => handleLinkClick(link.id)} 
+                    // Styling for regular links and CTA in the mobile dropdown
+                    className={`block py-2 transition duration-200 text-base w-full text-left
+                      ${isCTA 
+                        ? 'bg-[#00D9FF] text-black font-medium w-full text-center rounded-sm mt-2 hover:bg-[#00FFFF]/80' 
+                        // Use gray-700 text and bright blue hover for regular links on white background
+                        : 'text-gray-700 hover:text-[#00D9FF] hover:bg-gray-100 px-4'
+                      }
+                    `}
+                  >
+                    {link.name}
+                  </button>
+                </li>
+              );
             })}
           </ul>
         )}

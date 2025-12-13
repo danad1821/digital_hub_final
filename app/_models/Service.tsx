@@ -4,7 +4,6 @@ const serviceSchema = new mongoose.Schema(
   {
     serviceName: {type: String, required: true, unique: true},
     summary: {type: String, required: true},
-    description: {type: String, required: true},
   },
   {
     timestamps: true, // Adds createdAt and updatedAt timestamps

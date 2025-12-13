@@ -101,22 +101,7 @@ background-clip: text;
 
 /* In your global CSS file (e.g., globals.css) */
 
-/* Styles the entire popup wrapper */
-.custom-popup {
-  padding: 0; /* Remove default padding to let the inner div control spacing */
-  border-radius: 8px; /* Match the rounded corners in the image */
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15); /* Add a subtle shadow */
-  background: white; /* Ensure white background */
-}
+.gradient-icon{
+  background: linear-gradient(180deg, #00D9FF 0%, #4A6FA5 100%);
 
-/* Styles the content area inside the wrapper */
-.leaflet-popup-content {
-  margin: 0; /* Remove default margin */
-}
-
-/* Styles the bottom pointer/tip of the popup */
-.leaflet-popup-tip {
-  background: white; /* Make the pointer white */
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15); /* Apply shadow to the tip for consistency */
-  border: none;
 }
