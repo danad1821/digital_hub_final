@@ -112,7 +112,7 @@ const PortPinWrapper = ({ loc }: { loc: any }) => { // Removed state props
 export default function DynamicShippingMap({ locations }: DynamicShippingMapProps) { // Removed state props
     
     const center: [number, number] = [30, 10]; 
-    const zoom = 4; 
+    const zoom = 5; 
     
     const markers = useMemo(() => {
         return locations.map((loc: any) => (
@@ -130,14 +130,14 @@ export default function DynamicShippingMap({ locations }: DynamicShippingMapProp
             zoom={zoom} 
             scrollWheelZoom={true} 
             className="w-full h-full"
-            minZoom={4} 
+            minZoom={5} 
             maxBounds={[[90, -180], [-90, 180]]} 
             zoomControl={false} 
         >
             <TileLayer
-                url="https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png"
+                url="https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png"
                 attribution=''
-                maxZoom={4} 
+                maxZoom={5} 
             />
             
             {markers}
