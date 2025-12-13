@@ -3,7 +3,7 @@ import Header from "../_components/Header"
 export default function NewsPage(){
     return(
         <>
-        <Header/>
+        {/* <Header/> */}
         <main className="min-h-screen bg-gray-50 py-12">
             {/* Main content container, max-width, centering, and custom-container class */}
             <div className="max-w-7xl mx-auto custom-container">

@@ -34,7 +34,7 @@ export default function CaseStudiesPage() {
     const router = useRouter();
   return (
     <>
-      <Header />
+      {/* <Header /> */}
       <main className="min-h-screen">
         {/* 1. HERO SECTION - Text-Focused */}
         <section className="h-[40vh] flex items-center bg-[#0A1C30] text-white">

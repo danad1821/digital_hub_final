@@ -3,7 +3,7 @@ import Header from "../_components/Header"
 export default function SafetyPage(){
     return(
         <>
-        <Header/>
+        {/* <Header/> */}
         {/* Changed bg-gray-40 to min-h-screen bg-gray-50 py-12 for consistent look */}
         <main className="min-h-screen bg-gray-50 py-12"> 
             {/* Main content container, max-width, centering, and custom-container class */}

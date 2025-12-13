@@ -40,7 +40,7 @@ export default function CareersPage() {
   const router = useRouter();
   return (
     <>
-      <Header />
+      {/* <Header /> */}
       <main className="min-h-screen">
         {/* 1. HERO SECTION - Career Focus */}
         <section className="relative h-[60vh] overflow-hidden flex items-center bg-[#0A1C30]">
