@@ -51,7 +51,7 @@ export default function Home() {
   // ⭐ NEW: SCROLL HANDLER FUNCTION
   const scrollToSection = (sectionId: string) => {
     // A map to look up the correct ref based on the ID string
-    const sectionRefs: { [key: string]: React.RefObject<HTMLDivElement> } = {
+    const sectionRefs: { [key: string]: any } = {
         services: servicesRef,
         about: aboutRef,
         gallery: galleryRef,
