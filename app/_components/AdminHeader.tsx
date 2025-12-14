@@ -65,7 +65,7 @@ export default function AdminHeader() {
 
   return (
     <header className="bg-[#0A1C30] shadow-lg sticky top-0 z-10">
-      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <nav className="mx-auto px-4 sm:px-6 lg:px-8">
         {/* Desktop & Mobile Header */}
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -79,7 +79,7 @@ export default function AdminHeader() {
               <Link href="/admin/services">Services</Link>
             </li>
             <li className="text-white hover:text-[#00FFFF] transition duration-200">
-              <Link href="/admin/pages">Pages</Link>
+              <Link href="/admin/editor">Editor</Link>
             </li>
             <li className="text-white hover:text-[#00FFFF] transition duration-200">
               <Link href="/admin/gallery">Gallery</Link>
@@ -89,6 +89,9 @@ export default function AdminHeader() {
             </li>
             <li className="text-white hover:text-[#00FFFF] transition duration-200">
               <Link href="/admin/locations">Locations</Link>
+            </li>
+            <li className="text-white hover:text-[#00FFFF] transition duration-200">
+              <Link href="/admin/schedule">Schedule</Link>
             </li>
 
             <li>
@@ -117,8 +120,8 @@ export default function AdminHeader() {
               </Link>
             </li>
             <li className="text-white hover:text-[#00FFFF] transition duration-200">
-              <Link href="/admin/pages" onClick={() => setOpen(false)}>
-                Pages
+              <Link href="/admin/editor" onClick={() => setOpen(false)}>
+                Editor
               </Link>
             </li>
             <li className="text-white hover:text-[#00FFFF] transition duration-200">
@@ -135,6 +138,9 @@ export default function AdminHeader() {
               <Link href="/admin/messages" onClick={() => setOpen(false)}>
                 Messages
               </Link>
+            </li>
+            <li className="text-white hover:text-[#00FFFF] transition duration-200">
+              <Link href="/admin/schedule">Schedule</Link>
             </li>
 
             {/* Mobile Logout Button */}

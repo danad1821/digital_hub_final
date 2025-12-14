@@ -121,16 +121,16 @@ export default function HomePageEditor() {
   const Navy = "bg-gray-800 text-white";
   const Cyan = "bg-cyan-600 hover:bg-cyan-700 text-white";
   const InputStyle =
-    "p-2 mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md focus:ring-cyan-500 focus:border-cyan-500 transition duration-150";
+    "text-white p-2 mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md focus:ring-cyan-500 focus:border-cyan-500 transition duration-150";
   const SectionHeaderStyle =
     "text-2xl font-bold border-b border-cyan-600/50 pb-2 mb-4 text-cyan-400";
   const CardStyle =
     "p-4 bg-gray-700 rounded-lg shadow-lg border border-gray-600";
 
   return (
-    <div className={`min-h-screen p-8 ${Navy}`}>
+    <div className={`min-h-screen p-8 text-grey-800`}>
       <header className="flex justify-between items-center mb-8">
-        <h1 className="text-4xl font-extrabold text-white">
+        <h1 className="text-4xl font-extrabold ">
           <Anchor className="inline-block w-8 h-8 mr-2 text-cyan-400" />
           Home Page Editor
         </h1>
@@ -172,7 +172,7 @@ export default function HomePageEditor() {
               />
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-4 text-white">
               <div>
                 <label
                   htmlFor="hero-title"
@@ -205,7 +205,7 @@ export default function HomePageEditor() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-6 mt-6">
+            <div className="grid grid-cols-2 gap-6 mt-6 text-white">
               {/* Button 1 */}
               <div className={CardStyle}>
                 <h4 className="text-xl font-semibold mb-3 text-cyan-400">
@@ -296,7 +296,7 @@ export default function HomePageEditor() {
           {/* Section 1: Stats */}
           <section className={CardStyle}>
             <h2 className={SectionHeaderStyle}>Stats Section</h2>
-            <div className="space-y-4 mb-6">
+            <div className="space-y-4 mb-6 text-white">
               <div>
                 <label
                   htmlFor="stats-title"
@@ -333,7 +333,7 @@ export default function HomePageEditor() {
               <h4 className="text-xl font-semibold mb-4 text-cyan-400">
                 Stats Cards
               </h4>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-white">
                 {pageData.sections[1].data.stats_list.map(
                   (i: any, index: number) => (
                     <div
@@ -394,7 +394,7 @@ export default function HomePageEditor() {
                 )}
               </div>
             </div>
-            <div className="relative mb-6 h-96">
+            <div className="relative mb-6 h-96 text-white">
               {/* isLarge={true} for the hero image visual style */}
               <ImageEditor
                 sectionIndex={1}
@@ -452,151 +452,6 @@ export default function HomePageEditor() {
             </button>
           </section>
 
-          {/* Section 3: Why Choose Us (Cards) - Index is 3 in array, 4th element */}
-          <section className={CardStyle}>
-            <h2 className={SectionHeaderStyle}>Why Choose Us Section</h2>
-            <div className="space-y-4 mb-6">
-              <div>
-                <label
-                  htmlFor="why-title"
-                  className="font-medium text-cyan-300"
-                >
-                  Title
-                </label>
-                <input
-                  type="text"
-                  id="why-title"
-                  className={InputStyle}
-                  value={pageData.sections[3].title}
-                  onChange={(e) => handleChange(e.target.value, 3, "title")}
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="why-subtitle"
-                  className="font-medium text-cyan-300"
-                >
-                  Subtitle
-                </label>
-                <input
-                  type="text"
-                  id="why-subtitle"
-                  className={InputStyle}
-                  value={pageData.sections[3].subtitle}
-                  onChange={(e) => handleChange(e.target.value, 3, "subtitle")}
-                />
-              </div>
-            </div>
-
-            <div className="p-4 bg-gray-800 rounded-md">
-              <h4 className="text-xl font-semibold mb-4 text-cyan-400">
-                Cards List
-              </h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {pageData.sections[3].data.cards.map(
-                  (c: any, index: number) => (
-                    <div
-                      key={index}
-                      className="p-4 bg-gray-700 rounded-lg border border-gray-600 space-y-3"
-                    >
-                      <h5 className="text-lg font-bold text-white flex items-center">
-                        <HelpCircle className="w-4 h-4 mr-2 text-cyan-400" />{" "}
-                        Card {index + 1}
-                      </h5>
-                      <div>
-                        <label
-                          htmlFor={`card-${index}-name`}
-                          className="text-cyan-300 text-sm"
-                        >
-                          Name
-                        </label>
-                        <input
-                          type="text"
-                          id={`card-${index}-name`}
-                          className={InputStyle}
-                          value={c.name}
-                          onChange={(e) =>
-                            handleChange(
-                              e.target.value,
-                              3,
-                              "name",
-                              "cards",
-                              index
-                            )
-                          }
-                        />
-                      </div>
-                      <div>
-                        <label
-                          htmlFor={`card-${index}-desc`}
-                          className="text-cyan-300 text-sm"
-                        >
-                          Description
-                        </label>
-                        <input
-                          type="text"
-                          id={`card-${index}-desc`}
-                          className={InputStyle}
-                          value={c.description}
-                          onChange={(e) =>
-                            handleChange(
-                              e.target.value,
-                              3,
-                              "description",
-                              "cards",
-                              index
-                            )
-                          }
-                        />
-                      </div>
-                      <div>
-                        <label
-                          htmlFor={`card-${index}-icon`}
-                          className="text-cyan-300 text-sm"
-                        >
-                          Icon (Lucide Name)
-                        </label>
-                        {/* NOTE: Icon changing is still read-only, assuming a fixed list for now */}
-                        <select
-                          id={`card-${index}-icon`}
-                          className={InputStyle.replace(
-                            "bg-gray-700",
-                            "bg-gray-700 appearance-none"
-                          )} // Style select
-                          value={c.icon}
-                          onChange={(e) =>
-                            handleChange(
-                              e.target.value,
-                              3,
-                              "icon",
-                              "cards",
-                              index
-                            )
-                          }
-                        >
-                          {/* Using a fixed, simplified list of possible icons for the editor */}
-                          {/* In a real app, you would fetch the full list of available icons */}
-                          {[
-                            "Globe",
-                            "Clock",
-                            "Anchor",
-                            "Ship",
-                            "ShieldCheck",
-                            "UserCheck",
-                            "HelpCircle",
-                          ].map((iconName) => (
-                            <option key={iconName} value={iconName}>
-                              {iconName}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                  )
-                )}
-              </div>
-            </div>
-          </section>
 
           {/* Section 4: Gallery (External Edit) - Index is 4 in array, 5th element */}
           <section className={CardStyle}>
@@ -613,8 +468,8 @@ export default function HomePageEditor() {
                   type="text"
                   id="gallery-title"
                   className={InputStyle}
-                  value={pageData.sections[4].title}
-                  onChange={(e) => handleChange(e.target.value, 4, "title")}
+                  value={pageData.sections[3].title}
+                  onChange={(e) => handleChange(e.target.value, 3, "title")}
                 />
               </div>
               <div>
@@ -628,8 +483,8 @@ export default function HomePageEditor() {
                   type="text"
                   id="gallery-subtitle"
                   className={InputStyle}
-                  value={pageData.sections[4].subtitle}
-                  onChange={(e) => handleChange(e.target.value, 4, "subtitle")}
+                  value={pageData.sections[3].subtitle}
+                  onChange={(e) => handleChange(e.target.value, 3, "subtitle")}
                 />
               </div>
             </div>
@@ -658,8 +513,8 @@ export default function HomePageEditor() {
                   type="text"
                   id="locations-title"
                   className={InputStyle}
-                  value={pageData.sections[5].title}
-                  onChange={(e) => handleChange(e.target.value, 5, "title")}
+                  value={pageData.sections[4].title}
+                  onChange={(e) => handleChange(e.target.value, 4, "title")}
                 />
               </div>
               <div>
@@ -673,8 +528,8 @@ export default function HomePageEditor() {
                   type="text"
                   id="locations-subtitle"
                   className={InputStyle}
-                  value={pageData.sections[5].subtitle}
-                  onChange={(e) => handleChange(e.target.value, 5, "subtitle")}
+                  value={pageData.sections[4].subtitle}
+                  onChange={(e) => handleChange(e.target.value, 4, "subtitle")}
                 />
               </div>
             </div>
@@ -703,8 +558,8 @@ export default function HomePageEditor() {
                   type="text"
                   id="contact-title"
                   className={InputStyle}
-                  value={pageData.sections[6].title}
-                  onChange={(e) => handleChange(e.target.value, 6, "title")}
+                  value={pageData.sections[5].title}
+                  onChange={(e) => handleChange(e.target.value, 5, "title")}
                 />
               </div>
               <div>
@@ -718,19 +573,58 @@ export default function HomePageEditor() {
                   type="text"
                   id="contact-subtitle"
                   className={InputStyle}
-                  value={pageData.sections[6].subtitle}
-                  onChange={(e) => handleChange(e.target.value, 6, "subtitle")}
+                  value={pageData.sections[5].subtitle}
+                  onChange={(e) => handleChange(e.target.value, 5, "subtitle")}
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="contact-email"
+                  className="font-medium text-cyan-300"
+                >
+                  Email
+                </label>
+                <input
+                  type="text"
+                  id="contact-email"
+                  className={InputStyle}
+                  value={pageData.sections[5].data.email}
+                  onChange={(e) => handleChange(e.target.value, 5, "email")}
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="contact-phone"
+                  className="font-medium text-cyan-300"
+                >
+                  Phone
+                </label>
+                <input
+                  type="text"
+                  id="contact-phone"
+                  className={InputStyle}
+                  value={pageData.sections[5].data.phone}
+                  onChange={(e) => handleChange(e.target.value, 5, "phone")}
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="contact-hq"
+                  className="font-medium text-cyan-300"
+                >
+                  Headquarters
+                </label>
+                <input
+                  type="text"
+                  id="contact-hq"
+                  className={InputStyle}
+                  value={pageData.sections[5].data.hq}
+                  onChange={(e) => handleChange(e.target.value, 5, "hq")}
                 />
               </div>
             </div>
-            <button
-              type="button"
-              onClick={() => router.push("/admin/contact")}
-              className={`flex items-center px-4 py-2 rounded-md font-semibold transition-colors ${Cyan} `}
-            >
-              <UserCheck className="w-5 h-5 mr-2" />
-              Edit Contact Details 
-            </button>
+            
+            
           </section>
         </form>
       ) : (

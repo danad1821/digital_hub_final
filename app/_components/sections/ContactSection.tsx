@@ -57,7 +57,7 @@ const ContactSection = forwardRef<HTMLDivElement, ContactSectionProps>(
                         href="mailto:chartering@altamaritime.com"
                         className="text-gray-600 hover:text-[#00D9FF] text-base"
                       >
-                        chartering@altamaritime.com
+                        {sectionData?.data.email}
                       </a>
                     </div>
                   </div>
@@ -72,7 +72,7 @@ const ContactSection = forwardRef<HTMLDivElement, ContactSectionProps>(
                         href="tel:+1800maritime"
                         className="text-gray-600 hover:text-[#00D9FF] text-base"
                       >
-                        +1 (800) MARITIME
+                        {sectionData?.data.phone}
                       </a>
                     </div>
                   </div>
@@ -85,8 +85,8 @@ const ContactSection = forwardRef<HTMLDivElement, ContactSectionProps>(
                       <h4 className="font-medium text-xl sm:text-2xl">
                         Headquarters
                       </h4>
-                      <p className="text-gray-600 text-base">Port of Rotterdam</p>
-                      <p className="text-gray-600 text-base">3011 AD, Netherlands</p>
+                      <p className="text-gray-600 text-base">{sectionData?.data.hq.split(" ").slice(0,3).join(" ")}</p>
+                      <p className="text-gray-600 text-base">{sectionData?.data.hq.split(" ").slice(3).join(" ")}</p>
                     </div>
                   </div>
                 </div>

@@ -100,7 +100,7 @@ const PortPinWrapper = ({ loc }: { loc: any }) => {
         autoClose={false}
         closeOnClick={false}
         // We will rely on CSS to style the Leaflet container itself
-        className="rcustom-popup"
+        className="custom-popup"
       >
         {/* 📌 Updated Info Card Content: 
                   - Padding p-4 for more internal space.
@@ -200,7 +200,7 @@ export default function DynamicShippingMap({
       scrollWheelZoom={true}
       className="w-full h-full"
       // ⭐️ UPDATE: minZoom must be set to 2 to allow the mobile zoom level
-      minZoom={4}
+      minZoom={1}
       // ⭐️ UPDATE: maxZoom set higher to allow user interaction
       maxBounds={[
         [90, -180],

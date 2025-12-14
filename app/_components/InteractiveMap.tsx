@@ -35,7 +35,7 @@ export default function InteractiveMap() {
       
       {/* 🚢 GLOBAL PORTS COUNT LABEL */}
       {/* ADJUSTED: Smaller padding, top position, and responsive font size */}
-      <div className="absolute top-3 left-3 md:top-4 md:left-4 z-10 text-white rounded-sm px-3 py-1 md:px-4 md:py-2 bg-white/10 backdrop-blur-md border border-white/20 text-white">
+      <div className="absolute top-3 left-3 md:top-4 md:left-4 z-10 text-white rounded-sm px-3 py-1 md:px-4 md:py-2 bg-white/5 backdrop-blur-sm border border-white/20 text-white">
         <span className="text-gray-400 text-xs md:text-sm">Global Ports</span>
         <div className="text-3xl md:text-4xl font-light text-[#00D9FF]">{globalPortsCount}</div>
       </div>

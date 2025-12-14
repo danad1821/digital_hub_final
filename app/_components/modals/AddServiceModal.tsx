@@ -36,11 +36,11 @@ export default function AddServiceModal({
               className="w-full p-2 rounded bg-gray-900 text-gray-200 border border-gray-700"
             />
 
-            <input
+            <textarea
               placeholder="Description"
               value={summary}
               onChange={(e) => setSummary(e.target.value)}
-              className="w-full p-2 rounded bg-gray-900 text-gray-200 border border-gray-700"
+              className="w-full min-h-50 p-2 rounded bg-gray-900 text-gray-200 border border-gray-700"
             />
           </div>
 

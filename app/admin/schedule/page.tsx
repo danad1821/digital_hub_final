@@ -131,7 +131,7 @@ export default function AdminSchedule() {
 
 
   return (
-    <div className="text-white p-8 space-y-8 bg-[#0A1628] min-h-screen">
+    <div className="text-grey-800 p-8 space-y-8 bg-white min-h-screen">
       <h1 className="text-3xl font-bold border-b pb-4 border-gray-700">Manage Shipping Schedule</h1>
       
       {/* Upload Section */}

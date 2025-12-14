@@ -164,15 +164,15 @@ export default function Home() {
       {/* Sections[3] is skipped in original code, assuming it's Section[4] */}
       <GallerySection
         ref={galleryRef}
-        sectionData={sections[4]}
+        sectionData={sections[3]}
         gallery={gallery}
       />
 
-      <LocationsSection ref={locationsRef} sectionData={sections[5]} />
+      <LocationsSection ref={locationsRef} sectionData={sections[4]} />
 
       <ContactSection
         ref={contactRef}
-        sectionData={sections[6]}
+        sectionData={sections[5]}
         locations={locations}
       />
     </main>

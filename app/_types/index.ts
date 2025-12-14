@@ -33,6 +33,9 @@ export type PageSectionData = {
     button1_text?: string;
     button2_text?: string;
     stats_list?: Stat[];
+    email?: string;
+    phone?: string;
+    hq? :string;
     // Add other section-specific data fields
   };
 };
