@@ -32,11 +32,10 @@ const PortPinContent = () => {
       <div
         className={`relative w-8 h-8 flex items-center justify-center transition duration-300 hover:scale-150`}
       >
-        <div className="absolute w-7 h-7 border-2 border-[#00D9FF] rounded-full animate-wave-1 flex items-center justify-center"></div>
-        <div className="absolute w-9 h-9 border-2 border-[#00D9FF] rounded-full animate-wave-2 flex items-center justify-center"></div>
-        <div className="absolute w-11 h-11 border-2 border-[#00D9FF] rounded-full animate-wave-3 flex items-center justify-center"></div>
-        <div className="absolute w-6 h-6 rounded-full z-20 shadow-lg bg-white flex items-center justify-center transition duration-300">
-          <div className="absolute w-4 h-4 bg-[#00D9FF] rounded-full z-20"></div>
+        <div className="absolute w-7 h-7 border-2 border-[#00D9FF] rounded-full animate-ping-2 flex items-center justify-center"></div>
+        <div className="absolute w-9 h-9 border-2 border-[#00D9FF] rounded-full animate-ping-1 flex items-center justify-center"></div>
+        <div className="absolute w-6 h-6 rounded-full z-20 shadow-lg bg-white flex items-center justify-center transition duration-300 ">
+          <div className="absolute w-4 h-4 gradient-pin rounded-full z-20 pulsing-pin"></div>
         </div>
       </div>
     </div>
@@ -44,10 +43,30 @@ const PortPinContent = () => {
 };
 
 const PortPinWrapper = ({ loc }: { loc: any }) => {
-  // Removed state props
+  // --- NEW: State for responsive click logic ---
+  const [isMobile, setIsMobile] = useState(false); // Default to false
 
   // useRef to get direct access to the Leaflet Marker instance
   const markerRef = useRef<L.Marker>(null);
+
+  // --- NEW: Custom hook/logic to determine if it's mobile ---
+  useEffect(() => {
+    const MOBILE_BREAKPOINT = 768; // Must match the value in DynamicShippingMap
+    const checkIsMobile = () => {
+      if (typeof window !== "undefined") {
+        setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
+      }
+    };
+
+    // Set initial state
+    checkIsMobile();
+
+    // Add event listener for dynamic updates
+    window.addEventListener("resize", checkIsMobile);
+
+    // Cleanup
+    return () => window.removeEventListener("resize", checkIsMobile);
+  }, []); // Run only on mount/unmount
 
   const iconMarkup = useMemo(
     () => renderToStaticMarkup(<PortPinContent />),
@@ -65,48 +84,69 @@ const PortPinWrapper = ({ loc }: { loc: any }) => {
     [iconMarkup]
   );
 
-  return (
-    <Marker
-      key={loc._id}
-      position={[loc.lat, loc.lng]}
-      icon={customIcon}
-      ref={markerRef} // Attach ref to the Marker
-      eventHandlers={{
-        // ⭐️ FIX: Programmatically open the Popup on mouseover
-        mouseover: () => {
+  const eventHandlers = useMemo(() => {
+    if (isMobile) {
+      // ⭐️ MOBILE LOGIC: Use 'click' to open the popup
+      // Note: Leaflet handles popup closing on map click by default
+      return {
+        click: () => {
           if (markerRef.current) {
             markerRef.current.openPopup();
           }
         },
-        // ⭐️ FIX: Programmatically close the Popup on mouseout
         mouseout: () => {
-          // Use a small delay to prevent accidental closure when mouse briefly leaves pin
-          // This creates a better UX for hover popups
+          // Use a small delay for better hover UX
           setTimeout(() => {
             if (markerRef.current) {
               markerRef.current.closePopup();
             }
           }, 50);
         },
-      }}
-      
+      };
+    } else {
+      // ⭐️ DESKTOP LOGIC: Use 'mouseover' and 'mouseout' for hover
+      return {
+        click: () => {
+          if (markerRef.current) {
+            markerRef.current.openPopup();
+          }
+        },
+        mouseover: () => {
+          if (markerRef.current) {
+            markerRef.current.openPopup();
+          }
+        },
+        mouseout: () => {
+          // Use a small delay for better hover UX
+          setTimeout(() => {
+            if (markerRef.current) {
+              markerRef.current.closePopup();
+            }
+          }, 50);
+        },
+      };
+    }
+  }, [isMobile]); // Re-calculate handlers when isMobile changes
+
+  return (
+    <Marker
+      key={loc._id}
+      position={[loc.lat, loc.lng]}
+      icon={customIcon}
+      ref={markerRef} // Attach ref to the Marker
+      // ⭐️ UPDATE: Use the conditionally calculated event handlers
+      eventHandlers={eventHandlers}
     >
-      {/* ⭐️ Updated Popup: Using Tailwind classes to achieve the new look */}
       <Popup
-        // Adjust Y offset to lift the popup above the 40x40 custom icon
-        offset={[0, -20]}
-        
-        closeButton={false}
-        autoClose={false}
-        closeOnClick={false}
-        // We will rely on CSS to style the Leaflet container itself
+        offset={[0,255]}
+        // We need to allow the popup to be closed automatically on mobile click
+        // But keep it from closing automatically when using hover (desktop)
+        closeButton={isMobile} // Show close button on mobile
+        autoClose={!isMobile} // Automatically close on map click on mobile
+        closeOnClick={isMobile} // Allow close on click (for mobile)
         className="custom-popup"
       >
-        {/* 📌 Updated Info Card Content: 
-                  - Padding p-4 for more internal space.
-                  - Text colors changed to match the image.
-                */}
-        <div className="p-4 text-gray-800 w-60 rounded-sm">
+        <div className="p-4 text-gray-800 rounded-sm">
           {" "}
           {/* Added w-60 for a fixed width */}
           {/* Location Name (Larger and Bold) with Green Dot */}
@@ -156,8 +196,8 @@ export default function DynamicShippingMap({
   locations,
 }: DynamicShippingMapProps) {
   const center: [number, number] = [30, 10];
-  const desktopZoom = 4;
-  const mobileZoom = 1; // Target zoom for mobile devices
+  const desktopZoom = 3;
+  const mobileZoom = -2; // Target zoom for mobile devices
   const MOBILE_BREAKPOINT = 768; // Screen width threshold for mobile
 
   // ⭐️ New: State to hold the dynamically calculated zoom level
@@ -200,7 +240,7 @@ export default function DynamicShippingMap({
       scrollWheelZoom={true}
       className="w-full h-full"
       // ⭐️ UPDATE: minZoom must be set to 2 to allow the mobile zoom level
-      minZoom={1}
+      minZoom={-5}
       // ⭐️ UPDATE: maxZoom set higher to allow user interaction
       maxBounds={[
         [90, -180],

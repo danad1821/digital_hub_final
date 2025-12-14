@@ -100,12 +100,12 @@ export default function Header({ scrollToSection }: HeaderProps) {
 
               // 1. Define base classes for regular links (depends on scroll state)
               const regularLinkClasses = `transition duration-150 cursor-pointer ${
-                scrolled || isOpen ? "text-gray-700 hover:text-[#00D9FF]" : "text-white hover:text-[#00D9FF]"
+                scrolled || isOpen ? "text-gray-800 hover:text-[#00D9FF]" : "text-white hover:text-[#00D9FF]"
               }`;
               
               // 2. Define classes for the CTA button (always solid)
               const ctaClasses = `
-                py-2 px-4 rounded-sm whitespace-nowrap text-black cursor-pointer
+                py-2 px-4 rounded-sm whitespace-nowrap text-gray-800 cursor-pointer text-center
                 bg-[#00D9FF] hover:bg-[#00FFFF]/80
               `;
 
@@ -155,9 +155,9 @@ export default function Header({ scrollToSection }: HeaderProps) {
                     // Styling for regular links and CTA in the mobile dropdown
                     className={`block py-2 transition duration-200 text-base w-full text-left
                       ${isCTA 
-                        ? 'bg-[#00D9FF] text-black font-medium w-full text-center rounded-sm mt-2 hover:bg-[#00FFFF]/80' 
+                        ? 'bg-[#00D9FF] flex items-center justify-center text-gray-800 font-medium w-full text-center rounded-sm mt-2 hover:bg-[#00FFFF]/80' 
                         // Use gray-700 text and bright blue hover for regular links on white background
-                        : 'text-gray-700 hover:text-[#00D9FF] hover:bg-gray-100 px-4'
+                        : 'text-gray-800 hover:text-[#00D9FF] hover:bg-gray-100 px-4'
                       }
                     `}
                   >

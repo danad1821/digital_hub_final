@@ -1,16 +1,16 @@
-@import 'leaflet/dist/leaflet.css';
+@import "leaflet/dist/leaflet.css";
 @import "tailwindcss";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root{
-    --cyan: #00D9FF;
-    --muted-blue: #4A6FA5;
-    --tertiary-color: #FF6B00;
+:root {
+  --cyan: #00d9ff;
+  --muted-blue: #4a6fa5;
+  --tertiary-color: #ff6b00;
 }
 
-body{
+body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -18,90 +18,135 @@ body{
   margin: 0;
 }
 
-main{
+main {
   flex: 1;
   min-height: 80vh;
 }
 
-footer{
+footer {
   flex-grow: 0;
 }
 
-.custom-container{
+.custom-container {
   width: 90%;
   margin: 0 auto;
 }
 
-header{
-    padding: 15px 0;
+header {
+  padding: 15px 0;
 }
 
-.service-card{
-    margin: 10px 15px;
-    padding: 15px;
+.service-card {
+  margin: 10px 15px;
+  padding: 15px;
 }
-.service-card button{
-    padding: 10px 5px;
+.service-card button {
+  padding: 10px 5px;
 }
 
-button{
-    cursor: pointer;
+button {
+  cursor: pointer;
 }
 
 .gradient-text {
-            /* This is equivalent to Tailwind's 'bg-clip-text' */
-            
-            background: linear-gradient(135deg, var(--cyan) 0%, var(--muted-blue) 100%);
--webkit-background-clip: text;
--webkit-text-fill-color: transparent;
-background-clip: text;
-        }
+  /* This is equivalent to Tailwind's 'bg-clip-text' */
+  background: linear-gradient(135deg, var(--cyan) 0%, var(--muted-blue) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
 
-
-@media (max-width: 580px){
-  .custom-container{
-    width: 90%;
+@keyframes pulsing {
+  0% {
+    transform: scale(1); /* Start very small */
+  }
+  50% {
+    transform: scale(1.3); /* Expands past the view */
+  }
+  0% {
+    transform: scale(1); /* Start very small */
   }
 }
 
-/* --- Custom CSS for the Pulsing Wave Effect --- */
-
-/* 1. Define the animation */
-@keyframes pulse-wave {
-    0% {
-        transform: scale(1);
-        opacity: 0.7;
-    }
-    50% {
-        transform: scale(2.05);
-        opacity: 1;
-    }
-    100% {
-        transform: scale(1);
-        opacity: 0.7;
-    }
+@keyframes ping-fade {
+  /* Start small and opaque at the center */
+  0% {
+    transform: scale(0.1); /* Start very small */
+    opacity: 0.8;
+  }
+  /* Expand and slightly increase opacity in the middle */
+  50% {
+    opacity: 0.5;
+  }
+  /* Fully expanded and completely transparent */
+  100% {
+    transform: scale(2.5); /* Expands past the view */
+    opacity: 0;
+  }
 }
 
-/* 2. Apply the animation with different delays for staggering */
-.animate-wave-1 {
-    animation: pulse-wave 2.5s cubic-bezier(0, 0, 0.2, 1) infinite;
-    background-color: #00d9ff14;
-    
+.pulsing-pin:hover {
+  transition: all 0.1s linear;
+  animation: pulsing 1s linear infinite;
 }
 
-.animate-wave-2 {
-    animation: pulse-wave 2.5s cubic-bezier(0, 0, 0.2, 1) infinite 0.8s; /* 0.8s delay */
-    background-color: #00d9ff14;
+/* 1. Apply the new animation */
+.animate-ping-1 {
+  /* 2.5s duration, linear speed, continuous, no initial delay */
+  animation: ping-fade 2.5s linear infinite;
+  border-color: #00d9ff;
 }
 
-.animate-wave-3 {
-    animation: pulse-wave 2.5s cubic-bezier(0, 0, 0.2, 1) infinite 1.6s; /* 1.6s delay */
-    background-color: #00d9ff14;
+.animate-ping-2 {
+  /* Starts halfway through the cycle (1.25s delay) for staggering */
+  animation: ping-fade 2.5s linear infinite 0.25s;
+  border-color: #00d9ff;
 }
-
 /* In your global CSS file (e.g., globals.css) */
 
-.gradient-icon{
-  background: linear-gradient(180deg, #00D9FF 0%, #4A6FA5 100%);
-
+.gradient-icon {
+  background: linear-gradient(180deg, #00d9ff 0%, #4a6fa5 100%);
 }
+
+.gradient-pin {
+  background: linear-gradient(135deg, var(--cyan) 0%, var(--muted-blue) 100%);
+}
+
+/* --- CUSTOM LEAFLET POPUP STYLES (ROBUST OVERRIDES) --- */
+
+/* 1. Main Content Wrapper (The Box) */
+.leaflet-popup.custom-popup .leaflet-popup-content-wrapper {
+  /* REQUIRED OVERRIDES */
+  background: #ffffff !important; /* Force white background */
+  border-radius: 4px !important; /* Force slight rounded corners */
+  padding: 0 !important; /* Critical: Remove default Leaflet padding */
+  border-top: 4px #00d9ff solid;
+  min-width: 20vw;
+}
+
+/* 2. Popup Content (Inner area where React renders) */
+/* This class must be targeted to eliminate Leaflet's default internal margin */
+.leaflet-popup.custom-popup
+  .leaflet-popup-content-wrapper
+  .leaflet-popup-content {
+  margin: 0 !important;
+}
+
+/* 3. Popup Arrow Tip (The actual arrow color) */
+.leaflet-popup.custom-popup .leaflet-popup-tip-container {
+  display: none !important;
+}
+.leaflet-popup.custom-popup .leaflet-popup-tip {
+  display: none !important;
+}
+
+/* 4. Close Button (Optional styling for visibility on mobile) */
+.leaflet-popup.custom-popup .leaflet-popup-close-button {
+  color: #333 !important;
+  font-size: 1.5rem !important;
+  right: 5px !important;
+  top: 5px !important;
+}
+
+/* NOTE: .leaflet-popup-tip-container is now implicitly handled by the styles above.
+*/
