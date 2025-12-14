@@ -85,6 +85,22 @@ button {
   }
 }
 
+@keyframes rotate-icon{
+  0%{
+    transform: rotate(6deg);
+  }
+  50%{
+    transform: rotate(-6deg);
+  }
+  100%{
+    transform: rotate(0);
+  }
+}
+
+.rotate-icon:hover{
+  animation: rotate-icon 0.5s linear alternate;
+}
+
 .pulsing-pin:hover {
   transition: all 0.1s linear;
   animation: pulsing 1s linear infinite;

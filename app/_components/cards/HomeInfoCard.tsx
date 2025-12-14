@@ -48,7 +48,7 @@ export default function HomeInfoCard({
         mb-4 
         text-3xl
         
-        transition duration-300 hover:rotate-6
+        transition duration-100 rotate-icon
       "
       >
         {icon}

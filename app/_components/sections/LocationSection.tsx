@@ -41,7 +41,7 @@ const LocationsSection = forwardRef<HTMLDivElement, LocationsSectionProps>(
             transition={{ duration: 0.6 }}
             className="text-center mb-12 md:mb-16"
           >
-            <h2 className="text-3xl lg:text-5xl font-bold mb-3 sm:mb-4 text-white">
+            <h2 className="font-extrabold text-4xl lg:text-5xl mb-3 sm:mb-4 text-white">
               {sectionData.title}
             </h2>
             <p className="mb-8 text-gray-400 text-base sm:text-lg max-w-2xl mx-auto">
