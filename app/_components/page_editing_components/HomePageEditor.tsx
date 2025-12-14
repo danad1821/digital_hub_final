@@ -33,7 +33,10 @@ type SectionDataKey =
   | "button1_text"
   | "button1_link"
   | "button2_text"
-  | "button2_link";
+  | "button2_link"
+  | "email"
+  | "phone"
+  | "hq";
 
 export default function HomePageEditor() {
   const router = useRouter();

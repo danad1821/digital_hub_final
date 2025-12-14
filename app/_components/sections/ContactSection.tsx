@@ -5,10 +5,10 @@ import { Mail, Phone, Pin } from "lucide-react";
 
 // Components & Types
 import ContactForm from "../ContactForm";
-import { PageSectionData, Location } from "../../_types";
+import { Location } from "../../_types";
 
 type ContactSectionProps = {
-  sectionData: PageSectionData;
+  sectionData: any;
   locations: Location[];
 };
 
@@ -85,8 +85,8 @@ const ContactSection = forwardRef<HTMLDivElement, ContactSectionProps>(
                       <h4 className="font-medium text-xl sm:text-2xl">
                         Headquarters
                       </h4>
-                      <p className="text-gray-600 text-base">{sectionData?.data.hq.split(" ").slice(0,3).join(" ")}</p>
-                      <p className="text-gray-600 text-base">{sectionData?.data.hq.split(" ").slice(3).join(" ")}</p>
+                      <p className="text-gray-600 text-base">{sectionData.data.hq.split(" ").slice(0,3).join(" ")}</p>
+                      <p className="text-gray-600 text-base">{sectionData.data.hq.split(" ").slice(3).join(" ")}</p>
                     </div>
                   </div>
                 </div>
