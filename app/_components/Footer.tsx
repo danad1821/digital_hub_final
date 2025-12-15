@@ -5,6 +5,16 @@ import { MdOutlineEmail, MdOutlineLocalPhone } from "react-icons/md";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+// Define the type for the new prop
+type FooterProps = {
+  // Assuming the contact info comes from a database/CMS and is passed down as a prop
+  contactInfo: {
+    email: string; // e.g., "info@altamaritime.com"
+    phone: string; // e.g., "+1 (800) MARITIME"
+    emergencyPhone: string; // e.g., "+1 (800) 123-4567"
+  };
+};
+
 // Helper function to convert a service name to a URL-safe slug
 // e.g., "Heavy Lift Cargo" -> "Heavy Lift Cargo" (assuming the service category matches)
 const getServiceCategoryName = (slug: string) => {
@@ -26,7 +36,8 @@ const getServiceCategoryName = (slug: string) => {
   }
 };
 
-export default function Footer() {
+// Update the function signature to accept props
+export default function Footer({ contactInfo }: FooterProps) {
   const pathname = usePathname();
   if (pathname === "/admin") {
     return <></>;
@@ -50,17 +61,17 @@ export default function Footer() {
 
   const companyLinks = [
     { name: "About Us", href: "/" },
-    { name: "Our Fleet", href: "/our_fleet" },
-    { name: "Case Studies", href: "/case_studies" },
-    { name: "Careers", href: "/careers" },
-    { name: "News & Updates", href: "/news" },
-    { name: "Safety Standards", href: "/safety" },
+    { name: "Our Fleet", href: "/" },
+    { name: "Case Studies", href: "/" },
+    { name: "Careers", href: "/" },
+    { name: "News & Updates", href: "/" },
+    { name: "Safety Standards", href: "/" },
   ];
 
   const legalLinks = [
-    { name: "Privacy Policy", href: "/privacy" },
-    { name: "Terms of Service", href: "/terms" },
-    { name: "Cookie Policy", href: "/cookies" },
+    { name: "Privacy Policy", href: "/" },
+    { name: "Terms of Service", href: "/" },
+    { name: "Cookie Policy", href: "/" },
   ];
 
   // Social links (using placeholder links)
@@ -153,28 +164,31 @@ export default function Footer() {
 
             {/* Email */}
             <Link
-              href="mailto:info@altamaritime.com"
+              // Use contactInfo.email for the href and display text
+              href={`mailto:${contactInfo.email}`}
               className={`flex items-start gap-3 text-base text-gray-300 ${hoverColor} transition duration-150`}
             >
               <MdOutlineEmail className="text-2xl flex-shrink-0 mt-0.5 text-[#00D9FF]" />
-              <span>info@altamaritime.com</span>
+              <span>{contactInfo.email}</span>
             </Link>
 
             {/* Phone */}
             <Link
-              href="tel:+180062748463"
+              // Use contactInfo.phone for the href and display text
+              href={`tel:${contactInfo.phone.replace(/[^0-9+]/g, "")}`} // Clean phone number for tel: link
               className={`flex items-start gap-3 text-base text-gray-300 ${hoverColor} transition duration-150`}
             >
               <MdOutlineLocalPhone className="text-2xl flex-shrink-0 mt-0.5 text-[#00D9FF]" />
-              <span>+1 (800) MARITIME</span>
+              <span>{contactInfo.phone}</span>
             </Link>
 
             <div className="pt-4 border-t border-gray-700">
               <p className="text-sm font-semibold text-gray-400 mb-1">
                 24/7 Operations Center
               </p>
+              {/* Emergency Phone (optional: make this dynamic too) */}
               <p className="text-sm text-gray-500">
-                Emergency: +1 (800) 123-4567
+                Emergency: {contactInfo.emergencyPhone}
               </p>
             </div>
           </div>
