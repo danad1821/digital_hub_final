@@ -1,6 +1,6 @@
 "use client";
 import { FaFacebook, FaLinkedin, FaTwitter } from "react-icons/fa";
-import { Anchor } from "lucide-react";
+import Image from "next/image";
 import { MdOutlineEmail, MdOutlineLocalPhone } from "react-icons/md";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -28,10 +28,8 @@ const getServiceCategoryName = (slug: string) => {
 
 export default function Footer() {
   const pathname = usePathname();
-  if(pathname === '/admin'){
-    return(
-      <></>
-    )
+  if (pathname === "/admin") {
+    return <></>;
   }
   const serviceLinks = [
     // ⚠️ The 'name' value here MUST exactly match the 'category' value in your database
@@ -77,7 +75,7 @@ export default function Footer() {
   // Use white/light gray text for contrast
   const textColor = "text-white";
   // Accent color for hover effects (used the subtle orange from the logo)
-  const hoverColor = "hover:text-[#00FFFF]";
+  const hoverColor = "hover:text-[#00D9FF]";
 
   // Helper component for link columns
   const LinkColumn = ({
@@ -113,9 +111,12 @@ export default function Footer() {
           <div className="flex flex-col gap-6">
             {/* Logo Block */}
             <div className="flex items-center gap-2">
-              <Anchor className="text-3xl text-[#00FFFF]" />{" "}
-              {/* Placeholder ship icon */}
-              <h3 className="text-2xl font-bold text-white">ALTA MARITIME</h3>
+              <Image
+                src="/images/ultamaritime.svg"
+                alt="alta maritime logo"
+                width={200}
+                height={100}
+              />
             </div>
 
             {/* Slogan */}
@@ -155,7 +156,7 @@ export default function Footer() {
               href="mailto:info@altamaritime.com"
               className={`flex items-start gap-3 text-base text-gray-300 ${hoverColor} transition duration-150`}
             >
-              <MdOutlineEmail className="text-2xl flex-shrink-0 mt-0.5 text-[#00FFFF]" />
+              <MdOutlineEmail className="text-2xl flex-shrink-0 mt-0.5 text-[#00D9FF]" />
               <span>info@altamaritime.com</span>
             </Link>
 
@@ -164,7 +165,7 @@ export default function Footer() {
               href="tel:+180062748463"
               className={`flex items-start gap-3 text-base text-gray-300 ${hoverColor} transition duration-150`}
             >
-              <MdOutlineLocalPhone className="text-2xl flex-shrink-0 mt-0.5 text-[#00FFFF]" />
+              <MdOutlineLocalPhone className="text-2xl flex-shrink-0 mt-0.5 text-[#00D9FF]" />
               <span>+1 (800) MARITIME</span>
             </Link>
 

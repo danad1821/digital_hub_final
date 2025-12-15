@@ -93,7 +93,7 @@ export default function AdminLogin() {
       <label htmlFor={id} className="text-sm font-medium text-gray-700">
         {label}
       </label>
-      <div className="flex items-center bg-white rounded-sm border border-gray-300 focus-within:ring-2 focus-within:ring-[#00FFFF]">
+      <div className="flex items-center bg-white rounded-sm border border-gray-300 focus-within:ring-2 focus-within:ring-[#00D9FF]">
         <span className="p-3 text-gray-400">
           <Icon className="w-5 h-5" />
         </span>
@@ -151,7 +151,7 @@ export default function AdminLogin() {
         <button
           type="submit"
           disabled={status === "loading" || status === "success"}
-          className="w-full flex items-center justify-center px-6 py-3 border cursor-pointer border-transparent text-base font-medium rounded-sm text-[#0A1C30] bg-[#00FFFF] hover:bg-[#00FFFF]/50 transition duration-300 shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
+          className="w-full flex items-center justify-center px-6 py-3 border cursor-pointer border-transparent text-base font-medium rounded-sm text-[#0A1C30] bg-[#00D9FF] hover:bg-[#00D9FF]/50 transition duration-300 shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {status === "loading" ? (
             <>

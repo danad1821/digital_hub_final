@@ -88,7 +88,7 @@ export default function AdminLocations() {
                 <h1 className="text-3xl font-bold text-[#0A1C30]">Shipping Locations</h1>
                 <button
                     onClick={() => setIsModalOpen(true)}
-                    className="flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-sm text-[#0A1C30] bg-[#00FFFF] hover:bg-[#00FFFF]/50 transition duration-300 shadow-md"
+                    className="flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-sm text-[#0A1C30] bg-[#00D9FF] hover:bg-[#00D9FF]/50 transition duration-300 shadow-md"
                 >
                     <Plus className="w-5 h-5 mr-2" />
                     Add Location

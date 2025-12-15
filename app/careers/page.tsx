@@ -52,7 +52,7 @@ export default function CareersPage() {
               JOIN OUR GLOBAL TEAM
             </p>
             <h1 className="text-5xl sm:text-6xl font-bold mb-4 tracking-tight flex flex-col mt-2">
-              <span className="gradient-text font-black tracking-tight bg-gradient-to-r from-[#00FFFF] to-white pb-2">
+              <span className="gradient-text font-black tracking-tight bg-gradient-to-r from-[#00D9FF] to-white pb-2">
                 Launch Your Maritime Career
               </span>
             </h1>
@@ -68,7 +68,7 @@ export default function CareersPage() {
           <div className="custom-container">
             <div className="flex flex-wrap lg:flex-nowrap gap-10">
               <div className="lg:w-1/2">
-                <p className="rounded-sm bg-[#00FFFF]/15 w-fit px-3 py-1 text-[#00FFFF] text-sm mb-2">
+                <p className="rounded-sm bg-[#00D9FF]/15 w-fit px-3 py-1 text-[#00D9FF] text-sm mb-2">
                   THE ALTA ADVANTAGE
                 </p>
                 <h2 className="text-4xl font-extrabold mb-4">
@@ -83,23 +83,23 @@ export default function CareersPage() {
                 {/* Benefits List */}
                 <ul className="space-y-3 text-gray-200">
                   <li className="flex items-center gap-2">
-                    <ArrowRight className="w-5 h-5 text-[#00FFFF]" />
+                    <ArrowRight className="w-5 h-5 text-[#00D9FF]" />
                     Competitive Compensation & Bonuses
                   </li>
                   <li className="flex items-center gap-2">
-                    <ArrowRight className="w-5 h-5 text-[#00FFFF]" />
+                    <ArrowRight className="w-5 h-5 text-[#00D9FF]" />
                     Comprehensive Health, Dental, and Vision Plans
                   </li>
                   <li className="flex items-center gap-2">
-                    <ArrowRight className="w-5 h-5 text-[#00FFFF]" />
+                    <ArrowRight className="w-5 h-5 text-[#00D9FF]" />
                     Global Mobility & Relocation Support
                   </li>
                   <li className="flex items-center gap-2">
-                    <ArrowRight className="w-5 h-5 text-[#00FFFF]" />
+                    <ArrowRight className="w-5 h-5 text-[#00D9FF]" />
                     Continuous Professional Development & Training
                   </li>
                   <li className="flex items-center gap-2">
-                    <ArrowRight className="w-5 h-5 text-[#00FFFF]" />
+                    <ArrowRight className="w-5 h-5 text-[#00D9FF]" />
                     Generous Paid Time Off and Parental Leave
                   </li>
                 </ul>
@@ -135,7 +135,7 @@ export default function CareersPage() {
               {openPositions.map((role, index) => (
                 <div
                   key={index}
-                  className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-5 bg-white rounded-lg shadow hover:shadow-md transition duration-300 border-l-4 border-[#00FFFF]"
+                  className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-5 bg-white rounded-lg shadow hover:shadow-md transition duration-300 border-l-4 border-[#00D9FF]"
                 >
                   <div className="text-left mb-2 sm:mb-0">
                     <h3 className="font-bold text-lg">{role.title}</h3>
@@ -143,7 +143,7 @@ export default function CareersPage() {
                       {role.location} &bull; {role.type}
                     </p>
                   </div>
-                  <button className="text-[#0A1C30] bg-[#00FFFF] px-4 py-2 rounded-sm font-semibold flex items-center gap-1 transition-all duration-300 hover:opacity-90">
+                  <button className="text-[#0A1C30] bg-[#00D9FF] px-4 py-2 rounded-sm font-semibold flex items-center gap-1 transition-all duration-300 hover:opacity-90">
                     View Details <Briefcase className="w-4 h-4" />
                   </button>
                 </div>
@@ -162,7 +162,7 @@ export default function CareersPage() {
         </section>
 
         {/* 5. CONTACT CTA - Footer/Final Section */}
-        <section className="py-16 bg-[#00FFFF]/10">
+        <section className="py-16 bg-[#00D9FF]/10">
           <div className="custom-container text-center">
             <h3 className="text-3xl font-bold mb-3 text-[#0A1C30]">
               Ready to Make an Impact?

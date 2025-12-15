@@ -39,14 +39,6 @@ export default function InteractiveMap() {
         <span className="text-gray-400 text-xs md:text-sm">Global Ports</span>
         <div className="text-3xl md:text-4xl font-light text-[#00D9FF]">{globalPortsCount}</div>
       </div>
-      
-      {/* 🟢 LIVE TRACKING LABEL */}
-      {/* ADJUSTED: Smaller padding, top position, and smaller text */}
-      <div className="absolute top-3 right-3 md:top-4 md:right-4 z-10 rounded-sm text-white px-3 py-1 bg-white/10 backdrop-blur-md border border-white/20 text-white flex items-center">
-        <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
-        <span className="text-[10px] sm:text-xs uppercase">Live Tracking</span>
-      </div>
-
 
       <div className="flex-grow z-2">
         {!isLoading && locations.length > 0 ? (

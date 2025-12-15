@@ -61,7 +61,7 @@ export default function AdminGallery() {
                 {/* Button to Open Modal */}
                 <button
                     onClick={() => setIsModalOpen(true)}
-                   className="flex items-center bg-[#00FFFF] text-[#11001C] px-4 py-2 rounded-lg font-semibold hover:opacity-90 transition"
+                   className="flex items-center bg-[#00D9FF] text-[#11001C] px-4 py-2 rounded-lg font-semibold hover:opacity-90 transition"
                 >
                     + Add New Image
                 </button>

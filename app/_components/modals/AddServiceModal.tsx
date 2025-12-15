@@ -24,7 +24,7 @@ export default function AddServiceModal({
 
       <div className="fixed inset-0 flex justify-center items-center z-50">
         <div className="bg-[#11001C] p-6 rounded-lg shadow-lg w-96 border border-gray-700">
-          <h3 className="text-xl font-bold text-[#00FFFF] mb-4">
+          <h3 className="text-xl font-bold text-[#00D9FF] mb-4">
             {initialService ? "Edit Service" : "Add Service"}
           </h3>
 
@@ -59,7 +59,7 @@ export default function AddServiceModal({
                     }
               )
             }
-            className="w-full mt-4 bg-[#00FFFF] text-[#11001C] py-2 rounded font-semibold hover:opacity-90 transition"
+            className="w-full mt-4 bg-[#00D9FF] text-[#11001C] py-2 rounded font-semibold hover:opacity-90 transition"
           >
             Save
           </button>

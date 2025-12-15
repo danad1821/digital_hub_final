@@ -6,8 +6,8 @@ interface PendingMessagesTableProps {
   onRowClick: (msg: any) => void; // NEW
 }
 
-const TEXT_POP_COLOR = "text-[#00FFFF]";
-const BG_POP_COLOR = "bg-[#00FFFF]";
+const TEXT_POP_COLOR = "text-[#00D9FF]";
+const BG_POP_COLOR = "bg-[#00D9FF]";
 
 export default function PendingMessagesTable({
   pendingMessages,

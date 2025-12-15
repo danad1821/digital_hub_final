@@ -93,7 +93,7 @@ export default function AdminServices() {
       {/* Top Controls */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-8 gap-4">
         <div className="flex items-center gap-3 bg-[#11001C] p-2 px-4 rounded-lg border border-gray-700">
-          <Search className="text-[#00FFFF] w-5 h-5" />
+          <Search className="text-[#00D9FF] w-5 h-5" />
           <input
             type="text"
             placeholder="Search services..."
@@ -108,7 +108,7 @@ export default function AdminServices() {
             setSelectedService(null);
             setShowModal(true);
           }}
-          className="flex items-center bg-[#00FFFF] text-[#11001C] px-4 py-2 rounded-lg font-semibold hover:opacity-90 transition"
+          className="flex items-center bg-[#00D9FF] text-[#11001C] px-4 py-2 rounded-lg font-semibold hover:opacity-90 transition"
         >
           <Plus className="w-5 h-5 mr-2" /> Add Service
         </button>

@@ -164,5 +164,6 @@ button {
   top: 5px !important;
 }
 
-/* NOTE: .leaflet-popup-tip-container is now implicitly handled by the styles above.
-*/
+.leaflet-control-attribution{
+  display: none;
+}

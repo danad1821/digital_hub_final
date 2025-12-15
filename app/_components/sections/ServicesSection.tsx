@@ -38,7 +38,7 @@ const ServicesSection = forwardRef<HTMLDivElement, ServicesSectionProps>(
             transition={{ duration: 0.6 }}
             className="text-center mb-12 md:mb-16"
           >
-            <h2 className="font-extrabold text-4xl lg:text-5xl  mb-3 sm:mb-4">
+            <h2 className="font-bold text-4xl lg:text-5xl  mb-3 sm:mb-4">
               {sectionData.title}
             </h2>
             <p className="mb-8 text-gray-400 text-base sm:text-lg max-w-2xl mx-auto">
@@ -46,7 +46,7 @@ const ServicesSection = forwardRef<HTMLDivElement, ServicesSectionProps>(
             </p>
           </motion.div>
 
-          <div className="flex flex-wrap lg:flex-nowrap items-center gap-2 justify-center">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 ">
             {services.slice(0, 6).map((s, index) => {
               const isScheduleCard = index === 2 && scheduleFileId; // Only if file ID exists
               const serviceIcon = icons[index % icons.length];

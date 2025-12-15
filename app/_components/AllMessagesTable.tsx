@@ -7,7 +7,7 @@ interface AllMessagesTableProps {
   onDeleteMessage: (id: string) => void;    // ⬅ NEW PROP
 }
 
-const TEXT_POP_COLOR = "text-[#00FFFF]";
+const TEXT_POP_COLOR = "text-[#00D9FF]";
 
 export default function AllMessagesTable({
   messages,

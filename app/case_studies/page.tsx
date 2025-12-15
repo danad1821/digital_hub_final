@@ -43,7 +43,7 @@ export default function CaseStudiesPage() {
               SUCCESS STORIES
             </p>
             <h1 className="text-5xl sm:text-6xl font-bold mb-4 tracking-tight flex flex-col mt-2">
-              <span className="gradient-text font-black tracking-tight bg-gradient-to-r from-[#00FFFF] to-white pb-2">
+              <span className="gradient-text font-black tracking-tight bg-gradient-to-r from-[#00D9FF] to-white pb-2">
                 Proven Project Delivery
               </span>
             </h1>
@@ -54,13 +54,13 @@ export default function CaseStudiesPage() {
         </section>
         
         {/* Horizontal Rule for separation */}
-        <hr className="border-t-4 border-[#00FFFF]" />
+        <hr className="border-t-4 border-[#00D9FF]" />
 
         {/* 2. INTRO/FILTER BAR */}
         <section className="py-8 bg-gray-50 border-b border-gray-200">
           <div className="custom-container flex flex-wrap gap-4 items-center justify-between">
             <h2 className="text-2xl font-bold text-[#0A1C30] flex items-center gap-2">
-                <BookOpen className="w-6 h-6 text-[#00FFFF]" /> Explore Our Expertise
+                <BookOpen className="w-6 h-6 text-[#00D9FF]" /> Explore Our Expertise
             </h2>
             {/* Simple Filter/Search Placeholder */}
             <div className="flex gap-3">
@@ -89,16 +89,16 @@ export default function CaseStudiesPage() {
                 className="grid lg:grid-cols-3 gap-8 p-6 lg:p-10 border border-gray-200 rounded-lg shadow-lg hover:shadow-xl transition duration-300"
               >
                 {/* LEFT COLUMN: Summary & Visual Accent */}
-                <div className="lg:col-span-1 border-r lg:border-r-2 pr-6 border-[#00FFFF]/50">
+                <div className="lg:col-span-1 border-r lg:border-r-2 pr-6 border-[#00D9FF]/50">
                     <p className="text-sm font-semibold text-gray-500 mb-2">{study.service}</p>
                     <h3 className="text-3xl font-extrabold text-[#0A1C30] mb-4">
                         {study.title}
                     </h3>
                     <div className="flex items-center gap-3 mb-4">
-                        <span className="text-xs font-medium text-[#0A1C30] bg-[#00FFFF]/30 px-3 py-1 rounded-full">{study.tag}</span>
+                        <span className="text-xs font-medium text-[#0A1C30] bg-[#00D9FF]/30 px-3 py-1 rounded-full">{study.tag}</span>
                         {/* Minimal Icon Visual */}
                         {study.icons.map((Icon, idx) => (
-                           <div key={idx} className="text-[#00FFFF]">{Icon}</div>
+                           <div key={idx} className="text-[#00D9FF]">{Icon}</div>
                         ))}
                     </div>
                      <button
@@ -114,7 +114,7 @@ export default function CaseStudiesPage() {
                     
                     {/* Challenge Block */}
                     <div>
-                        <h4 className="font-bold text-xl mb-1 text-[#00FFFF]">The Challenge</h4>
+                        <h4 className="font-bold text-xl mb-1 text-[#00D9FF]">The Challenge</h4>
                         <p className="text-gray-700 leading-relaxed border-l-4 border-red-500 pl-3">
                             {study.challenge}
                         </p>
@@ -122,7 +122,7 @@ export default function CaseStudiesPage() {
 
                     {/* Solution Block */}
                     <div>
-                        <h4 className="font-bold text-xl mb-1 text-[#00FFFF]">Our Solution</h4>
+                        <h4 className="font-bold text-xl mb-1 text-[#00D9FF]">Our Solution</h4>
                         <p className="text-gray-700 leading-relaxed border-l-4 border-green-500 pl-3">
                             {study.solution}
                         </p>
@@ -130,7 +130,7 @@ export default function CaseStudiesPage() {
                     
                     {/* Result Block */}
                     <div>
-                        <h4 className="font-bold text-xl mb-1 text-[#00FFFF]">The Result</h4>
+                        <h4 className="font-bold text-xl mb-1 text-[#00D9FF]">The Result</h4>
                         <p className="text-gray-700 leading-relaxed border-l-4 border-blue-500 pl-3">
                             {study.result}
                         </p>

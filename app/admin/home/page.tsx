@@ -17,8 +17,8 @@ import {
 import axios from "axios";
 import Link from "next/link"; // ⬅ Import Link for navigation
 
-const TEXT_POP_COLOR = "text-[#00FFFF]";
-const BG_POP_COLOR = "bg-[#00FFFF]";
+const TEXT_POP_COLOR = "text-[#00D9FF]";
+const BG_POP_COLOR = "bg-[#00D9FF]";
 
 export default function Admin() {
   const [messages, setMessages] = useState<any[]>([]);

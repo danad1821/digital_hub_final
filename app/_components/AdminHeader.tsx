@@ -45,7 +45,7 @@ export default function AdminHeader() {
         ${isMobile ? 'w-fit py-2' : ''}
         ${isLoggingOut
           ? 'bg-gray-500 text-white border-gray-500 disabled:cursor-not-allowed'
-          : 'text-white hover:bg-[#00FFFF] hover:text-[#0A1C30] hover:border-[#00FFFF]'
+          : 'text-white hover:bg-[#00D9FF] hover:text-[#0A1C30] hover:border-[#00D9FF]'
         }
       `}
     >
@@ -69,28 +69,28 @@ export default function AdminHeader() {
         {/* Desktop & Mobile Header */}
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="text-[#00FFFF] font-bold text-xl tracking-wider">
+          <div className="text-[#00D9FF] font-bold text-xl tracking-wider">
             ALTA MARITIME
           </div>
 
           {/* Desktop Nav */}
           <ul className="hidden md:flex items-center space-x-6">
-            <li className="text-white hover:text-[#00FFFF] transition duration-200">
+            <li className="text-white hover:text-[#00D9FF] transition duration-200">
               <Link href="/admin/services">Services</Link>
             </li>
-            <li className="text-white hover:text-[#00FFFF] transition duration-200">
+            <li className="text-white hover:text-[#00D9FF] transition duration-200">
               <Link href="/admin/editor">Editor</Link>
             </li>
-            <li className="text-white hover:text-[#00FFFF] transition duration-200">
+            <li className="text-white hover:text-[#00D9FF] transition duration-200">
               <Link href="/admin/gallery">Gallery</Link>
             </li>
-            <li className="text-white hover:text-[#00FFFF] transition duration-200">
+            <li className="text-white hover:text-[#00D9FF] transition duration-200">
               <Link href="/admin/messages">Messages</Link>
             </li>
-            <li className="text-white hover:text-[#00FFFF] transition duration-200">
+            <li className="text-white hover:text-[#00D9FF] transition duration-200">
               <Link href="/admin/locations">Locations</Link>
             </li>
-            <li className="text-white hover:text-[#00FFFF] transition duration-200">
+            <li className="text-white hover:text-[#00D9FF] transition duration-200">
               <Link href="/admin/schedule">Schedule</Link>
             </li>
 
@@ -114,32 +114,32 @@ export default function AdminHeader() {
         {open && (
           <ul className="md:hidden flex flex-col space-y-4 pb-4 pt-2 border-t border-gray-700">
             {/* Navigation links (kept as is) */}
-            <li className="text-white hover:text-[#00FFFF] transition duration-200">
+            <li className="text-white hover:text-[#00D9FF] transition duration-200">
               <Link href="/admin/services" onClick={() => setOpen(false)}>
                 Services
               </Link>
             </li>
-            <li className="text-white hover:text-[#00FFFF] transition duration-200">
+            <li className="text-white hover:text-[#00D9FF] transition duration-200">
               <Link href="/admin/editor" onClick={() => setOpen(false)}>
                 Editor
               </Link>
             </li>
-            <li className="text-white hover:text-[#00FFFF] transition duration-200">
+            <li className="text-white hover:text-[#00D9FF] transition duration-200">
               <Link href="/admin/gallery" onClick={() => setOpen(false)}>
                 Gallery
               </Link>
             </li>
-            <li className="text-white hover:text-[#00FFFF] transition duration-200">
+            <li className="text-white hover:text-[#00D9FF] transition duration-200">
               <Link href="/admin/locations" onClick={() => setOpen(false)}>
                 Locations
               </Link>
             </li>
-            <li className="text-white hover:text-[#00FFFF] transition duration-200">
+            <li className="text-white hover:text-[#00D9FF] transition duration-200">
               <Link href="/admin/messages" onClick={() => setOpen(false)}>
                 Messages
               </Link>
             </li>
-            <li className="text-white hover:text-[#00FFFF] transition duration-200">
+            <li className="text-white hover:text-[#00D9FF] transition duration-200">
               <Link href="/admin/schedule">Schedule</Link>
             </li>
 

@@ -139,7 +139,7 @@ export default function EditLocationModal({
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Port of Tripoli"
                 required
-                className="w-full p-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#00FFFF] focus:border-transparent outline-none"
+                className="w-full p-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#00D9FF] focus:border-transparent outline-none"
               />
             </div>
 
@@ -155,7 +155,7 @@ export default function EditLocationModal({
                 onChange={(e) => setAddress(e.target.value)}
                 placeholder="Tripoli, Lebanon"
                 required
-                className="w-full p-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#00FFFF] focus:border-transparent outline-none"
+                className="w-full p-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#00D9FF] focus:border-transparent outline-none"
               />
               <p className="text-xs text-gray-500 mt-1">
                 Changing the address will trigger **re-geocoding** (updates Lat/Lng, and Country).
@@ -174,7 +174,7 @@ export default function EditLocationModal({
                 onChange={(e) => setCountry(e.target.value)}
                 placeholder="Lebanon"
                 required
-                className="w-full p-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#00FFFF] focus:border-transparent outline-none"
+                className="w-full p-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#00D9FF] focus:border-transparent outline-none"
               />
             </div>
 
@@ -188,7 +188,7 @@ export default function EditLocationModal({
                 value={status}
                 onChange={(e) => setStatus(e.target.value as 'Active Operations' | 'Planned Operations' | 'Maintenance')}
                 required
-                className="w-full p-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#00FFFF] focus:border-transparent outline-none bg-white"
+                className="w-full p-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#00D9FF] focus:border-transparent outline-none bg-white"
               >
                 {STATUS_OPTIONS.map(option => (
                     <option key={option} value={option}>{option}</option>
@@ -209,7 +209,7 @@ export default function EditLocationModal({
               placeholder="E.g., Major transshipment hub for the Eastern Mediterranean, specializing in container and bulk cargo."
               rows={3}
               required
-              className="w-full p-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#00FFFF] focus:border-transparent outline-none resize-none"
+              className="w-full p-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#00D9FF] focus:border-transparent outline-none resize-none"
             />
             <p className="text-xs text-gray-500 mt-1">
                 This description appears in the map popup.
@@ -226,7 +226,7 @@ export default function EditLocationModal({
             onClick={handleSave}
             // Disabled check now includes the new required fields
             disabled={isSaving || !name.trim() || !address.trim() || !country.trim() || !description.trim() || !status.trim()}
-            className="flex items-center px-6 py-3 border cursor-pointer border-transparent text-base font-medium rounded-sm text-[#0A1C30] bg-[#00FFFF] hover:bg-[#00FFFF]/50 transition duration-300 shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
+            className="flex items-center px-6 py-3 border cursor-pointer border-transparent text-base font-medium rounded-sm text-[#0A1C30] bg-[#00D9FF] hover:bg-[#00D9FF]/50 transition duration-300 shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {isSaving ? (
               <>

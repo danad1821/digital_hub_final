@@ -23,7 +23,7 @@ export default function NewsPage(){
                         
                         {/* News Card Example 1 */}
                         <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-100 transition duration-300 hover:shadow-xl">
-                            <span className="text-sm font-semibold text-[#00FFFF] uppercase">Press Release</span>
+                            <span className="text-sm font-semibold text-[#00D9FF] uppercase">Press Release</span>
                             <h3 className="text-xl font-bold text-[#0A1C30] mt-2 mb-3">
                                 New Regional Hub Opens in Rotterdam
                             </h3>
@@ -35,7 +35,7 @@ export default function NewsPage(){
                         
                         {/* News Card Example 2 */}
                         <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-100 transition duration-300 hover:shadow-xl">
-                            <span className="text-sm font-semibold text-[#00FFFF] uppercase">Industry Update</span>
+                            <span className="text-sm font-semibold text-[#00D9FF] uppercase">Industry Update</span>
                             <h3 className="text-xl font-bold text-[#0A1C30] mt-2 mb-3">
                                 Navigating Green Shipping Regulations
                             </h3>

@@ -123,7 +123,7 @@ export default function ContactForm() {
       >
         {label}
       </label>
-      <div className="flex items-center bg-white rounded-sm border border-gray-300 focus-within:ring-2 focus-within:ring-[#00FFFF]">
+      <div className="flex items-center bg-white rounded-sm border border-gray-300 focus-within:ring-2 focus-within:ring-[#00D9FF]">
         <input
           type={type}
           id={id}
@@ -150,7 +150,7 @@ export default function ContactForm() {
       >
         {label}
       </label>
-      <div className="flex bg-white rounded-sm border border-gray-300 focus-within:ring-2 focus-within:ring-[#00FFFF]">
+      <div className="flex bg-white rounded-sm border border-gray-300 focus-within:ring-2 focus-within:ring-[#00D9FF]">
         <textarea
           id={id}
           value={contactData[id]}
@@ -201,7 +201,7 @@ export default function ContactForm() {
         <button
           type="submit"
           disabled={status === "loading"}
-          className="w-full sm:w-fit flex items-center justify-center px-6 py-3 sm:px-8 sm:py-4 border cursor-pointer border-transparent text-sm sm:text-base font-medium rounded-sm text-[#0A1C30] bg-[#00FFFF] hover:bg-[#00FFFF]/50 transition duration-300 disabled:opacity-60 disabled:cursor-not-allowed hover:brightness-70 hover:scale-105" // Full width on mobile, responsive padding/text size
+          className="w-full sm:w-fit flex items-center justify-center px-6 py-3 sm:px-8 sm:py-4 border cursor-pointer border-transparent text-sm sm:text-base font-medium rounded-sm text-[#0A1C30] bg-[#00D9FF] hover:bg-[#00D9FF]/50 transition duration-300 disabled:opacity-60 disabled:cursor-not-allowed hover:brightness-70 hover:scale-105" // Full width on mobile, responsive padding/text size
         >
           {status === "loading" ? (
             <>

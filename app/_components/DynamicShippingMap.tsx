@@ -237,7 +237,7 @@ export default function DynamicShippingMap({
       center={center}
       // ⭐️ UPDATE: Use the responsive zoom state
       zoom={responsiveZoom}
-      scrollWheelZoom={true}
+      scrollWheelZoom={false}
       className="w-full h-full"
       // ⭐️ UPDATE: minZoom must be set to 2 to allow the mobile zoom level
       minZoom={-5}

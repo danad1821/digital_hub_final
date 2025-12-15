@@ -62,7 +62,7 @@ export default function EditImageModal({ imageDoc, onClose, onEditComplete }: Ed
       {/* Modal Content */}
       <div className="fixed inset-0 flex justify-center items-center z-50">
         <div className="bg-[#11001C] p-6 rounded-lg shadow-2xl w-96 border border-gray-700">
-          <h3 className="text-xl font-bold text-[#00FFFF] mb-4">
+          <h3 className="text-xl font-bold text-[#00D9FF] mb-4">
             Edit Gallery Image
           </h3>
           
@@ -86,13 +86,13 @@ export default function EditImageModal({ imageDoc, onClose, onEditComplete }: Ed
                 onChange={(e) => setTitle(e.target.value)}
                 disabled={isPending}
                 placeholder="Enter a title..."
-                className="w-full bg-gray-700 text-white placeholder-gray-400 border border-gray-600 rounded px-3 py-2 focus:outline-none focus:border-[#00FFFF] transition"
+                className="w-full bg-gray-700 text-white placeholder-gray-400 border border-gray-600 rounded px-3 py-2 focus:outline-none focus:border-[#00D9FF] transition"
               />
             </div>
             
             {/* Status Message */}
             {message && (
-              <p className={`mb-4 text-sm font-semibold ${message.startsWith('Update Failed') || message.startsWith('Please') ? 'text-red-400' : 'text-[#00FFFF]'}`}>
+              <p className={`mb-4 text-sm font-semibold ${message.startsWith('Update Failed') || message.startsWith('Please') ? 'text-red-400' : 'text-[#00D9FF]'}`}>
                 {message}
               </p>
             )}
@@ -101,7 +101,7 @@ export default function EditImageModal({ imageDoc, onClose, onEditComplete }: Ed
             <button
               type="submit"
               disabled={isPending || !title.trim()} 
-              className={`w-full bg-[#00FFFF] text-[#11001C] py-2 rounded font-semibold transition ${
+              className={`w-full bg-[#00D9FF] text-[#11001C] py-2 rounded font-semibold transition ${
                 isPending || !title.trim()
                   ? 'opacity-60 cursor-not-allowed'
                   : 'hover:opacity-90'
