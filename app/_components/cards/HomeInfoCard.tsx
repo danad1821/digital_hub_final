@@ -49,7 +49,7 @@ export default function HomeInfoCard({
       >
         {icon}
       </div>
-      <h3 className="text-2xl font-bold mb-4 ">
+      <h3 className="text-2xl font-bold mb-6 ">
         {service.serviceName}
       </h3>
       {/* Set the summary text to use remaining space and manage overflow */}
