@@ -11,7 +11,6 @@ import { Loader2 } from "lucide-react";
 // Components
 
 import Header from "./_components/Header";
-import Footer from "./_components/Footer";
 
 import { useScrollToSection } from "./_components/ScrollToSection";
 
@@ -139,21 +138,6 @@ export default function Home() {
   // Memoized page sections for cleaner prop passing
   const sections = pageData.sections;
 
-  // --- FIX: Derive contact data for the Footer ---
-  // The ContactSection (index 5) holds the necessary email and phone
-  const contactSectionData = sections[5].data;
-
-  const contactData = {
-    // These properties are available from the ContactSection's data
-    email: contactSectionData.email || "info@altamaritime.com",
-    phone: contactSectionData.phone || "+1 (800) MARITIME",
-    // We assume the emergency phone is not stored separately but hardcoded or derived from another source.
-    // Based on the original Footer.tsx, we can hardcode this value or check if it exists in data
-    emergencyPhone: "+1 (800) 123-4567", 
-  };
-  // ----------------------------------------------
-
-
   // The rest of the page rendering
   return (
     <main className="min-h-screen">
@@ -191,9 +175,6 @@ export default function Home() {
         sectionData={sections[5]}
         locations={locations}
       />
-
-      {/* 5. PASS THE DYNAMICALLY CREATED contactData OBJECT */}
-      <Footer contactInfo={contactData} />
     </main>
   );
 }

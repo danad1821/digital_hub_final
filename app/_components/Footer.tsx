@@ -5,16 +5,6 @@ import { MdOutlineEmail, MdOutlineLocalPhone } from "react-icons/md";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-// Define the type for the new prop
-type FooterProps = {
-  // Assuming the contact info comes from a database/CMS and is passed down as a prop
-  contactInfo: {
-    email: string; // e.g., "info@altamaritime.com"
-    phone: string; // e.g., "+1 (800) MARITIME"
-    emergencyPhone: string; // e.g., "+1 (800) 123-4567"
-  };
-};
-
 // Helper function to convert a service name to a URL-safe slug
 // e.g., "Heavy Lift Cargo" -> "Heavy Lift Cargo" (assuming the service category matches)
 const getServiceCategoryName = (slug: string) => {
@@ -36,8 +26,7 @@ const getServiceCategoryName = (slug: string) => {
   }
 };
 
-// Update the function signature to accept props
-export default function Footer({ contactInfo }: FooterProps) {
+export default function Footer() {
   const pathname = usePathname();
   if (pathname === "/admin") {
     return <></>;
@@ -164,31 +153,28 @@ export default function Footer({ contactInfo }: FooterProps) {
 
             {/* Email */}
             <Link
-              // Use contactInfo.email for the href and display text
-              href={`mailto:${contactInfo.email}`}
+              href="mailto:info@altamaritime.com"
               className={`flex items-start gap-3 text-base text-gray-300 ${hoverColor} transition duration-150`}
             >
               <MdOutlineEmail className="text-2xl flex-shrink-0 mt-0.5 text-[#00D9FF]" />
-              <span>{contactInfo.email}</span>
+              <span>info@altamaritime.com</span>
             </Link>
 
             {/* Phone */}
             <Link
-              // Use contactInfo.phone for the href and display text
-              href={`tel:${contactInfo.phone.replace(/[^0-9+]/g, "")}`} // Clean phone number for tel: link
+              href="tel:+180062748463"
               className={`flex items-start gap-3 text-base text-gray-300 ${hoverColor} transition duration-150`}
             >
               <MdOutlineLocalPhone className="text-2xl flex-shrink-0 mt-0.5 text-[#00D9FF]" />
-              <span>{contactInfo.phone}</span>
+              <span>+1 (800) MARITIME</span>
             </Link>
 
             <div className="pt-4 border-t border-gray-700">
               <p className="text-sm font-semibold text-gray-400 mb-1">
                 24/7 Operations Center
               </p>
-              {/* Emergency Phone (optional: make this dynamic too) */}
               <p className="text-sm text-gray-500">
-                Emergency: {contactInfo.emergencyPhone}
+                Emergency: +1 (800) 123-4567
               </p>
             </div>
           </div>
