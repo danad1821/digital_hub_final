@@ -25,13 +25,11 @@ export default function Footer() {
     { name: "Port Operations", href: "/" },
   ];
 
-
   const legalLinks = [
     { name: "Privacy Policy", href: "/" },
     { name: "Terms of Service", href: "/" },
     { name: "Cookie Policy", href: "/" },
   ];
-
 
   // Use a deep navy blue background
   const footerBg = "bg-[#0A1C30]";
@@ -69,7 +67,7 @@ export default function Footer() {
     <footer className={`${footerBg} ${textColor} font-sans`}>
       <div className="max-w-7xl py-16 custom-container">
         {/* Main 4-Column Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-8">
           {/* Column 1: Logo, Slogan, and Socials */}
           <div className="flex flex-col gap-6">
             {/* Logo Block */}
@@ -98,11 +96,11 @@ export default function Footer() {
 
             {/* Email */}
             <Link
-              href="mailto:info@altamaritime.com"
+              href="mailto:chartering@altamaritime.com"
               className={`flex items-start gap-3 text-base text-gray-300 ${hoverColor} transition duration-150`}
             >
               <MdOutlineEmail className="text-2xl flex-shrink-0 mt-0.5 text-[#00D9FF]" />
-              <span>info@altamaritime.com</span>
+              <span>chartering@altamaritime.com</span>
             </Link>
 
             {/* Phone */}
@@ -111,7 +109,11 @@ export default function Footer() {
               className={`flex items-start gap-3 text-base text-gray-300 ${hoverColor} transition duration-150`}
             >
               <MdOutlineLocalPhone className="text-2xl flex-shrink-0 mt-0.5 text-[#00D9FF]" />
-              <span>+1 (800) MARITIME</span>
+              <span>
+                P: +86-21-6521 8923
+                <br />
+                M: +86 1366 1933
+              </span>
             </Link>
 
             <div className="pt-4 border-t border-gray-700">
