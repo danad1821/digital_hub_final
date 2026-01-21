@@ -602,8 +602,7 @@ export default function HomePageEditor() {
                 >
                   Phone
                 </label>
-                <input
-                  type="text"
+                <textarea
                   id="contact-phone"
                   className={InputStyle}
                   value={pageData.sections[5].data.phone}
@@ -617,8 +616,7 @@ export default function HomePageEditor() {
                 >
                   Headquarters
                 </label>
-                <input
-                  type="text"
+                <textarea
                   id="contact-hq"
                   className={InputStyle}
                   value={pageData.sections[5].data.hq}

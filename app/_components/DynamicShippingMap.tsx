@@ -167,7 +167,7 @@ const PortPinWrapper = ({ loc }: { loc: any }) => {
             {/* Assuming 'loc.country' exists or fallback */}
           </p>
           {/* Description (Medium Gray) */}
-          <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+          <p className="text-sm text-gray-600 mb-4 leading-relaxed whitespace-pre-line">
             {loc.description || "Logistics and port operations center"}
           </p>
           {/* Separator Line */}
@@ -238,6 +238,7 @@ export default function DynamicShippingMap({
       // ⭐️ UPDATE: Use the responsive zoom state
       zoom={responsiveZoom}
       scrollWheelZoom={false}
+      doubleClickZoom={true}
       className="w-full h-full"
       // ⭐️ UPDATE: minZoom must be set to 2 to allow the mobile zoom level
       minZoom={-5}

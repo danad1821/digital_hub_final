@@ -70,7 +70,7 @@ const ContactSection = forwardRef<HTMLDivElement, ContactSectionProps>(
                       <h4 className="font-medium text-xl sm:text-2xl">Phone</h4>
                       <a
                         href="tel:+1800maritime"
-                        className="text-gray-600 hover:text-[#00D9FF] text-base"
+                        className="text-gray-600 hover:text-[#00D9FF] text-base whitespace-pre-line"
                       >
                         {sectionData?.data.phone}
                       </a>
@@ -85,8 +85,7 @@ const ContactSection = forwardRef<HTMLDivElement, ContactSectionProps>(
                       <h4 className="font-medium text-xl sm:text-2xl">
                         Headquarters
                       </h4>
-                      <p className="text-gray-600 text-base">{sectionData.data.hq.split(" ").slice(0,3).join(" ")}</p>
-                      <p className="text-gray-600 text-base">{sectionData.data.hq.split(" ").slice(3).join(" ")}</p>
+                      <p className="text-gray-600 text-base whitespace-pre-line">{sectionData.data.hq}</p>
                     </div>
                   </div>
                 </div>

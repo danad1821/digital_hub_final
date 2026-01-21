@@ -7,24 +7,6 @@ import { usePathname } from "next/navigation";
 
 // Helper function to convert a service name to a URL-safe slug
 // e.g., "Heavy Lift Cargo" -> "Heavy Lift Cargo" (assuming the service category matches)
-const getServiceCategoryName = (slug: string) => {
-  switch (slug) {
-    case "heavy-lift":
-      return "Heavy Lift Cargo";
-    case "break-bulk":
-      return "Break Bulk Shipping";
-    case "project-logistics":
-      return "Project Logistics";
-    case "port-operations":
-      return "Port Operations";
-    case "relocation":
-      return "Machinery Relocation";
-    case "chartering":
-      return "Cargo Chartering";
-    default:
-      return slug;
-  }
-};
 
 export default function Footer() {
   const pathname = usePathname();
@@ -41,21 +23,8 @@ export default function Footer() {
     },
     { name: "Project Logistics", href: "/" },
     { name: "Port Operations", href: "/" },
-    {
-      name: "Machinery Relocation",
-      href: "/",
-    },
-    { name: "Cargo Chartering", href: "/" },
   ];
 
-  const companyLinks = [
-    { name: "About Us", href: "/" },
-    { name: "Our Fleet", href: "/" },
-    { name: "Case Studies", href: "/" },
-    { name: "Careers", href: "/" },
-    { name: "News & Updates", href: "/" },
-    { name: "Safety Standards", href: "/" },
-  ];
 
   const legalLinks = [
     { name: "Privacy Policy", href: "/" },
@@ -63,12 +32,6 @@ export default function Footer() {
     { name: "Cookie Policy", href: "/" },
   ];
 
-  // Social links (using placeholder links)
-  const socialLinks = [
-    { icon: FaLinkedin, href: "1" },
-    { icon: FaTwitter, href: "2" },
-    { icon: FaFacebook, href: "3" },
-  ];
 
   // Use a deep navy blue background
   const footerBg = "bg-[#0A1C30]";
@@ -83,7 +46,7 @@ export default function Footer() {
     links,
   }: {
     title: string;
-    links: typeof serviceLinks | typeof companyLinks | typeof legalLinks;
+    links: typeof serviceLinks | typeof legalLinks;
   }) => (
     <div className="flex flex-col gap-4">
       <h4 className={`text-xl font-semibold mb-2 text-white`}>{title}</h4>
@@ -124,28 +87,10 @@ export default function Footer() {
               Global maritime logistics solutions with expertise in heavy lift
               cargo and project management.
             </p>
-
-            {/* Social Media Icons */}
-            <div className="flex gap-2 mt-2">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.href}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`p-3 border border-gray-700/50 rounded-md transition duration-200 text-gray-300 ${hoverColor}`}
-                >
-                  <social.icon className="text-lg" />
-                </a>
-              ))}
-            </div>
           </div>
 
           {/* Column 2: Services */}
           <LinkColumn title="Services" links={serviceLinks} />
-
-          {/* Column 3: Company */}
-          <LinkColumn title="Company" links={companyLinks} />
 
           {/* Column 4: Get In Touch */}
           <div className="flex flex-col gap-6">

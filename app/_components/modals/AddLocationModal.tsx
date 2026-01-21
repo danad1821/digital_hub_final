@@ -80,7 +80,6 @@ export default function AddLocationModal({
     e.preventDefault();
     setError(null);
 
-    // UPDATED client-side validation
     if (!name.trim() || !address.trim() || !country.trim() || !description.trim() || !status.trim()) {
       setError("Port Name, Address, Country, Description, and Status are required.");
       return;
@@ -88,14 +87,13 @@ export default function AddLocationModal({
 
     setIsSaving(true);
     
-    // The data structure to be sent to the server for processing
     const newLocationData: NewLocationDataPayload = {
-        name,
-        address,
-        country, // NEW
-        description, // NEW
-        status, // NEW
-        // Only pass the necessary destination fields (name, lat, lng)
+        name: name.trim(),
+        address: address.trim(),
+        country: country.trim(),
+        // .trim() removes leading/trailing spaces but KEEPS new lines (\n) in the middle
+        description: description.trim(), 
+        status,
         destinations: selectedDestinations.map(dest => ({
             name: dest.name,
             lat: dest.lat,
