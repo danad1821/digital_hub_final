@@ -251,7 +251,7 @@ export default function DynamicShippingMap({
     >
       <TileLayer
         // Tile layer URL remains unchanged as requested
-        url="https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png"
+        url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}.png"
         attribution={false as any}
         // ⭐️ UPDATE: maxZoom set higher to allow user interaction
         maxZoom={18}
