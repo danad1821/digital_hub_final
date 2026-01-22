@@ -12,4 +12,4 @@ const config = {
   serverExternalPackages: ['mongoose']
 };
  
-module.exports = config;
+export default config;
