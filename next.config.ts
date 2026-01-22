@@ -1,15 +1,17 @@
-/** @type {import('next').NextConfig} */
-const config = {
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  serverExternalPackages: ['mongoose'],
   experimental: {
-    // This is required for Server Actions in older versions (Next.js 13)
-    // and where the bodySizeLimit option lives.
+    // 2. serverActions is now stable in Next 14+, 
+    // but bodySizeLimit still lives here if you need to increase it
     serverActions: {
-      // Set the maximum size for the request body.
-      // Example: Setting the limit to 10 megabytes.
-      bodySizeLimit: '50mb', 
+      bodySizeLimit: '50mb',
+      allowedOrigins: ['https://goldenrod-llama-844473.hostingersite.com/']
     },
   },
-  serverExternalPackages: ['mongoose']
+
+
 };
- 
-export default config;
+
+export default nextConfig;
