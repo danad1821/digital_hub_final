@@ -1,7 +1,5 @@
 /** @type {import('next').NextConfig} */
 const config = {
-  // ... other configuration settings you might have ...
-
   experimental: {
     // This is required for Server Actions in older versions (Next.js 13)
     // and where the bodySizeLimit option lives.
@@ -11,6 +9,7 @@ const config = {
       bodySizeLimit: '50mb', 
     },
   },
+  serverExternalPackages: ['mongoose']
 };
  
 module.exports = config;
