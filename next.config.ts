@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
     // but bodySizeLimit still lives here if you need to increase it
     serverActions: {
       bodySizeLimit: '50mb',
-      allowedOrigins: ['https://goldenrod-llama-844473.hostingersite.com/']
+      allowedOrigins: ['https://altamaritime.com/']
     },
   },
 
