@@ -84,8 +84,7 @@ export async function POST(request: Request) {
         
         cookiesData.set("auth-token", token, { // Set the JWT under the name 'auth-token'
             httpOnly: true, // Prevents client-side JavaScript access (essential for security)
-            secure: process.env.NODE_ENV === "production", // Only send over HTTPS in production
-            domain: process.env.NODE_ENV ==="production" ? "altamaritime.com" : 'springgreen-hedgehog-502712.hostingersite.com',
+            secure: false, // Only send over HTTPS in production
             maxAge: 60 * 60 * 24 * 7, // 1 week (matches token expiry)
             path: "/", // Available across the entire domain
             sameSite: 'lax', // Helps mitigate Cross-Site Request Forgery (CSRF)
