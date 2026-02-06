@@ -12,7 +12,7 @@ interface LoginData {
 }
 
 export default function AdminLogin() {
-    const router = useRouter();
+  const router = useRouter();
   const [loginData, setLoginData] = useState<LoginData>({
     email: "",
     password: "",
@@ -36,7 +36,7 @@ export default function AdminLogin() {
       setError("Please enter both email and password.");
       return false;
     }
-    // Basic email format check can be added here if needed, 
+    // Basic email format check can be added here if needed,
     // but the backend will handle the final, secure validation.
     return true;
   };
@@ -58,11 +58,18 @@ export default function AdminLogin() {
 
       if (response.status === 200) {
         setStatus("success");
+        // 1. Tell Next.js to start loading the admin page in the background
+        router.prefetch("/admin/home");
+
+        // 2. Wait 500ms for cookies to settle, then move
+        setTimeout(() => {
+          router.push("/admin/home");
+          router.refresh();
+        }, 600);
       }
-      router.push("/admin/home");
     } catch (err) {
       console.error(err);
-      
+
       let errorMessage = "An unexpected error occurred. Please try again.";
 
       if (axios.isAxiosError(err) && err.response) {
@@ -86,7 +93,7 @@ export default function AdminLogin() {
     id: keyof LoginData, // Use keyof LoginData for type safety
     type: string,
     placeholder: string,
-    Icon: React.ElementType
+    Icon: React.ElementType,
   ) => (
     <div className="relative mb-6">
       <label htmlFor={id} className="text-sm font-medium text-gray-700">
@@ -120,7 +127,7 @@ export default function AdminLogin() {
           "email",
           "email",
           "admin@example.com",
-          Mail
+          Mail,
         )}
 
         {renderLoginInput(
@@ -128,7 +135,7 @@ export default function AdminLogin() {
           "password",
           "password",
           "Enter your password",
-          Lock
+          Lock,
         )}
 
         {/* Status/Error Messages */}
