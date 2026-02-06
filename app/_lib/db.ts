@@ -27,9 +27,14 @@ if (!global._mongooseCache) {
 cached = global._mongooseCache;
 
 export async function connectToDatabase(): Promise<typeof mongoose> {
+
+  if (cached.conn && mongoose.connection.readyState === 1) {
+    return cached.conn;
+  }
   if (cached.conn) {
     return cached.conn;
   }
+
 
   if (!cached.promise) {
     const opts: mongoose.ConnectOptions = {

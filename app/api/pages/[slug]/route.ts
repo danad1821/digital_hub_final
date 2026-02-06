@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/app/_lib/db';
 import Page from '@/app/_models/Page';
 import { PageDocument, ApiResponse } from '@/app/_types/PageData';
+import mongoose from 'mongoose';
 
 /**
  * @method GET
@@ -13,11 +14,18 @@ export async function GET(
     request: NextRequest, 
     { params }: { params: Promise<{ slug: string }> }
 ) {
-    await connectToDatabase();
     const { slug } = await params;
 
     try {
-        const page = await Page.findOne({ slug: slug });
+        // Force a connection check
+        await connectToDatabase();
+        
+        // Safety check: If mongoose isn't actually connected, throw error to trigger catch
+        if (mongoose.connection.readyState !== 1) {
+            throw new Error("Database is in disconnected state");
+        }
+
+        const page = await Page.findOne({ slug: slug }).lean(); // .lean() for faster, plain JSON
 
         if (!page) {
             return NextResponse.json({ success: false, error: 'Page not found' }, { status: 404 });
@@ -25,7 +33,11 @@ export async function GET(
 
         return NextResponse.json({ success: true, data: page });
     } catch (error: any) {
-        return NextResponse.json({ success: false, error: error.message }, { status: 400 });
+        console.error("MongoDB GET Error:", error);
+        return NextResponse.json(
+            { success: false, error: "External Database Error" }, 
+            { status: 500 } // Keep it 500 so you know it's a server failure
+        );
     }
 }
 
