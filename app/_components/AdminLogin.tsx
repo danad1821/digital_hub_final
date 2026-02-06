@@ -59,7 +59,7 @@ export default function AdminLogin() {
       if (response.status === 200) {
         setStatus("success");
         setTimeout(() => {
-          window.location.href = "/admin/home";
+          router.replace("/admin/home")
         }, 100);
       }
     } catch (err) {
