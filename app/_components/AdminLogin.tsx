@@ -58,14 +58,9 @@ export default function AdminLogin() {
 
       if (response.status === 200) {
         setStatus("success");
-        // 1. Tell Next.js to start loading the admin page in the background
-        router.prefetch("/admin/home");
-
-        // 2. Wait 500ms for cookies to settle, then move
         setTimeout(() => {
-          router.push("/admin/home");
-          router.refresh();
-        }, 600);
+          window.location.href = "/admin/home";
+        }, 100);
       }
     } catch (err) {
       console.error(err);

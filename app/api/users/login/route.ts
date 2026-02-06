@@ -87,7 +87,7 @@ export async function POST(request: Request) {
             secure: process.env.NODE_ENV === "production", // Only send over HTTPS in production
             maxAge: 60 * 60 * 24 * 7, // 1 week (matches token expiry)
             path: "/", // Available across the entire domain
-            sameSite: 'strict', // Helps mitigate Cross-Site Request Forgery (CSRF)
+            sameSite: 'lax', // Helps mitigate Cross-Site Request Forgery (CSRF)
         });
 
         // 7. Return Success Response
