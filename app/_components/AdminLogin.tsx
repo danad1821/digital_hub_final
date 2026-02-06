@@ -58,9 +58,8 @@ export default function AdminLogin() {
 
       if (response.status === 200) {
         setStatus("success");
-        // Optional: Redirect the user after successful login
-        router.push("/admin/home");
       }
+      router.push("/admin/home");
     } catch (err) {
       console.error(err);
       
