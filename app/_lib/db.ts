@@ -34,18 +34,20 @@ export async function connectToDatabase(): Promise<typeof mongoose> {
   if (!cached.promise) {
     const opts: mongoose.ConnectOptions = {
       bufferCommands: false,
-      // add any other options you need here
+      // Added for stability on Hostinger:
+      maxPoolSize: 10,
+      serverSelectionTimeoutMS: 10000, // Wait 10s before failing
+      socketTimeoutMS: 45000,
+      family: 4, // Force IPv4 (often fixes intermittent DNS issues)
     };
 
     cached.promise = mongoose
       .connect(MONGODB_URI, opts)
       .then((mongooseInstance) => {
-        console.log("MongoDB connected successfully");
         return mongooseInstance;
       })
       .catch((err) => {
-        console.error("MongoDB connection failed:", err);
-        cached.promise = null;
+        cached.promise = null; // Reset on failure
         throw err;
       });
   }
