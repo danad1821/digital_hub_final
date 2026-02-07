@@ -16,15 +16,15 @@ type MongooseCache = {
 // Expose a typed cache on the global object so it survives HMR in dev
 declare global {
   // eslint-disable-next-line no-var
-  var _mongooseCache: MongooseCache | undefined;
+  var _mongooseCache_AltaMaritime: MongooseCache | undefined;
 }
 
 let cached: MongooseCache;
 
-if (!global._mongooseCache) {
-  global._mongooseCache = { conn: null, promise: null };
+if (!global._mongooseCache_AltaMaritime) {
+  global._mongooseCache_AltaMaritime = { conn: null, promise: null };
 }
-cached = global._mongooseCache;
+cached = global._mongooseCache_AltaMaritime;
 
 export async function connectToDatabase(): Promise<typeof mongoose> {
 
