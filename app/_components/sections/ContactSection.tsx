@@ -96,7 +96,7 @@ const ContactSection = forwardRef<HTMLDivElement, ContactSectionProps>(
                 </h3>
                 <div className="grid grid-cols-2 gap-y-4 gap-x-8">
                   {locations.map((l) => (
-                    <div key={l.country}>
+                    <div key={l.country + " "+l.name}>
                       <p className="text-[#2A3544] text-xl mb-4">{l.country}</p>
                       <p className="text-gray-400 text-lg">{l.name} Office</p>
                     </div>
