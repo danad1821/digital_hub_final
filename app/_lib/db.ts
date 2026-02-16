@@ -1,58 +1,47 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI: any = process.env.MONGODB_URI;
+const MONGODB_URI = process.env.MONGODB_URI!;
 
-if (!MONGODB_URI) {
-  throw new Error(
-    "Please define MONGODB_URI in .env.local → https://mongodb.com/atlas"
-  );
-}
-
-type MongooseCache = {
+// 1. Extend the global object to prevent multiple connections during hot reloads
+interface MongooseCache {
   conn: typeof mongoose | null;
   promise: Promise<typeof mongoose> | null;
-};
+}
 
-// Expose a typed cache on the global object so it survives HMR in dev
 declare global {
-  // eslint-disable-next-line no-var
-  var _mongooseCache_AltaMaritime: MongooseCache | undefined;
+  var _mongooseCache_Altamaritime: MongooseCache | undefined;
 }
 
-let cached: MongooseCache;
+// 2. Use the existing connection if it exists
+let cached = global._mongooseCache_Altamaritime || { conn: null, promise: null };
 
-if (!global._mongooseCache_AltaMaritime) {
-  global._mongooseCache_AltaMaritime = { conn: null, promise: null };
+if (!global._mongooseCache_Altamaritime) {
+  global._mongooseCache_Altamaritime = cached;
 }
-cached = global._mongooseCache_AltaMaritime;
 
-export async function connectToDatabase(): Promise<typeof mongoose> {
-  // Try to get the URI inside the function call
-  let uri = process.env.MONGODB_URI;
-
+export async function connectToDatabase() {
   if (cached.conn && mongoose.connection.readyState === 1) {
     return cached.conn;
   }
 
   if (!cached.promise) {
-    // If URI is missing, wait 500ms and try once more before crashing
-    if (!uri) {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      uri = process.env.MONGODB_URI;
-    }
-
-    if (!uri) throw new Error("MONGODB_URI is missing from environment");
-
-    cached.promise = mongoose.connect(uri, {
+    const opts = {
       bufferCommands: false,
-    }).then((m) => m);
+      maxPoolSize: 5, // 3. Keep this small on Free Tier to avoid "Leakage" errors
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+    };
+
+    cached.promise = mongoose.connect(MONGODB_URI, opts).then((m) => m);
   }
 
   try {
     cached.conn = await cached.promise;
-    return cached.conn;
   } catch (e) {
-    cached.promise = null; // Reset so the next refresh actually tries again
+    // 4. Reset if it fails so the next ping can try again
+    cached.promise = null;
     throw e;
   }
+
+  return cached.conn;
 }
