@@ -84,6 +84,9 @@ export default function Home() {
   // 2. COMBINE FETCHING LOGIC INTO A SINGLE ASYNC FUNCTION (Memoized)
   const initDataFetch = useCallback(async () => {
     setIsLoading(true);
+    console.log(process.env.MONGODB_URI
+          ? "URI found"
+          : "URI NOT FOUND IN PROCESS")
     try {
       // 1. Fetch critical page data first
       const pageResponse = await axios.get(`/api/pages/home`);

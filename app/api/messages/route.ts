@@ -52,8 +52,8 @@ export async function POST(request: Request) {
     // 3. Send the email
     try {
       const info = await transporter.sendMail({
-        from: `"Alta Maritime - Contact Form" <${process.env.SMTP_USER}>`,
-        to: "danadabdoub@gmail.com",
+        from: `"Alta Maritime - Contact Form (on website)" <${process.env.SMTP_USER}>`,
+        to: "chartering@altamaritime.com",
         subject: "Alta Maritime Inquiry",
         html: emailHtml, // This replaces the 'react' property
       });

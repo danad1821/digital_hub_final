@@ -1,44 +1,54 @@
 // app/api/pages/[slug]/route.ts
 
-import { NextRequest, NextResponse } from 'next/server';
-import { connectToDatabase } from '@/app/_lib/db';
-import Page from '@/app/_models/Page';
-import { PageDocument, ApiResponse } from '@/app/_types/PageData';
-import mongoose from 'mongoose';
+import { NextRequest, NextResponse } from "next/server";
+import { connectToDatabase } from "@/app/_lib/db";
+import Page from "@/app/_models/Page";
+import { PageDocument, ApiResponse } from "@/app/_types/PageData";
+import mongoose from "mongoose";
 
 /**
  * @method GET
  * @description Fetches a page document by its slug.
  */
 export async function GET(
-    request: NextRequest, 
-    { params }: { params: Promise<{ slug: string }> }
+  request: NextRequest,
+  { params }: { params: Promise<{ slug: string }> },
 ) {
-    const { slug } = await params;
+  const { slug } = await params;
 
-    try {
-        // Force a connection check
-        await connectToDatabase();
-        
-        // Safety check: If mongoose isn't actually connected, throw error to trigger catch
-        if (mongoose.connection.readyState !== 1) {
-            throw new Error("Database is in disconnected state");
-        }
+  try {
+    // Force a connection check
+    await connectToDatabase();
 
-        const page = await Page.findOne({ slug: slug }).lean(); // .lean() for faster, plain JSON
-
-        if (!page) {
-            return NextResponse.json({ success: false, error: 'Page not found' }, { status: 404 });
-        }
-
-        return NextResponse.json({ success: true, data: page });
-    } catch (error: any) {
-        console.error("MongoDB GET Error:", error);
-        return NextResponse.json(
-            { success: false, error: "External Database Error" }, 
-            { status: 500 } // Keep it 500 so you know it's a server failure
-        );
+    // Safety check: If mongoose isn't actually connected, throw error to trigger catch
+    if (mongoose.connection.readyState !== 1) {
+      throw new Error("Database is in disconnected state");
     }
+
+    const page = await Page.findOne({ slug: slug }).lean(); // .lean() for faster, plain JSON
+
+    if (!page) {
+      return NextResponse.json(
+        { success: false, error: "Page not found" },
+        { status: 404 },
+      );
+    }
+
+    return NextResponse.json({ success: true, data: page });
+  } catch (error: any) {
+    console.error("MongoDB GET Error:", error);
+    return NextResponse.json(
+      {
+        success: false,
+        message: error.message,
+        envCheck: process.env.MONGODB_URI
+          ? "URI found"
+          : "URI NOT FOUND IN PROCESS",
+        path: slug,
+      },
+      { status: 500 }, // Keep it 500 so you know it's a server failure
+    );
+  }
 }
 
 /**
@@ -47,12 +57,15 @@ export async function GET(
  */
 export async function PUT(
   request: Request,
-  { params }: { params: Promise<{ slug: string }> }
+  { params }: { params: Promise<{ slug: string }> },
 ) {
   const { slug } = await params;
 
   if (!slug) {
-    return NextResponse.json({ success: false, error: "Missing page slug" }, { status: 400 });
+    return NextResponse.json(
+      { success: false, error: "Missing page slug" },
+      { status: 400 },
+    );
   }
 
   try {
@@ -65,32 +78,40 @@ export async function PUT(
     // 3. Find the document by slug and update it entirely
     const updatedPage = await Page.findOneAndUpdate(
       { slug: slug },
-      { 
-        $set: { 
+      {
+        $set: {
           sections: pageData.sections,
           page_title: pageData.page_title,
           // Add any other top-level fields you want to update
           updatedAt: new Date(),
-        } 
+        },
       },
-      { new: true, runValidators: true } // 'new: true' returns the updated document
+      { new: true, runValidators: true }, // 'new: true' returns the updated document
     ).exec();
 
     if (!updatedPage) {
-      return NextResponse.json({ success: false, error: `Page with slug '${slug}' not found.` }, { status: 404 });
+      return NextResponse.json(
+        { success: false, error: `Page with slug '${slug}' not found.` },
+        { status: 404 },
+      );
     }
 
     // 4. Return the updated document to the client
     // Use JSON.parse(JSON.stringify(updatedPage)) to ensure it's a plain JavaScript object
     const resultData = JSON.parse(JSON.stringify(updatedPage));
 
-    return NextResponse.json({ success: true, data: resultData }, { status: 200 });
-
+    return NextResponse.json(
+      { success: true, data: resultData },
+      { status: 200 },
+    );
   } catch (error) {
     console.error("Error updating page content:", error);
     return NextResponse.json(
-      { success: false, error: (error as Error).message || "Failed to update page content." },
-      { status: 500 }
+      {
+        success: false,
+        error: (error as Error).message || "Failed to update page content.",
+      },
+      { status: 500 },
     );
   }
 }
