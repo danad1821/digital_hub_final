@@ -32,7 +32,12 @@ export async function connectToDatabase() {
       socketTimeoutMS: 45000,
     };
 
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((m) => m);
+    cached.promise = mongoose.connect(MONGODB_URI, opts).then((m) => m)
+      .catch(err => {
+        cached.promise = null; // Reset so we can try again next request
+        console.error("CRITICAL: MongoDB Connection failed but keeping server alive. Error: ", err);
+        return null; 
+      });;
   }
 
   try {
