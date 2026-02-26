@@ -1,17 +1,14 @@
-import { connectToDatabase } from "@/app/_lib/db";
-import User from "@/app/_models/User";
+import pool from "@/app/_lib/db";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken"; // 💡 JWT Library Import
+import jwt from "jsonwebtoken";
 
-// Define the shape for the request body for type safety
 interface LoginBody {
     email?: string;
     password?: string;
 }
 
-// Define the shape for the JWT payload
 interface JwtPayload {
     userId: string;
     email: string;
@@ -22,75 +19,60 @@ export async function POST(request: Request) {
     try {
         const body: LoginBody = await request.json();
         const { email, password } = body;
-        
-        // 1. Simple Input Validation
+
+        // 1. Input Validation
         if (!email || !password) {
             return NextResponse.json(
                 { error: "Email and password are required." },
-                { status: 400 } // Bad Request
+                { status: 400 }
             );
         }
-        
-        // 2. Database Connection and Secret Check
-        await connectToDatabase();
-        
+
         const jwtSecret = process.env.JWT_SECRET;
         if (!jwtSecret) {
-            // Log for server admin, return generic error to client
-            console.error("Configuration Error: JWT_SECRET environment variable is not set.");
-            return NextResponse.json(
-                { error: "Server configuration error." },
-                { status: 500 }
-            );
+            console.error("JWT_SECRET is not set.");
+            return NextResponse.json({ error: "Server configuration error." }, { status: 500 });
         }
 
-        // 3. Find the User
-        const user = await User.findOne({ email }).select('+password');
+        // 2. Find the User in MySQL
+        // Note: Using id as a string (VARCHAR) if you migrated MongoDB ObjectIds
+        const [rows]: any = await pool.query(
+            "SELECT id, email, password, role FROM users WHERE email = ? LIMIT 1",
+            [email]
+        );
+
+        const user = rows[0];
 
         if (!user) {
-            // Security: Don't reveal if it's the email or password that is wrong
-            return NextResponse.json(
-                { error: "Invalid credentials." },
-                { status: 401 } // Unauthorized
-            );
+            return NextResponse.json({ error: "Invalid credentials." }, { status: 401 });
         }
 
-        // 4. Compare Passwords
+        // 3. Compare Passwords
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) {
-            return NextResponse.json(
-                { error: "Invalid credentials." },
-                { status: 401 } // Unauthorized
-            );
+            return NextResponse.json({ error: "Invalid credentials." }, { status: 401 });
         }
 
-        // 5. 🔑 Generate the JWT
+        // 4. Generate the JWT
         const payload: JwtPayload = {
-            userId: user._id.toString(), // Convert ObjectId to string for JWT
+            userId: user.id.toString(),
             email: user.email,
-            role: user.role || "user", // Assuming user role is stored in the user document
+            role: user.role || "user",
         };
 
-        const token = jwt.sign(
-            payload, 
-            jwtSecret, 
-            { expiresIn: '7d' } // Token expires in 7 days
-        );
-        
+        const token = jwt.sign(payload, jwtSecret, { expiresIn: '7d' });
 
-        // 6. Set the Secure Cookie
+        // 5. Set the Secure Cookie
         const cookiesData = await cookies();
-        
-        cookiesData.set("auth-token", token, { // Set the JWT under the name 'auth-token'
-            httpOnly: true, // Prevents client-side JavaScript access (essential for security)
-            secure: false, // Only send over HTTPS in production
-            maxAge: 60 * 60 * 24 * 7, // 1 week (matches token expiry)
-            path: "/", // Available across the entire domain
-            sameSite: 'lax', // Helps mitigate Cross-Site Request Forgery (CSRF)
+        cookiesData.set("auth-token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production", // Secure in production
+            maxAge: 60 * 60 * 24 * 7,
+            path: "/",
+            sameSite: 'lax',
         });
 
-        // 7. Return Success Response
         return NextResponse.json(
             { message: "Login successful.", role: payload.role },
             { status: 200 }
@@ -98,10 +80,8 @@ export async function POST(request: Request) {
 
     } catch (error) {
         console.error("Login API Error:", error);
-        
-        // Return a generic error response for internal server issues
         return NextResponse.json(
-            { error: "An internal server error occurred during login." },
+            { error: "An internal server error occurred." },
             { status: 500 }
         );
     }

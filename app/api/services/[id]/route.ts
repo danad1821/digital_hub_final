@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
-import { connectToDatabase } from "@/app/_lib/db";
-import Service from "@/app/_models/Service";
-import { ObjectId } from "mongodb";
+import pool from "@/app/_lib/db";
 
 export async function PUT(
   request: Request,
@@ -9,24 +7,27 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
-    await connectToDatabase();
     const data = await request.json();
-    const updatedService = await Service.findByIdAndUpdate(
-      new ObjectId(id),
-      data,
-      { new: true }
+    const { serviceName, summary } = data;
+
+    const [result]: any = await pool.query(
+      `UPDATE services SET 
+        service_name = COALESCE(?, service_name), 
+        summary = COALESCE(?, summary),
+        updated_at = NOW()
+       WHERE id = ?`,
+      [serviceName, summary, id]
     );
-    if (!updatedService) {
+
+    if (result.affectedRows === 0) {
       return NextResponse.json({ error: "Service not found" }, { status: 404 });
     }
-    return NextResponse.json(updatedService, { status: 200 });
+
+    return NextResponse.json({ message: "Service updated successfully" }, { status: 200 });
   } catch (error: any) {
     console.error("Error updating Service:", error);
     return NextResponse.json(
-      {
-        message: "Failed to create new service.",
-        error: error.message || error,
-      },
+      { message: "Failed to update service.", error: error.message },
       { status: 500 }
     );
   }
@@ -38,19 +39,21 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    await connectToDatabase();
-    const deletedService = await Service.findByIdAndDelete(new ObjectId(id));
-    if (!deletedService) {
+    
+    const [result]: any = await pool.query("DELETE FROM services WHERE id = ?", [id]);
+
+    if (result.affectedRows === 0) {
       return NextResponse.json({ error: "Service not found" }, { status: 404 });
     }
+
     return NextResponse.json(
       { message: "Service deleted successfully" },
       { status: 200 }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error deleting Service:", error);
     return NextResponse.json(
-      { error: "Failed to delete Service" },
+      { error: "Failed to delete Service", details: error.message },
       { status: 500 }
     );
   }

@@ -1,68 +1,29 @@
-import { connectToDatabase } from "@/app/_lib/db";
-import mongoose, { Types } from "mongoose";
+import pool from "@/app/_lib/db";
 import { NextResponse } from "next/server";
-import { Readable } from "stream";
 
-// The standard Next.js App Router function signature for dynamic parameters
 export async function GET(
   request: Request,
- { params }: { params: Promise<{ fileId: string }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { fileId } = await params; // Safely access the dynamic segment from destructured params
-
-  // Added a check to prevent errors if fileId is still missing
-  if (!fileId) {
-    return new NextResponse("Missing File ID in URL", { status: 400 });
-  }
-
   try {
-    // 1. Convert string fileId to ObjectId
-    let objectId: Types.ObjectId;
-    try {
-      objectId = new Types.ObjectId(fileId);
-    } catch (e) {
-      return new NextResponse("Invalid File ID format", { status: 400 });
+    const { id } = await params;
+
+    // 1. Fetch the image record from MySQL
+    const [rows]: any = await pool.query(
+      "SELECT title, image_url FROM gallery_images WHERE id = ?",
+      [id]
+    );
+
+    if (!rows.length) {
+      return NextResponse.json({ error: "Image record not found" }, { status: 404 });
     }
 
-    // 2. Database Connection and GridFS Setup
-    const connection = await connectToDatabase();
-    const db: any = connection.connection.db;
-    const bucket = new mongoose.mongo.GridFSBucket(db, {
-      bucketName: "uploads",
-    });
+    // 2. Return the metadata including the URL
+    // The frontend can then use <img src={data.image_url} />
+    return NextResponse.json(rows[0], { status: 200 });
 
-    // 3. Look up file metadata by ID (using _id)
-    const files = await bucket.find({ _id: objectId }).toArray();
-
-    if (!files.length) {
-      return new NextResponse("File not found", { status: 404 });
-    }
-
-    // `file` is of type GridFSFile (or similar)
-    const file = files[0];
-
-    // 4. Create a stream to read from GridFS by ID
-    const downloadStream = bucket.openDownloadStream(objectId);
-
-    // 5. Convert Node stream to Web ReadableStream for NextResponse
-    const stream = new ReadableStream({
-      start(controller) {
-        downloadStream.on("data", (chunk) => controller.enqueue(chunk));
-        downloadStream.on("end", () => controller.close());
-        downloadStream.on("error", (err) => controller.error(err));
-      },
-    });
-
-    return new NextResponse(stream as any, {
-      headers: {
-        // 👇 FIX: Access the contentType from the metadata object
-        "Content-Type": file.metadata?.contentType || "image/jpeg", 
-        "Content-Disposition": `filename="${file.filename}"`,
-      },
-    });
-  } catch (error) {
-    return new NextResponse("Internal Server Error during retrieval", {
-      status: 500,
-    });
+  } catch (error: any) {
+    console.error("Gallery Fetch Error:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

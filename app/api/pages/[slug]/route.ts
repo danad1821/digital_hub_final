@@ -1,14 +1,9 @@
-// app/api/pages/[slug]/route.ts
-
 import { NextRequest, NextResponse } from "next/server";
-import { connectToDatabase } from "@/app/_lib/db";
-import Page from "@/app/_models/Page";
-import { PageDocument, ApiResponse } from "@/app/_types/PageData";
-import mongoose from "mongoose";
+import pool from "@/app/_lib/db"; //
 
 /**
  * @method GET
- * @description Fetches a page document by its slug.
+ * @description Fetches a page document by its slug from MySQL.
  */
 export async function GET(
   request: NextRequest,
@@ -17,43 +12,29 @@ export async function GET(
   const { slug } = await params;
 
   try {
-    // Force a connection check
-    await connectToDatabase();
+    const [rows]: any = await pool.query("SELECT * FROM pages WHERE slug = ?", [slug]);
 
-    // Safety check: If mongoose isn't actually connected, throw error to trigger catch
-    if (mongoose.connection.readyState !== 1) {
-      throw new Error("Database is in disconnected state");
-    }
-
-    const page = await Page.findOne({ slug: slug }).lean(); // .lean() for faster, plain JSON
-
-    if (!page) {
+    if (!rows || rows.length === 0) {
       return NextResponse.json(
         { success: false, error: "Page not found" },
         { status: 404 },
       );
     }
 
-    return NextResponse.json({ success: true, data: page });
+    // MySQL returns the JSON column as a parsed object/array automatically
+    return NextResponse.json({ success: true, data: rows[0] });
   } catch (error: any) {
-    console.error("MongoDB GET Error:", error);
+    console.error("MySQL GET Error:", error);
     return NextResponse.json(
-      {
-        success: false,
-        message: error.message,
-        envCheck: process.env.MONGODB_URI
-          ? "URI found"
-          : "URI NOT FOUND IN PROCESS",
-        path: slug,
-      },
-      { status: 500 }, // Keep it 500 so you know it's a server failure
+      { success: false, message: error.message, path: slug },
+      { status: 500 },
     );
   }
 }
 
 /**
  * @method PUT
- * @description Updates an existing page document by its slug.
+ * @description Updates an existing page document by its slug in MySQL.
  */
 export async function PUT(
   request: Request,
@@ -69,39 +50,27 @@ export async function PUT(
   }
 
   try {
-    // 1. Connect to the database
-    await connectToDatabase();
+    const pageData = await request.json();
 
-    // 2. Parse the request body (the full PageDocument)
-    const pageData: PageDocument = await request.json();
+    // Update the record. Using JSON.stringify ensures the array is correctly formatted for the JSON column.
+    const [result]: any = await pool.query(
+      `UPDATE pages SET 
+        sections = ?, 
+        page_title = ?, 
+        updated_at = NOW() 
+       WHERE slug = ?`,
+      [JSON.stringify(pageData.sections), pageData.page_title, slug]
+    );
 
-    // 3. Find the document by slug and update it entirely
-    const updatedPage = await Page.findOneAndUpdate(
-      { slug: slug },
-      {
-        $set: {
-          sections: pageData.sections,
-          page_title: pageData.page_title,
-          // Add any other top-level fields you want to update
-          updatedAt: new Date(),
-        },
-      },
-      { new: true, runValidators: true }, // 'new: true' returns the updated document
-    ).exec();
-
-    if (!updatedPage) {
+    if (result.affectedRows === 0) {
       return NextResponse.json(
         { success: false, error: `Page with slug '${slug}' not found.` },
         { status: 404 },
       );
     }
 
-    // 4. Return the updated document to the client
-    // Use JSON.parse(JSON.stringify(updatedPage)) to ensure it's a plain JavaScript object
-    const resultData = JSON.parse(JSON.stringify(updatedPage));
-
     return NextResponse.json(
-      { success: true, data: resultData },
+      { success: true, message: "Page updated successfully" },
       { status: 200 },
     );
   } catch (error) {

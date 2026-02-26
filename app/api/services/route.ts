@@ -1,63 +1,52 @@
-import { connectToDatabase } from "@/app/_lib/db";
+import pool from "@/app/_lib/db";
 import { NextResponse } from "next/server";
-import Service from "@/app/_models/Service";
 
 // === GET Handler: Fetch All Services ===
-/**
- * @method GET
- * @returns A list of all services from the MongoDB database.
- */
 export async function GET() {
   try {
-    await connectToDatabase();
-
-    // Find all services in the database
-    const services = await Service.find().lean();
-
-    return NextResponse.json(services, { status: 200 });
+    const [rows] = await pool.query("SELECT * FROM services ORDER BY created_at DESC");
+    return NextResponse.json(rows, { status: 200 });
   } catch (error) {
     console.error("GET Services Error:", error);
     return NextResponse.json(
-      { message: "Failed to fetch services.", error: error },
+      { message: "Failed to fetch services.", error: (error as Error).message },
       { status: 500 }
     );
   }
 }
 
-// === POST Handler: Create a New Service (Updated for GridFS) ===
-/**
- * @method POST
- * @param {Request} request - The incoming request object containing service data (multipart/form-data).
- * @returns The newly created service document.
- */
+// === POST Handler: Create a New Service ===
 export async function POST(request: Request) {
   try {
-    await connectToDatabase();
     const data = await request.json();
-    const newService = await Service.create(data);
-    return NextResponse.json(newService, { status: 201 });
+    const { serviceName, summary } = data;
+
+    if (!serviceName || !summary) {
+      return NextResponse.json({ message: "Missing required fields." }, { status: 400 });
+    }
+
+    const [result]: any = await pool.query(
+      "INSERT INTO services (service_name, summary) VALUES (?, ?)",
+      [serviceName, summary]
+    );
+
+    return NextResponse.json(
+      { id: result.insertId, serviceName, summary },
+      { status: 201 }
+    );
   } catch (error: any) {
     console.error("POST Service Error:", error);
 
-    // Handle specific Mongoose errors for better client feedback
-
-    // Mongoose Validation Error (required fields missing, wrong type, etc.)
-    if (error.name === "ValidationError") {
+    // MySQL Duplicate Entry Error (ER_DUP_ENTRY)
+    if (error.code === 'ER_DUP_ENTRY') {
       return NextResponse.json(
-        {
-          message: "Validation failed. Check required fields and data types.",
-          errors: error.errors,
-        },
-        { status: 400 }
+        { message: `Service with name already exists.` },
+        { status: 409 }
       );
     }
 
-    // Fallback server error
     return NextResponse.json(
-      {
-        message: "Failed to create new service.",
-        error: error.message || error,
-      },
+      { message: "Failed to create new service.", error: error.message },
       { status: 500 }
     );
   }

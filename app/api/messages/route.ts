@@ -1,84 +1,83 @@
-import { connectToDatabase } from "@/app/_lib/db";
+import pool from "@/app/_lib/db"; //
 import { NextResponse } from "next/server";
-import Message from "@/app/_models/Message";
 import nodemailer from "nodemailer";
 import { render } from "@react-email/render";
 import { EmailTemplate } from "@/app/_components/EmailTemplate";
 
+// ---------------------------
+// 📩 GET (FETCH ALL MESSAGES)
+// ---------------------------
 export async function GET() {
   try {
-    await connectToDatabase();
-    const messages = await Message.find().lean();
-    return NextResponse.json(messages, { status: 200 });
+    // Select all messages ordered by newest first
+    const [rows] = await pool.query("SELECT * FROM messages ORDER BY created_at DESC");
+    return NextResponse.json(rows, { status: 200 });
   } catch (error) {
-    console.error(error);
-    return NextResponse.json(error, { status: 500 });
+    console.error("GET messages Error:", error);
+    return NextResponse.json({ error: "Failed to fetch messages" }, { status: 500 });
   }
 }
 
+// ---------------------------
+// ✉️ POST (CREATE & NOTIFY)
+// ---------------------------
 export async function POST(request: Request) {
   try {
     const body = await request.json();
+    const { fullName, email, message, company } = body;
 
-    // 1. Establish database connection first (Critical step)
-    await connectToDatabase();
+    // 1. Basic Validation
+    if (!fullName || !email || !message) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
 
-    // 2. Save message to database
-    // This is the most likely place an error (like schema validation) would occur.
-    const newMessage: any = await Message.create(body);
+    // 2. Save message to MySQL database
+    const [result]: any = await pool.query(
+      "INSERT INTO messages (full_name, email, message, company) VALUES (?, ?, ?, ?)",
+      [fullName, email, message, company || null]
+    );
 
-    // 3. Send email notification via Resend
-    // 1. Create a transporter (using Gmail as an example)
+    const messageId = result.insertId;
+
+    // 3. Send email notification via SMTP
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port: parseInt(process.env.SMTP_PORT || "465"),
-      secure: true, // true for 465, false for other ports
+      secure: true,
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
       },
     });
 
-    // 2. Render your React template to HTML string
     const emailHtml = await render(
       EmailTemplate({
-        fullName: newMessage.fullName,
-        company: newMessage.company,
-        email: newMessage.email,
-        message: newMessage.message,
+        fullName,
+        company: company || "Not Provided",
+        email,
+        message,
       }),
     );
 
-    // 3. Send the email
     try {
-      const info = await transporter.sendMail({
-        from: `"Alta Maritime - Contact Form (on website)" <${process.env.SMTP_USER}>`,
+      await transporter.sendMail({
+        from: `"Alta Maritime - Website" <${process.env.SMTP_USER}>`,
         to: "chartering@altamaritime.com",
-        subject: "Alta Maritime Inquiry",
-        html: emailHtml, // This replaces the 'react' property
+        subject: "New Website Inquiry",
+        html: emailHtml,
       });
-
-      console.log("Message sent: %s", info.messageId);
-    } catch (error) {
-      return NextResponse.json({ message: "Failed to send email" });
-      console.error("Error sending email:", error);
+    } catch (mailError) {
+      console.error("Email notification failed, but message was saved to DB:", mailError);
+      // We return 201 because the data was successfully saved to the database
     }
 
-    // Success response
-    return NextResponse.json({ newMessage: newMessage }, { status: 201 });
-  } catch (error) {
-    // Catch database connection, Mongoose validation, or JSON parsing errors.
-    console.error(
-      "Failed to process message (DB or Validation Error): ",
-      error,
-    );
+    return NextResponse.json({ id: messageId, status: "Message saved" }, { status: 201 });
+
+  } catch (error: any) {
+    console.error("POST Message Error:", error);
     return NextResponse.json(
-      {
-        error: "Failed to process message.",
-        // IMPORTANT: Return the specific error message to aid debugging (e.g., Mongoose validation failure)
-        details: (error as Error).message,
-      },
-      { status: 500 },
+      { error: "Failed to process message.", details: error.message },
+      { status: 500 }
     );
   }
 }

@@ -1,57 +1,47 @@
-// /app/api/schedule/[fileId]/route.ts
-
-import { connectToDatabase } from '@/app/_lib/db'; // Adjust path as needed
-import mongoose, { Types } from 'mongoose';
+import pool from '@/app/_lib/db';
 import { NextResponse } from 'next/server';
-
-// Get the DB connection and GridFS Bucket
-async function getBucket() {
-  const connection = await connectToDatabase();
-  const db: any = connection.connection.db;
-  return new mongoose.mongo.GridFSBucket(db, { bucketName: 'uploads' });
-}
+import path from 'path';
+import fs from 'fs/promises';
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ fileId: string }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const bucket = await getBucket();
-    const {fileId} = await params;
-    const objectId = new Types.ObjectId(fileId);
+    const { id } = await params;
 
-    // Fetch the file metadata to get the content type
-    const file = await bucket.find({ _id: objectId }).next();
-    if (!file) {
-        return new NextResponse('File not found', { status: 404 });
+    // 1. Fetch metadata from MySQL
+    const [rows]: any = await pool.query(
+      "SELECT filename, content_type FROM schedules WHERE id = ?", 
+      [id]
+    );
+
+    if (!rows.length) {
+      return new NextResponse('File record not found', { status: 404 });
     }
 
-    // Create a read stream from GridFS
-    const downloadStream = bucket.openDownloadStream(objectId);
+    const { filename, content_type } = rows[0];
 
-    // Convert the stream to a Web Stream
-    const webStream = new ReadableStream({
-      start(controller) {
-        downloadStream.on('data', (chunk) => {
-          controller.enqueue(chunk);
-        });
-        downloadStream.on('end', () => {
-          controller.close();
-        });
-        downloadStream.on('error', (err) => {
-          console.error("Download Stream Error:", err);
-          controller.error(err);
-        });
-      },
-    });
+    // 2. Define the absolute path to the file on the server
+    // Assuming files are stored in a folder named 'uploads' at the project root
+    const filePath = path.join(process.cwd(), 'uploads', filename);
 
-    // Return the stream as a response
-    return new NextResponse(webStream, {
+    // 3. Check if file exists on disk
+    try {
+      await fs.access(filePath);
+    } catch {
+      return new NextResponse('Physical file not found on server', { status: 404 });
+    }
+
+    // 4. Read the file as a buffer
+    const fileBuffer = await fs.readFile(filePath);
+
+    // 5. Return the file with appropriate headers
+    return new NextResponse(fileBuffer, {
       status: 200,
       headers: {
-        // Set the appropriate Content-Type for the PDF
-        'Content-Type': file.metadata?.contentType || 'application/pdf',
-        'Content-Disposition': `inline; filename="${file.filename}"`,
+        'Content-Type': content_type || 'application/pdf',
+        'Content-Disposition': `inline; filename="${filename}"`,
       },
     });
   } catch (e) {

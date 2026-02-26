@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   // serverExternalPackages: ['mongoose'],
-  output: 'standalone',
+  // output: 'standalone',
   experimental: {
     // 2. serverActions is now stable in Next 14+, 
     // but bodySizeLimit still lives here if you need to increase it
