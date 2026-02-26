@@ -56,7 +56,7 @@ export default function PendingMessagesTable({
             >
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white flex items-center">
                 <User className={`w-4 h-4 mr-2 ${TEXT_POP_COLOR}`} />
-                {msg.fullName || "N/A"}
+                {msg.full_name || "N/A"}
               </td>
 
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
@@ -64,7 +64,7 @@ export default function PendingMessagesTable({
               </td>
 
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400 hidden sm:table-cell">
-                {new Date(msg.createdAt).toLocaleDateString()}
+                {new Date(msg.created_at).toLocaleDateString()}
               </td>
 
               <td className="px-6 py-4 text-sm text-gray-300 max-w-xs truncate">
@@ -75,7 +75,7 @@ export default function PendingMessagesTable({
                 <button
                   onClick={(e) => {
                     e.stopPropagation(); // prevents modal from opening
-                    onToggleRead(msg.id, msg.isRead);
+                    onToggleRead(msg.id, msg.is_read);
                   }}
                   className={`inline-flex items-center px-3 py-1 border border-transparent rounded-full shadow-sm text-xs font-medium text-[#11001C] ${BG_POP_COLOR} hover:opacity-90 transition`}
                 >

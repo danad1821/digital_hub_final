@@ -31,7 +31,7 @@ export default function MessageModal({
 
           <p className="text-gray-300 mb-2">
             <strong>Date:</strong>{" "}
-            {new Date(message.createdAt).toLocaleString()}
+            {new Date(message.created_at).toLocaleString()}
           </p>
 
           <p className="text-gray-300 mb-4 whitespace-pre-line">

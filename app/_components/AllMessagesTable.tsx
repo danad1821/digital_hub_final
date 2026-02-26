@@ -54,13 +54,13 @@ export default function AllMessagesTable({
             >
               <td className="px-6 py-4 text-sm text-white flex items-center">
                 <User className={`w-4 h-4 mr-2 ${TEXT_POP_COLOR}`} />
-                {msg.fullName || "N/A"}
+                {msg.full_name || "N/A"}
               </td>
 
               <td className="px-6 py-4 text-sm text-gray-300">{msg.email}</td>
 
               <td className="px-6 py-4 text-sm text-gray-400 hidden sm:table-cell">
-                {new Date(msg.createdAt).toLocaleDateString()}
+                {new Date(msg.created_at).toLocaleDateString()}
               </td>
 
               <td className="px-6 py-4 text-sm text-gray-300 max-w-xs truncate">

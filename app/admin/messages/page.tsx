@@ -19,7 +19,8 @@ export default function AdminMessages() {
     try {
       const res = await axios.get("/api/messages");
       const data = res.data?.messages ?? res.data ?? [];
-      setMessages(Array.isArray(data) ? data.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) : []);
+      console.log(data)
+      setMessages(Array.isArray(data) ? data.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()) : []);
     } catch (error) {
       console.error("Error fetching messages:", error);
       setMessages([]);
@@ -31,10 +32,10 @@ export default function AdminMessages() {
   const toggleReadStatus = async (id: string, currentStatus: boolean) => {
     try {
       const newStatus = !currentStatus;
-      await axios.put(`/api/messages/${id}`, { isRead: newStatus });
+      await axios.put(`/api/messages/${id}`, { is_read: newStatus });
 
       setMessages((prev) =>
-        prev.map((m) => (m.id === id ? { ...m, isRead: newStatus } : m))
+        prev.map((m) => (m.id === id ? { ...m, is_read: newStatus } : m))
       );
     } catch (error) {
       console.error("Error updating status:", error);
@@ -53,7 +54,7 @@ export default function AdminMessages() {
   }
 
   const getPendingMessages = (msgs: any[] = messages) => {
-    setPendingMessages(msgs.filter((m) => m.isRead === false));
+    setPendingMessages(msgs.filter((m) => m.is_read === 0));
   };
 
   useEffect(() => {
