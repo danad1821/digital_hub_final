@@ -130,7 +130,7 @@ const PortPinWrapper = ({ loc }: { loc: any }) => {
 
   return (
     <Marker
-      key={loc._id}
+      key={loc.id}
       position={[loc.lat, loc.lng]}
       icon={customIcon}
       ref={markerRef} // Attach ref to the Marker
@@ -228,7 +228,7 @@ export default function DynamicShippingMap({
 
   const markers = useMemo(() => {
     return locations.map((loc: any) => (
-      <PortPinWrapper key={loc._id} loc={loc} />
+      <PortPinWrapper key={loc.id} loc={loc} />
     ));
   }, [locations]);
 

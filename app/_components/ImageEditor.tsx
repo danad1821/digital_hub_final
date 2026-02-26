@@ -11,6 +11,7 @@ interface ImageEditorProps {
   sectionIndex: number;
   imageKey: string; // e.g., 'image_ref'
   pageData: PageDocument;
+  sectionData: any;
   setPageData: React.Dispatch<React.SetStateAction<PageDocument | null>>;
   isLarge?: boolean; // For visual styling
   slug: string;
@@ -19,6 +20,7 @@ interface ImageEditorProps {
 const ImageEditor: React.FC<ImageEditorProps> = ({
   sectionIndex,
   imageKey,
+  sectionData,
   pageData,
   setPageData,
   isLarge = false,
@@ -28,7 +30,11 @@ const ImageEditor: React.FC<ImageEditorProps> = ({
   const [isUploading, setIsUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-  const currentFileId = pageData.sections[sectionIndex].data[imageKey] || null;
+  if (!pageData || !pageData.sections || !pageData.sections[sectionIndex]) {
+    return null; 
+  }
+
+  const currentFileId = sectionData.data[imageKey] || null;
 
   // Clear temporary object URL when component unmounts or file changes
   useEffect(() => {
@@ -76,33 +82,29 @@ const ImageEditor: React.FC<ImageEditorProps> = ({
       // AND deletes the old GridFS file.
       const result = await updatePageSectionImage(slug, sectionType, formData);
 
-      if (result.success && result.newFileId) {
-        // 2. Update the pageData state (client-side UI update only)
-        setPageData((prevData: any) => {
-          if (!prevData) return null;
+      if (result.success && result.newImageUrl) {
+      setPageData((prevData: any) => {
+        if (!prevData) return null;
 
-          // Find the index dynamically using sectionType
-          const sectionIndex = prevData.sections.findIndex(
-            (s: any) => s.type === sectionType
-          );
+        const sectionIndex = prevData.sections.findIndex(
+          (s: any) => s.type === sectionType
+        );
 
-          if (sectionIndex === -1) return prevData;
+        if (sectionIndex === -1) return prevData;
 
-          const newSections = [...prevData.sections];
+        const newSections = [...prevData.sections];
+        const imageKey = "image_ref";
 
-          // Assuming imageKey is 'image_ref'
-          const imageKey = "image_ref";
-
-          newSections[sectionIndex] = {
-            ...newSections[sectionIndex],
-            // Use the new ID returned from the server to update the local state
-            data: {
-              ...newSections[sectionIndex].data,
-              [imageKey]: result.newFileId,
-            },
-          };
-          return { ...prevData, sections: newSections };
-        });
+        newSections[sectionIndex] = {
+          ...newSections[sectionIndex],
+          data: {
+            ...newSections[sectionIndex].data,
+            // 🌟 FIX: Use newImageUrl here
+            [imageKey]: result.newImageUrl,
+          },
+        };
+        return { ...prevData, sections: newSections };
+      });
 
         // Clear input and preview after successful upload
         if (fileInputRef.current) fileInputRef.current.value = "";
@@ -134,7 +136,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({
     setIsUploading(true); // Reusing upload state for deletion status
 
     try {
-      const result = await deletePageImageByFileId(currentFileId);
+      const result = await deletePageImageByFileId(slug, sectionIndex);
 
       if (result.success) {
         // Remove the image reference from pageData state

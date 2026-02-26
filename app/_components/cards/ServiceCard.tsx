@@ -13,7 +13,7 @@ export default function ServiceCard({
   return (
     <div className="bg-[#11001C] border border-gray-700 rounded-xl p-5 shadow-md hover:shadow-lg transition">
       <div className="flex items-center mb-3">
-        <h3 className="text-xl font-semibold text-white">{service.serviceName}</h3>
+        <h3 className="text-xl font-semibold text-white">{service.service_name}</h3>
       </div>
 
       <p className="text-gray-300 text-sm mb-2">{service.summary}</p>

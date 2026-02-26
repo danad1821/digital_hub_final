@@ -55,6 +55,7 @@ export default function Home() {
   const getAllServices = useCallback(async () => {
     try {
       const response = await axios.get("/api/services");
+      console.log(services)
       setServices(response.data.services || response.data);
     } catch (error) {
       console.error("Error fetching services: ", error);
@@ -90,6 +91,7 @@ export default function Home() {
     try {
       // 1. Fetch critical page data first
       const pageResponse = await axios.get(`/api/pages/home`);
+      console.log(pageResponse)
       setPageData(pageResponse.data.data);
 
       // 2. Fetch auxiliary data (parallelized)
@@ -131,7 +133,7 @@ export default function Home() {
   }
 
   // Memoized page sections for cleaner prop passing
-  const sections = pageData.sections;
+  const sections = JSON.parse(pageData?.sections as any);
 
   // The rest of the page rendering
   return (

@@ -72,7 +72,7 @@ export default function AdminSchedule() {
     startTransition(async () => {
       // Pass the existing file ID (GridFS ID) for deletion and replacement
       // uploadSchedule will handle deleting both the old file and the model entry
-      const result = await uploadSchedule(formData, currentFileId); 
+      const result = await uploadSchedule(formData); 
 
       if (result.success && result.fileId) {
         // Refetch the metadata to update the UI with the new file info
@@ -109,7 +109,7 @@ export default function AdminSchedule() {
 
     startTransition(async () => {
       // Use the updated deleteSchedule action
-      const result = await deleteSchedule(currentFileId!); 
+      const result = await deleteSchedule(); 
 
       if (result.success) {
         setMetadata(null);

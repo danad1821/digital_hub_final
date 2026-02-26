@@ -105,7 +105,7 @@ export default function AdminLocations() {
                 {/* RENDER THE NEW LOCATION CARD COMPONENT */}
                 {shippingLocations.map((location) => (
                     <LocationCard 
-                        key={location._id}
+                        key={location.id}
                         location={location}
                         shippingLocations={shippingLocations} // Pass all locations for the Edit Modal to use
                         onUpdate={handleUpdateLocation}

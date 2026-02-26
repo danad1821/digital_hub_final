@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     );
 
     return NextResponse.json(
-      { id: result.insertId, serviceName, summary },
+      { id: result.insertId, service_name: serviceName, summary },
       { status: 201 }
     );
   } catch (error: any) {

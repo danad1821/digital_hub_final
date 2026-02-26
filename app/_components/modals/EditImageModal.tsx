@@ -2,12 +2,11 @@
 'use client';
 
 import { editGalleryImage } from '@/app/_actions/gallery';
-import { GalleryImageDocument } from '@/app/_models/GalleryImage';
 import React, { useState, useTransition } from 'react';
 
 // Define the component's props
 interface EditImageModalProps {
-  imageDoc: GalleryImageDocument;
+  imageDoc: any;
   onClose: () => void;
   onEditComplete: () => void; // Callback after successful edit
 }
@@ -36,7 +35,7 @@ export default function EditImageModal({ imageDoc, onClose, onEditComplete }: Ed
     // Start the server action
     startTransition(async () => {
       // Pass the document ID and the FormData to the new server action
-      const result = await editGalleryImage(imageDoc._id.toString(), formData);
+      const result = await editGalleryImage(imageDoc.id.toString(), formData);
 
       if (result.error) {
         setMessage(`Update Failed: ${result.error}`);
@@ -67,7 +66,7 @@ export default function EditImageModal({ imageDoc, onClose, onEditComplete }: Ed
           </h3>
           
           <img 
-            src={`/api/images/${imageDoc.image.toString()}`} 
+            src={imageDoc.image_url} 
             alt={`Current image: ${imageDoc.title}`} 
             className="w-full h-32 object-cover rounded mb-4 border border-gray-600"
           />

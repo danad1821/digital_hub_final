@@ -24,7 +24,7 @@ interface Destination {
 
 // 1. UPDATED LOCATION INTERFACE
 export interface Location {
-    _id: string; // MongoDB unique identifier
+    id: string; // MongoDB unique identifier
     name: string;
     lat: number;
     lng: number;
@@ -76,7 +76,7 @@ export default function LocationCard({
         setIsDeleting(true);
         setDeleteError(null);
         try {
-            const success = await onDelete(location._id);
+            const success = await onDelete(location.id);
             if (!success) {
                  setDeleteError("Delete failed due to an unknown error.");
             }
@@ -89,7 +89,7 @@ export default function LocationCard({
 
     return (
         <div 
-            key={location._id} 
+            key={location.id} 
             className="bg-white p-6 rounded-lg shadow-lg border border-gray-100 flex flex-col"
         >
             {deleteError && (

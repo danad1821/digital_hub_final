@@ -9,9 +9,9 @@ interface Destination {
   name: string;
 }
 
-// Location now uses the MongoDB _id string type
+// Location now uses the MongoDB id string type
 interface Location {
-  _id: string; // Use _id for MongoDB unique identifier
+  id: string; // Use id for MongoDB unique identifier
   name: string;
   lat: number;
   lng: number;
@@ -67,11 +67,11 @@ export default function AddLocationModal({
 
   if (!isOpen) return null;
 
-  // Toggle selection of a destination. Use _id for comparison.
+  // Toggle selection of a destination. Use id for comparison.
   const handleDestinationToggle = (location: Location) => {
     setSelectedDestinations((prev) =>
-      prev.some((dest) => dest._id === location._id)
-        ? prev.filter((dest) => dest._id !== location._id)
+      prev.some((dest) => dest.id === location.id)
+        ? prev.filter((dest) => dest.id !== location.id)
         : [...prev, location]
     );
   };

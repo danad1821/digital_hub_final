@@ -34,7 +34,7 @@ export default function AdminMessages() {
       await axios.put(`/api/messages/${id}`, { isRead: newStatus });
 
       setMessages((prev) =>
-        prev.map((m) => (m._id === id ? { ...m, isRead: newStatus } : m))
+        prev.map((m) => (m.id === id ? { ...m, isRead: newStatus } : m))
       );
     } catch (error) {
       console.error("Error updating status:", error);
@@ -44,7 +44,7 @@ export default function AdminMessages() {
   const deleteMessage = async (id: any)=>{
     try{
         await axios.delete(`/api/messages/${id}`);
-        const filteredMessage = messages.filter((m)=>m._id !== id);
+        const filteredMessage = messages.filter((m)=>m.id !== id);
         setMessages(filteredMessage);
 
     }catch(error){

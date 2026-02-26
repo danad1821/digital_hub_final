@@ -24,7 +24,7 @@ export interface PageSection<T> {
 
 // Define the structure of the full Page Document
 export interface PageDocument {
-    _id: string; // This will be the MongoDB ObjectId
+    id: string; // This will be the MongoDB ObjectId
     slug: string;
     page_title: string;
     status: 'published' | 'draft';

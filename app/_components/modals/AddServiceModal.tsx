@@ -11,7 +11,7 @@ export default function AddServiceModal({
   onClose: () => void;
 }) {
   const [serviceName, setServiceName] = useState(
-    initialService?.serviceName || ""
+    initialService?.service_name || ""
   );
   const [summary, setSummary] = useState(initialService?.summary || "");
 
@@ -49,7 +49,7 @@ export default function AddServiceModal({
               onSave(
                 initialService
                   ? {
-                      _id: initialService._id,
+                      id: initialService.id,
                       serviceName,
                       summary,
                     }

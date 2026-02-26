@@ -61,7 +61,7 @@ export default function Admin() {
 
       setMessages((prevMsgs) =>
         prevMsgs.map((msg) =>
-          msg._id === id ? { ...msg, isRead: newStatus } : msg
+          msg.id === id ? { ...msg, isRead: newStatus } : msg
         )
       );
     } catch (error) {

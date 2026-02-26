@@ -48,7 +48,7 @@ export default function AllMessagesTable({
         <tbody className="divide-y divide-gray-700">
           {messages.map((msg) => (
             <tr
-              key={msg._id}
+              key={msg.id}
               className="bg-[#11001C] hover:bg-[#0A1C30] transition duration-150 cursor-pointer"
               onClick={() => onRowClick(msg)}
             >
@@ -73,7 +73,7 @@ export default function AllMessagesTable({
                   className="text-red-400 hover:text-red-600 transition"
                   onClick={(e) => {
                     e.stopPropagation(); // ⬅ Prevent modal from opening
-                    onDeleteMessage(msg._id);
+                    onDeleteMessage(msg.id);
                   }}
                 >
                   <Trash className="w-5 h-5" />

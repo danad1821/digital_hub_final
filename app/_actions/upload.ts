@@ -1,73 +1,57 @@
 'use server'
 
-import { connectToDatabase } from '../_lib/db';
-import mongoose, { Types } from 'mongoose';
-import { Readable } from 'stream';
+import fs from "fs/promises";
+import path from "path";
 
-// Define the expected return type for the upload action
 export interface UploadResult {
   success: boolean;
-  fileId?: string;
+  fileId?: string; // This will now return the relative web path (e.g., /uploads/filename.jpg)
   error?: string;
 }
 
-export async function uploadImage(formData: FormData): Promise<UploadResult> {
-  // 1. Extract file and check type
-  const fileEntry = formData.get('image');
-  if (!fileEntry || typeof fileEntry === 'string') {
-    return { success: false, error: 'No valid file uploaded' };
-  }
-  const file = fileEntry as File;
-
-  // Next.js body parser limits apply here!
-  const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
-  if (file.size > MAX_FILE_SIZE) {
-      return { success: false, error: 'File size exceeds 50MB limit for in-memory buffer.' };
-  }
-  
-  // 2. Connect to DB
-  const connection = await connectToDatabase();
-  
-  // 3. Convert file to Buffer (needed for GridFS write stream)
-  const bytes = await file.arrayBuffer();
-  const buffer = Buffer.from(bytes);
-
-  // 4. Create GridFS Bucket
-  const db:any = connection.connection.db;
-  const bucket = new mongoose.mongo.GridFSBucket(db, {
-    bucketName: 'uploads'
-  });
-
-  // 5. Upload using a Promise wrapper
-  const uploadPromise: Promise<Types.ObjectId> = new Promise((resolve, reject) => {
-    // ------------------------------------------------------------------
-    // 👇 CRITICAL FIX: Wrap 'contentType' inside a 'metadata' object.
-    // This satisfies the GridFSBucketWriteStreamOptions type check.
-    // ------------------------------------------------------------------
-    const uploadStream = bucket.openUploadStream(file.name, {
-      metadata: { // Added metadata object
-        contentType: file.type || 'binary/octet-stream',
-      },
-    });
-
-    const readStream = Readable.from(buffer);
-
-    readStream
-      .pipe(uploadStream)
-      .on('finish', () => {
-         resolve(uploadStream.id);
-      })
-      .on('error', (error) => {
-         console.error("[Upload] Stream Error during upload:", error);
-         reject(error);
-      });
-  });
-
+/**
+ * Saves an image to the local file system and returns the public URL path.
+ * @param formData FormData containing the 'image' key.
+ * @param subFolder Optional sub-directory (e.g., 'gallery', 'pages').
+ */
+export async function uploadImage(formData: FormData, subFolder: string = 'general'): Promise<UploadResult> {
   try {
-    const fileId = await uploadPromise;
-    return { success: true, fileId: fileId.toString() };
+    // 1. Extract and Validate
+    const fileEntry = formData.get('image');
+    if (!fileEntry || !(fileEntry instanceof File)) {
+      return { success: false, error: 'No valid file uploaded' };
+    }
+    const file = fileEntry as File;
+
+    const MAX_FILE_SIZE = 10 * 1024 * 1024; // Lowered to 10MB for typical web images
+    if (file.size > MAX_FILE_SIZE) {
+      return { success: false, error: 'File size exceeds 10MB limit.' };
+    }
+
+    // 2. Prepare File Path
+    // Create a unique filename to prevent overwriting
+    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+    const filename = `${uniqueSuffix}-${file.name.replace(/\s+/g, '_')}`;
+    
+    // Define the absolute path on the server
+    const uploadDir = path.join(process.cwd(), "public", "uploads", subFolder);
+    const filePath = path.join(uploadDir, filename);
+
+    // 3. Ensure Directory Exists
+    await fs.mkdir(uploadDir, { recursive: true });
+
+    // 4. Write File to Disk
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+    await fs.writeFile(filePath, buffer);
+
+    // 5. Return the Relative URL Path
+    // This is what you will store in your MariaDB 'image_url' or 'image_ref' columns
+    const relativePath = `/uploads/${subFolder}/${filename}`;
+
+    return { success: true, fileId: relativePath };
   } catch (error) {
-    // Ensure we return a string error message
+    console.error("[Upload Error]:", error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown upload error';
     return { success: false, error: errorMessage };
   }

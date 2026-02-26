@@ -1,46 +1,37 @@
 "use server";
 
-import { connectToDatabase } from "../_lib/db";
-import Page from "@/app/_models/Page";
-import { Types } from "mongoose";
-import { uploadImage, UploadResult } from "./upload"; 
-import mongoose from "mongoose";
-// NOTE: Make sure to update your actual Mongoose model (../_models/Page) 
-// to include the 'headerImageId' field as a Types.ObjectId.
-
-// Use a placeholder type for reference. This now includes the image ID.
-type PageDocument = {
-    _id: Types.ObjectId;
-    slug: string;
-    title: string;
-    content: string;
-    headerImageId?: Types.ObjectId | null; // <--- NEW FIELD
-    createdAt: Date;
-    updatedAt: Date;
-};
+import pool from "@/app/_lib/db"; //
+import { saveLocalFile, deleteLocalFile } from "@/app/_lib/file-helper";
+import { revalidatePath } from "next/cache";
 
 // ---------------------------
 // --- READ (GET) ACTIONS ---
 // ---------------------------
 
 /**
- * Retrieves the content for a static page by its unique slug.
+ * Retrieves page content. 
+ * Note: MariaDB/MySQL returns the 'sections' column as a parsed JSON object/array 
+ * if using the mysql2 driver with modern versions.
  */
-export async function getStaticPageContent(
-  slug: string
-): Promise<PageDocument | null> {
-  await connectToDatabase();
-
+export async function getStaticPageContent(slug: string) {
   try {
-    const page = await Page.findOne({ slug: slug }).exec();
-    if (!page) {
-      return null;
+    const [rows]: any = await pool.query("SELECT * FROM pages WHERE slug = ?", [slug]);
+    if (rows.length === 0) return null;
+
+    const page = rows[0];
+    // Safety check: ensure sections is an object (mysql2 usually handles this)
+    if (typeof page.sections === 'string') {
+        page.sections = JSON.parse(page.sections);
     }
-    return JSON.parse(JSON.stringify(page));
+    return page;
   } catch (error) {
-    console.error(`Error fetching page content for slug '${slug}':`, error);
+    console.error(`Error fetching page slug '${slug}':`, error);
     return null;
   }
+}
+
+export async function getHomePageContent() {
+  return getStaticPageContent('home');
 }
 
 // ---------------------------
@@ -48,255 +39,114 @@ export async function getStaticPageContent(
 // ---------------------------
 
 /**
- * Updates the title and content for an existing static page.
+ * Updates basic page info (Title/Content)
  */
 export async function updateStaticPageContent(
   slug: string,
-  title: string,
-  content: string
-): Promise<{ success: boolean; error?: string }> {
-  await connectToDatabase();
-
-  if (!title || !content) {
-      return { success: false, error: "Title and content cannot be empty." };
-  }
-
+  title: string
+) {
   try {
-    const updateResult = await Page.findOneAndUpdate(
-      { slug: slug },
-      { $set: { title: title, content: content, updatedAt: new Date() } },
-      { new: true } 
-    ).exec();
-
-    if (!updateResult) {
-      return { success: false, error: `Page with slug '${slug}' not found.` };
-    }
+    await pool.query(
+      "UPDATE pages SET page_title = ?, last_updated = NOW() WHERE slug = ?",
+      [title, slug]
+    );
+    revalidatePath(`/${slug}`);
     return { success: true };
-  } catch (e) {
-    const errorMessage = (e as Error).message || "Failed to update page content.";
-    console.error("Error updating page content:", e);
-    return { success: false, error: errorMessage };
+  } catch (e: any) {
+    return { success: false, error: e.message };
   }
 }
 
 // ---------------------------
-// --- PAGE IMAGE ACTIONS ---
+// --- SECTION IMAGE ACTIONS ---
 // ---------------------------
 
 /**
- * Uploads a new header image and updates the page document reference.
- * It will automatically delete any old image file in GridFS if one exists.
- * @param slug The unique identifier for the page.
- * @param formData The FormData containing the new file ('image').
+ * Specifically updates an image within the sections JSON array.
+ * Example: Updates the "image_ref" inside the "hero" section.
  */
-export async function addPageImage(
-  slug: string,
-  formData: FormData
-): Promise<{ success: boolean; fileId?: string; error?: string }> {
-  await connectToDatabase();
-
-  let uploadResult: UploadResult;
-  try {
-    // 1. Upload the new file using the generic utility function
-    uploadResult = await uploadImage(formData); 
-  } catch (e) {
-    return { success: false, error: "File upload failed." };
-  }
-  
-  if (!uploadResult.success || !uploadResult.fileId) {
-    return { success: false, error: uploadResult.error || "Failed to upload image." };
-  }
-
-  try {
-    // 2. Find the existing page document to check for an old image
-    const page: PageDocument | null = await Page.findOne({ slug: slug }).exec();
-
-    if (!page) {
-      // Clean up the newly uploaded file if the page doesn't exist
-      await deletePageImageByFileId(uploadResult.fileId); 
-      return { success: false, error: `Page with slug '${slug}' not found.` };
-    }
-
-    // Capture the old file ID for cleanup
-    const oldFileId = page.headerImageId ? page.headerImageId.toString() : null;
-
-    // 3. Update the Page document with the new GridFS file ID
-    await Page.updateOne(
-      { slug: slug },
-      { $set: { headerImageId: new Types.ObjectId(uploadResult.fileId), updatedAt: new Date() } }
-    ).exec();
-
-    // 4. Clean up the old GridFS file (if one existed)
-    if (oldFileId) {
-        await deletePageImageByFileId(oldFileId);
-    }
-
-    return { success: true, fileId: uploadResult.fileId };
-  } catch (e) {
-    // If the DB update fails, clean up the newly uploaded GridFS file
-    await deletePageImageByFileId(uploadResult.fileId);
-    console.error("Error updating page image reference:", e);
-    return { success: false, error: "Failed to update page image reference." };
-  }
-}
-
-export async function deletePageImageByFileId(
-  fileId: string
-): Promise<{ success: boolean; error?: string }> {
-  await connectToDatabase();
-
-  if (!Types.ObjectId.isValid(fileId)) {
-    return { success: false, error: "Invalid file ID format." };
-  }
-
-  const db: any = mongoose.connection.db;
-  // NOTE: Ensure 'uploads' matches the bucketName used in the upload function
-  const bucket = new mongoose.mongo.GridFSBucket(db, { bucketName: "uploads" });
-  
-  try {
-    // Delete the file using its ObjectId
-    await bucket.delete(new Types.ObjectId(fileId));
-    return { success: true };
-  } catch (e) {
-    // If the file doesn't exist, GridFS will still throw an error
-    const errorMessage = (e as Error).message || "Failed to delete GridFS file.";
-    console.error("Error deleting GridFS file:", fileId, e);
-    return { success: false, error: errorMessage };
-  }
-}
-
 export async function updatePageSectionImage(
   slug: string,
   sectionType: string,
   formData: FormData
-): Promise<{ success: boolean; error?: string; newFileId?: string }> {
-  await connectToDatabase();
-
-  // 1. Upload the new file to GridFS
-  const uploadResult = await uploadImage(formData);
-
-  if (!uploadResult.success || !uploadResult.fileId) {
-    return { success: false, error: uploadResult.error || "Failed to upload new image." };
-  }
-  
-  const newFileId = uploadResult.fileId;
-  let oldFileId: string | undefined;
-
+) {
   try {
-    // 2. Find the current page document
-    const pageDoc = await Page.findOne({ slug: slug }).exec();
+    const imageFile = formData.get('image') as File;
+    if (!imageFile) return { success: false, error: "No image file provided." };
 
-    if (!pageDoc) {
-      await deletePageImageByFileId(newFileId);
-      return { success: false, error: `Page with slug '${slug}' not found.` };
+    // 1. Fetch current sections
+    const [rows]: any = await pool.query("SELECT sections FROM pages WHERE slug = ?", [slug]);
+    if (rows.length === 0) return { success: false, error: "Page not found." };
+
+    let sections = typeof rows[0].sections === 'string' 
+        ? JSON.parse(rows[0].sections) 
+        : rows[0].sections;
+
+    // 2. Find the correct section (e.g., 'hero' or 'stats')
+    const sectionIndex = sections.findIndex((s: any) => s.type === sectionType);
+    if (sectionIndex === -1) return { success: false, error: `Section ${sectionType} not found.` };
+
+    const oldImageRef = sections[sectionIndex].data?.image_ref;
+
+    // 3. Save the new local file
+    const newImageUrl = await saveLocalFile(imageFile, "pages");
+
+    // 4. Update the JSON structure
+    // We replace the old hex/ID with the new path string: "/uploads/pages/filename.jpg"
+    if (!sections[sectionIndex].data) sections[sectionIndex].data = {};
+    sections[sectionIndex].data.image_ref = newImageUrl;
+
+    // 5. Save back to MariaDB
+    await pool.query(
+      "UPDATE pages SET sections = ?, last_updated = NOW() WHERE slug = ?",
+      [JSON.stringify(sections), slug]
+    );
+
+    // 6. Cleanup old local file if it was a path (not an old Mongo hex ID)
+    if (oldImageRef && oldImageRef.startsWith('/uploads/')) {
+        await deleteLocalFile(oldImageRef);
     }
 
-    // Find the specific section index
-    const sectionIndex = pageDoc.sections.findIndex((s: any) => s.type === sectionType);
-
-    if (sectionIndex === -1) {
-      await deletePageImageByFileId(newFileId);
-      return { success: false, error: `Section type '${sectionType}' not found on page '${slug}'.` };
-    }
-
-    // Get the old file ID before update
-    // We assume data is defined on the section object
-    oldFileId = pageDoc.sections[sectionIndex].data?.image_ref?.toString();
-    
-    // 3. Update the Mongoose document using dot notation to target the nested field
-    const updatePath = `sections.${sectionIndex}.data.image_ref`;
-    
-    const updateResult = await Page.findOneAndUpdate(
-      { slug: slug },
-      // Convert string fileId back to Mongoose ObjectId for storage
-      { $set: { [updatePath]: new Types.ObjectId(newFileId), updatedAt: new Date() } },
-      { new: true }
-    ).exec();
-
-    if (!updateResult) {
-        // If update somehow fails after finding, clean up new file
-        await deletePageImageByFileId(newFileId);
-        return { success: false, error: `Failed to update page image reference.` };
-    }
-    
-    // 4. Delete the OLD image from GridFS (Cleanup)
-    if (oldFileId) {
-        // Delete asynchronously (or synchronously if you prefer to ensure cleanup)
-        // Logging the error if cleanup fails is sufficient for production logic.
-        deletePageImageByFileId(oldFileId)
-            .catch(err => console.error(`[Cleanup Error] Failed to delete old GridFS file ${oldFileId}:`, err));
-    }
-    
-    return { success: true, newFileId: newFileId };
-
-  } catch (e) {
-    // General failure cleanup
-    await deletePageImageByFileId(newFileId);
-    const errorMessage = (e as Error).message || "Failed to update page image content.";
-    console.error("Error updating page image:", e);
-    return { success: false, error: errorMessage };
+    revalidatePath(slug === 'home' ? '/' : `/${slug}`);
+    return { success: true, newImageUrl };
+  } catch (e: any) {
+    console.error("Section Image Update Error:", e);
+    return { success: false, error: e.message };
   }
 }
 
-
-export async function getHomePageContent(): Promise<PageDocument | null> {
-  // Use a fixed slug for the homepage content
-  const HOMEPAGE_SLUG = 'home';
-  await connectToDatabase();
-
-  try {
-    // Attempt to find the page content
-    const page = await Page.findOne({ slug: HOMEPAGE_SLUG }).exec();
-    
-    if (!page) {
-        // If not found, return null (the admin component will handle creation if necessary)
-        return null;
+/**
+ * General update for all sections (useful for the Admin JSON editor)
+ */
+export async function updateAllPageSections(slug: string, sections: any[]) {
+    try {
+        await pool.query(
+            "UPDATE pages SET sections = ?, last_updated = NOW() WHERE slug = ?",
+            [JSON.stringify(sections), slug]
+        );
+        revalidatePath(slug === 'home' ? '/' : `/${slug}`);
+        return { success: true };
+    } catch (e: any) {
+        return { success: false, error: e.message };
     }
-    
-    // Return a plain object
-    return JSON.parse(JSON.stringify(page));
+}
+
+// Example: @/app/_lib/api-utils.ts or wherever ImageEditor imports from
+
+import axios from 'axios';
+
+/**
+ * Deletes a specific image associated with a page section
+ */
+export const deletePageImageByFileId = async (slug: string, sectionIndex: number) => {
+  try {
+    // This calls your API route to remove the image_ref from the database
+    const response = await axios.delete(`/api/pages/${slug}/image`, {
+      data: { sectionIndex }
+    });
+    return response.data;
   } catch (error) {
-    console.error(`Error fetching home page content:`, error);
-    return null;
+    console.error("Failed to delete image:", error);
+    throw error;
   }
-}
-
-export async function updateHomePageContent(
-  title: string,
-  content: string,
-): Promise<{ success: boolean; error?: string }> {
-  const HOMEPAGE_SLUG = 'home';
-  await connectToDatabase();
-
-  if (!title || !content) {
-      return { success: false, error: "Title and content cannot be empty." };
-  }
-    
-  try {
-    // Find the existing document and update it.
-    const updateResult = await Page.findOneAndUpdate(
-      { slug: HOMEPAGE_SLUG },
-      { $set: { title: title, content: content, updatedAt: new Date() } },
-      { new: true } 
-    ).exec();
-
-    if (!updateResult) {
-      // If the document doesn't exist, create it (Upsert logic).
-      const newPage = new Page({ 
-          slug: HOMEPAGE_SLUG, 
-          title, 
-          content,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-      });
-      await newPage.save();
-      return { success: true };
-    }
-    return { success: true };
-  } catch (e) {
-    const errorMessage = (e as Error).message || "Failed to update home page content.";
-    console.error("Error updating home page content:", e);
-    return { success: false, error: errorMessage };
-  }
-}
-
+};

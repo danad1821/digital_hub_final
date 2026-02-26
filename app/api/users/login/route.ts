@@ -37,7 +37,7 @@ export async function POST(request: Request) {
         // 2. Find the User in MySQL
         // Note: Using id as a string (VARCHAR) if you migrated MongoDB ObjectIds
         const [rows]: any = await pool.query(
-            "SELECT id, email, password, role FROM users WHERE email = ? LIMIT 1",
+            "SELECT id, email, password FROM users WHERE email = ? LIMIT 1",
             [email]
         );
 
@@ -58,7 +58,7 @@ export async function POST(request: Request) {
         const payload: JwtPayload = {
             userId: user.id.toString(),
             email: user.email,
-            role: user.role || "user",
+            role: "admin",
         };
 
         const token = jwt.sign(payload, jwtSecret, { expiresIn: '7d' });

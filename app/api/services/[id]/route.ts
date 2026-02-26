@@ -10,7 +10,8 @@ export async function PUT(
     const data = await request.json();
     const { serviceName, summary } = data;
 
-    const [result]: any = await pool.query(
+    // 1. Perform the Update
+    const [updateResult]: any = await pool.query(
       `UPDATE services SET 
         service_name = COALESCE(?, service_name), 
         summary = COALESCE(?, summary),
@@ -19,11 +20,20 @@ export async function PUT(
       [serviceName, summary, id]
     );
 
-    if (result.affectedRows === 0) {
+    // 2. Check if the row existed
+    if (updateResult.affectedRows === 0) {
       return NextResponse.json({ error: "Service not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ message: "Service updated successfully" }, { status: 200 });
+    // 3. Fetch the newly updated data from the database
+    const [rows]: any = await pool.query(
+      "SELECT id, service_name, summary, updated_at as updatedAt FROM services WHERE id = ?",
+      [id]
+    );
+
+    // 4. Return the first (and only) row
+    return NextResponse.json(rows[0], { status: 200 });
+
   } catch (error: any) {
     console.error("Error updating Service:", error);
     return NextResponse.json(

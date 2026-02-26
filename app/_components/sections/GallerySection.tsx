@@ -31,7 +31,7 @@ const GallerySection = forwardRef<HTMLDivElement, GallerySectionProps>(
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {gallery.slice(0, 6).map((img, index) => (
               <motion.div
-                key={img._id.toString()}
+                key={img.id.toString()}
                 initial={{ opacity: 0, scale: 0.9 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}

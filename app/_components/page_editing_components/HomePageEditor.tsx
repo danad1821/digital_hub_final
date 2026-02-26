@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Loader2,
   Save,
@@ -51,6 +51,7 @@ export default function HomePageEditor() {
       // Assuming 'home' is the slug for the homepage
       const response =
         await axios.get<ApiResponse<PageDocument>>(`/api/pages/home`);
+        console.log(response.data)
       setPageData(response.data.data);
     } catch (error) {
       console.error("Error fetching home page data:", error);
@@ -130,6 +131,40 @@ export default function HomePageEditor() {
   const CardStyle =
     "p-4 bg-gray-700 rounded-lg shadow-lg border border-gray-600";
 
+  const sections = useMemo(() => {
+    setIsLoading(true)
+    // 1. Check if pageData and sections exist
+    if (!pageData || !pageData.sections) {
+      setIsLoading(false)
+      return [];
+    }
+
+    // 2. Check if it's already an object/array (no need to parse)
+    if (typeof pageData.sections !== "string") {
+      setIsLoading(false)
+      return pageData.sections;
+    }
+
+    // 3. Try to parse only if it's a string
+    try {
+      return JSON.parse(pageData.sections);
+    } catch (error) {
+      console.error("Failed to parse sections JSON:", error);
+      return [];
+    }finally{
+      setIsLoading(false)
+    }
+    
+  }, [pageData]);
+
+  if(isLoading){
+    return(
+      <div>
+        <Loader2 className="animate text-black"/>
+      </div>
+    )
+  }
+
   return (
     <div className={`min-h-screen p-8 text-grey-800`}>
       <header className="flex justify-between items-center mb-8">
@@ -167,7 +202,8 @@ export default function HomePageEditor() {
               {/* isLarge={true} for the hero image visual style */}
               <ImageEditor
                 sectionIndex={0}
-                imageKey={"image_ref"}
+                imageKey="image_ref"
+                sectionData={sections[0]}
                 pageData={pageData}
                 setPageData={setPageData}
                 isLarge={true}
@@ -187,7 +223,7 @@ export default function HomePageEditor() {
                   type="text"
                   id="hero-title"
                   className={InputStyle}
-                  value={pageData.sections[0].title}
+                  value={sections[0].title}
                   onChange={(e) => handleChange(e.target.value, 0, "title")}
                 />
               </div>
@@ -202,7 +238,7 @@ export default function HomePageEditor() {
                   type="text"
                   id="hero-subtitle"
                   className={InputStyle}
-                  value={pageData.sections[0].subtitle}
+                  value={sections[0].subtitle}
                   onChange={(e) => handleChange(e.target.value, 0, "subtitle")}
                 />
               </div>
@@ -226,7 +262,7 @@ export default function HomePageEditor() {
                       type="text"
                       id="btn1-text"
                       className={InputStyle}
-                      value={pageData.sections[0].data.button1_text}
+                      value={sections[0].data.button1_text}
                       onChange={(e) =>
                         handleChange(e.target.value, 0, "button1_text")
                       }
@@ -243,7 +279,7 @@ export default function HomePageEditor() {
                       type="text"
                       id="btn1-link"
                       className={InputStyle}
-                      value={pageData.sections[0].data.button1_link}
+                      value={sections[0].data.button1_link}
                       onChange={(e) =>
                         handleChange(e.target.value, 0, "button1_link")
                       }
@@ -268,7 +304,7 @@ export default function HomePageEditor() {
                       type="text"
                       id="btn2-text"
                       className={InputStyle}
-                      value={pageData.sections[0].data.button2_text}
+                      value={sections[0].data.button2_text}
                       onChange={(e) =>
                         handleChange(e.target.value, 0, "button2_text")
                       }
@@ -285,7 +321,7 @@ export default function HomePageEditor() {
                       type="text"
                       id="btn2-link"
                       className={InputStyle}
-                      value={pageData.sections[0].data.button2_link}
+                      value={sections[0].data.button2_link}
                       onChange={(e) =>
                         handleChange(e.target.value, 0, "button2_link")
                       }
@@ -311,7 +347,7 @@ export default function HomePageEditor() {
                   type="text"
                   id="stats-title"
                   className={InputStyle}
-                  value={pageData.sections[1].title}
+                  value={sections[1].title}
                   onChange={(e) => handleChange(e.target.value, 1, "title")}
                 />
               </div>
@@ -326,7 +362,7 @@ export default function HomePageEditor() {
                   type="text"
                   id="stats-subtitle"
                   className={InputStyle}
-                  value={pageData.sections[1].subtitle}
+                  value={sections[1].subtitle}
                   onChange={(e) => handleChange(e.target.value, 1, "subtitle")}
                 />
               </div>
@@ -337,7 +373,7 @@ export default function HomePageEditor() {
                 Stats Cards
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-white">
-                {pageData.sections[1].data.stats_list.map(
+                {sections[1].data.stats_list.map(
                   (i: any, index: number) => (
                     <div
                       key={index}
@@ -401,7 +437,8 @@ export default function HomePageEditor() {
               {/* isLarge={true} for the hero image visual style */}
               <ImageEditor
                 sectionIndex={1}
-                imageKey={"image_ref"}
+                imageKey="image_ref"
+                sectionData={sections[0]}
                 pageData={pageData}
                 setPageData={setPageData}
                 isLarge={false}
@@ -425,7 +462,7 @@ export default function HomePageEditor() {
                   type="text"
                   id="services-title"
                   className={InputStyle}
-                  value={pageData.sections[2].title}
+                  value={sections[2].title}
                   onChange={(e) => handleChange(e.target.value, 2, "title")}
                 />
               </div>
@@ -440,7 +477,7 @@ export default function HomePageEditor() {
                   type="text"
                   id="services-subtitle"
                   className={InputStyle}
-                  value={pageData.sections[2].subtitle}
+                  value={sections[2].subtitle}
                   onChange={(e) => handleChange(e.target.value, 2, "subtitle")}
                 />
               </div>
@@ -471,7 +508,7 @@ export default function HomePageEditor() {
                   type="text"
                   id="gallery-title"
                   className={InputStyle}
-                  value={pageData.sections[3].title}
+                  value={sections[3].title}
                   onChange={(e) => handleChange(e.target.value, 3, "title")}
                 />
               </div>
@@ -486,7 +523,7 @@ export default function HomePageEditor() {
                   type="text"
                   id="gallery-subtitle"
                   className={InputStyle}
-                  value={pageData.sections[3].subtitle}
+                  value={sections[3].subtitle}
                   onChange={(e) => handleChange(e.target.value, 3, "subtitle")}
                 />
               </div>
@@ -516,7 +553,7 @@ export default function HomePageEditor() {
                   type="text"
                   id="locations-title"
                   className={InputStyle}
-                  value={pageData.sections[4].title}
+                  value={sections[4].title}
                   onChange={(e) => handleChange(e.target.value, 4, "title")}
                 />
               </div>
@@ -531,7 +568,7 @@ export default function HomePageEditor() {
                   type="text"
                   id="locations-subtitle"
                   className={InputStyle}
-                  value={pageData.sections[4].subtitle}
+                  value={sections[4].subtitle}
                   onChange={(e) => handleChange(e.target.value, 4, "subtitle")}
                 />
               </div>
@@ -561,7 +598,7 @@ export default function HomePageEditor() {
                   type="text"
                   id="contact-title"
                   className={InputStyle}
-                  value={pageData.sections[5].title}
+                  value={sections[5].title}
                   onChange={(e) => handleChange(e.target.value, 5, "title")}
                 />
               </div>
@@ -576,7 +613,7 @@ export default function HomePageEditor() {
                   type="text"
                   id="contact-subtitle"
                   className={InputStyle}
-                  value={pageData.sections[5].subtitle}
+                  value={sections[5].subtitle}
                   onChange={(e) => handleChange(e.target.value, 5, "subtitle")}
                 />
               </div>
@@ -591,7 +628,7 @@ export default function HomePageEditor() {
                   type="text"
                   id="contact-email"
                   className={InputStyle}
-                  value={pageData.sections[5].data.email}
+                  value={sections[5].data.email}
                   onChange={(e) => handleChange(e.target.value, 5, "email")}
                 />
               </div>
@@ -605,7 +642,7 @@ export default function HomePageEditor() {
                 <textarea
                   id="contact-phone"
                   className={InputStyle}
-                  value={pageData.sections[5].data.phone}
+                  value={sections[5].data.phone}
                   onChange={(e) => handleChange(e.target.value, 5, "phone")}
                 />
               </div>
@@ -619,7 +656,7 @@ export default function HomePageEditor() {
                 <textarea
                   id="contact-hq"
                   className={InputStyle}
-                  value={pageData.sections[5].data.hq}
+                  value={sections[5].data.hq}
                   onChange={(e) => handleChange(e.target.value, 5, "hq")}
                 />
               </div>

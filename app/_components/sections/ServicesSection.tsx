@@ -57,7 +57,7 @@ const ServicesSection = forwardRef<HTMLDivElement, ServicesSectionProps>(
               // Render as a clickable link if it's the schedule card
               return (
                 <motion.div
-                  key={s._id}
+                  key={s.id}
                   initial={{ opacity: 0, scale: 0.9 }}
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}

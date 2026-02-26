@@ -19,7 +19,7 @@ export default function AdminServices() {
     try {
       const res = await axios.get("/api/services");
       const data = res.data?.services || res.data || [];
-
+      console.log(data)
       setServices(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Failed to load services:", error);
@@ -31,7 +31,7 @@ export default function AdminServices() {
    * --------------------------*/
   const filteredServices = useMemo(() => {
     return services.filter((s) =>
-      s.serviceName.toLowerCase().includes(search.toLowerCase())
+      s.service_name.toLowerCase().includes(search.toLowerCase())
     );
   }, [services, search]);
 
@@ -43,18 +43,17 @@ export default function AdminServices() {
       try {
         if (selectedService) {
           // UPDATE
-          const res = await axios.put(`/api/services/${service._id}`, service);
+          const res = await axios.put(`/api/services/${selectedService.id}`, service);
           const updated = res.data?.service || res.data;
-
+          console.log("updated: ",updated)
           setServices((prev) =>
-            prev.map((s) => (s._id === updated._id ? updated : s))
+            prev.map((s) => (s.id === updated.id ? updated : s))
           );
         } else {
           // CREATE
           console.log("Service: ", service)
           const res = await axios.post(`/api/services`, service);
           const created = res.data?.service || res.data;
-
           setServices((prev) => [...prev, created]);
         }
 
@@ -73,7 +72,7 @@ export default function AdminServices() {
   const handleDeleteService = useCallback(async (id: string) => {
     try {
       await axios.delete(`/api/services/${id}`);
-      setServices((prev) => prev.filter((s) => s._id !== id));
+      setServices((prev) => prev.filter((s) => s.id !== id));
     } catch (error) {
       console.error("Delete failed:", error);
     }
@@ -118,13 +117,13 @@ export default function AdminServices() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredServices.map((service) => (
           <ServiceCard
-            key={service._id}
+            key={service.id}
             service={service}
             onEdit={() => {
               setSelectedService(service);
               setShowModal(true);
             }}
-            onDelete={() => handleDeleteService(service._id)}
+            onDelete={() => handleDeleteService(service.id)}
           />
         ))}
       </div>

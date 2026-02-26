@@ -6,7 +6,7 @@ export type Stat = {
 };
 
 export type Service = {
-  _id: string;
+  id: string;
   serviceName: string;
   shortDescription: string;
   // Add other service properties as needed
@@ -19,7 +19,7 @@ export type Location = {
 };
 
 export type GalleryImage = {
-  _id: string;
+  id: string;
   image: string;
   title: string;
   // Add other gallery properties as needed
@@ -41,7 +41,7 @@ export type PageSectionData = {
 };
 
 export type HomePageData = {
-  _id: string;
+  id: string;
   sections: PageSectionData[];
   // Add other top-level page data
 };

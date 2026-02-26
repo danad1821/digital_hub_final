@@ -1,171 +1,92 @@
 "use server";
 
-import { connectToDatabase } from "../_lib/db";
-import GalleryImage, { GalleryImageDocument } from "@/app/_models/GalleryImage";
-import { uploadImage } from "./upload";
-import mongoose, { Types } from "mongoose";
-
-// --- CREATE (ADD) ---
+import pool from "@/app/_lib/db"; //
+import { saveLocalFile, deleteLocalFile } from "@/app/_lib/file-helper";
+import { revalidatePath } from "next/cache";
 
 /**
- * Uploads a file and creates a new GalleryImage reference document.
- * @param formData The FormData containing the file ('image').
+ * CREATE: Saves image to disk and URL to MySQL
  */
-export async function addGalleryImage(
-  formData: FormData
-): Promise<GalleryImageDocument | { error: string }> {
-  await connectToDatabase();
-
-  // 1. Extract and Validate the Title
-  const title = formData.get('title') as string;
-
-  if (!title || typeof title !== 'string' || !title.trim()) {
-    return { error: "A valid title is required." };
-  }
-
-  // 2. Upload the file to GridFS first
-  const uploadResult = await uploadImage(formData);
-
-  if (!uploadResult.success || !uploadResult.fileId) {
-    return { error: uploadResult.error || "Failed to upload image to GridFS." };
-  }
-
+export async function addGalleryImage(formData: FormData) {
   try {
-    // 3. Create the Mongoose document referencing the new GridFS file ID AND the Title
-    const newImage = await GalleryImage.create({
-      title: title, // <--- Save the title here
-      image: new Types.ObjectId(uploadResult.fileId),
-    });
+    const title = formData.get('title') as string;
+    const imageFile = formData.get('image') as File;
 
-    // The document is now created and linked to the image data
-    return JSON.parse(JSON.stringify(newImage)); 
-  } catch (e) {
-    // If the document creation fails, clean up the orphaned GridFS file
-    await deleteGridFsFile(new Types.ObjectId(uploadResult.fileId));
-    console.error("Database creation error:", e); // Helpful for debugging
-    return { error: "Failed to create database entry." };
-  }
-}
-
-// --- DELETE ---
-
-/**
- * Deletes a GalleryImage document and the associated GridFS file chunks.
- * @param id The Mongoose document ID of the GalleryImage to delete.
- */
-export async function deleteGalleryImage(
-  id: string
-): Promise<{ success: boolean; error?: string }> {
-  await connectToDatabase();
-
-  try {
-    // 1. Find the Mongoose document to get the GridFS file ID
-    const imageDoc = await GalleryImage.findById(id);
-
-    if (!imageDoc) {
-      return { success: false, error: "GalleryImage not found." };
+    if (!title?.trim() || !imageFile) {
+      return { error: "Title and Image are required." };
     }
 
-    const fileId = imageDoc.image; // This is the GridFS ObjectId
+    // 1. Save file to local disk
+    const imageUrl = await saveLocalFile(imageFile, "gallery");
 
-    // 2. Delete the Mongoose document
-    await GalleryImage.deleteOne({ _id: id });
-
-    // 3. Delete the associated GridFS file
-    await deleteGridFsFile(fileId);
-
-    return { success: true };
-  } catch (e) {
-    return {
-      success: false,
-      error: (e as Error).message || "Failed to delete image.",
-    };
-  }
-}
-
-/**
- * Internal helper to delete the actual file data from GridFS.
- */
-async function deleteGridFsFile(fileId: Types.ObjectId): Promise<void> {
-  const db: any = mongoose.connection.db;
-  const bucket = new mongoose.mongo.GridFSBucket(db, { bucketName: "uploads" });
-
-  try {
-    await bucket.delete(fileId);
-  } catch (e) {
-    console.error("Error deleting GridFS file:", fileId, e);
-    // Log the error but continue, as the Mongoose document is already gone.
-  }
-}
-
-// --- READ (GET) ---
-
-/**
- * Retrieves all GalleryImage documents.
- */
-export async function getAllGalleryImages(): Promise<GalleryImageDocument[]> {
-  await connectToDatabase();
-
-  const images = await GalleryImage.find({}).sort({ createdAt: -1 }).exec();
-
-  // Return a plain object array for client components
-  return JSON.parse(JSON.stringify(images));
-}
-
-/**
- * Retrieves a specific GalleryImage document by its Mongoose ID.
- */
-export async function getGalleryImageById(
-  id: string
-): Promise<GalleryImageDocument | null> {
-  await connectToDatabase();
-
-  const image = await GalleryImage.findById(id).exec();
-
-  if (!image) {
-    return null;
-  }
-
-  // Return a plain object for client components
-  return JSON.parse(JSON.stringify(image));
-}
-
-/**
- * Updates the title of an existing GalleryImage document.
- * Note: Changing the image file itself would require a different action flow.
- * @param id The Mongoose document ID of the GalleryImage to update.
- * @param formData The FormData containing the new title ('title').
- */
-export async function editGalleryImage(
-  id: string,
-  formData: FormData
-): Promise<{ success: boolean; error?: string }> {
-  await connectToDatabase();
-
-  // 1. Extract and Validate the Title
-  const newTitle = formData.get('title') as string;
-
-  if (!newTitle || typeof newTitle !== 'string' || !newTitle.trim()) {
-    return { success: false, error: "A valid title is required." };
-  }
-
-  try {
-    // 2. Find and Update the Mongoose document
-    const result = await GalleryImage.updateOne(
-      { _id: id },
-      { $set: { title: newTitle } }
+    // 2. Save record to MySQL
+    const [result]: any = await pool.query(
+      "INSERT INTO gallery_images (title, image_url) VALUES (?, ?)",
+      [title, imageUrl]
     );
 
-    if (result.matchedCount === 0) {
-        return { success: false, error: "GalleryImage not found." };
-    }
+    revalidatePath("/gallery");
+    return { id: result.insertId, title, imageUrl };
+  } catch (e: any) {
+    console.error("Upload Error:", e);
+    return { error: "Failed to upload gallery image." };
+  }
+}
 
+/**
+ * DELETE: Removes record from MySQL and file from disk
+ */
+export async function deleteGalleryImage(id: number) {
+  try {
+    // 1. Get the URL first to delete the file
+    const [rows]: any = await pool.query("SELECT image_url FROM gallery_images WHERE id = ?", [id]);
+    if (rows.length === 0) return { error: "Image not found" };
+
+    const imageUrl = rows[0].image_url;
+
+    // 2. Delete from DB
+    await pool.query("DELETE FROM gallery_images WHERE id = ?", [id]);
+
+    // 3. Delete from Disk
+    await deleteLocalFile(imageUrl);
+
+    revalidatePath("/gallery");
     return { success: true };
+  } catch (e: any) {
+    return { success: false, error: e.message };
+  }
+}
+
+/**
+ * READ: Get all images
+ */
+export async function getAllGalleryImages() {
+  try {
+    const [rows] = await pool.query("SELECT * FROM gallery_images ORDER BY created_at DESC");
+    return rows;
   } catch (e) {
-    console.error("Database update error:", e);
-    return {
-      success: false,
-      error: (e as Error).message || "Failed to update database entry.",
-    };
+    console.error(e);
+    return [];
+  }
+}
+
+/**
+ * UPDATE: Edit Title
+ */
+export async function editGalleryImage(id: number, formData: FormData) {
+  try {
+    const newTitle = formData.get('title') as string;
+
+    const [result]: any = await pool.query(
+      "UPDATE gallery_images SET title = ? WHERE id = ?",
+      [newTitle, id]
+    );
+
+    if (result.affectedRows === 0) return { error: "Not found" };
+
+    revalidatePath("/gallery");
+    return { success: true };
+  } catch (e: any) {
+    return { success: false, error: e.message };
   }
 }

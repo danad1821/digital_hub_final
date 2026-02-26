@@ -52,7 +52,7 @@ export default function EditLocationModal({
   if (!isOpen) return null;
 
   
-  const existingLocations = shippingLocations.filter(loc => loc._id !== locationToEdit._id);
+  const existingLocations = shippingLocations.filter(loc => loc.id !== locationToEdit.id);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,7 +87,7 @@ export default function EditLocationModal({
 
     try {
         // The PUT API handler will automatically re-geocode if 'address' is present in updateData.
-        const success = await onSave(locationToEdit._id, updateData);
+        const success = await onSave(locationToEdit.id, updateData);
 
         if (success) {
             onClose();

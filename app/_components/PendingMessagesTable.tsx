@@ -50,7 +50,7 @@ export default function PendingMessagesTable({
         <tbody className="divide-y divide-gray-700">
           {pendingMessages.map((msg) => (
             <tr
-              key={msg._id}
+              key={msg.id}
               className="bg-[#11001C] hover:bg-[#0A1C30] transition duration-150 cursor-pointer"
               onClick={() => onRowClick(msg)} // NEW → Opens modal
             >
@@ -75,7 +75,7 @@ export default function PendingMessagesTable({
                 <button
                   onClick={(e) => {
                     e.stopPropagation(); // prevents modal from opening
-                    onToggleRead(msg._id, msg.isRead);
+                    onToggleRead(msg.id, msg.isRead);
                   }}
                   className={`inline-flex items-center px-3 py-1 border border-transparent rounded-full shadow-sm text-xs font-medium text-[#11001C] ${BG_POP_COLOR} hover:opacity-90 transition`}
                 >
