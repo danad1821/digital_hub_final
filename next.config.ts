@@ -14,6 +14,18 @@ const nextConfig: NextConfig = {
       ],
     },
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'altamaritime.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.altamaritime.com',
+      },
+    ],
+  },
 };
 
 export default nextConfig;
