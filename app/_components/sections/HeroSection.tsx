@@ -14,6 +14,7 @@ export default function HeroSection({
   sectionData,
   scrollToSection,
 }: HeroSectionProps) {
+  if(!sectionData) return null;
   // SCROLL HOOKS FOR PARALLAX
   const { scrollY } = useScroll();
   const yParallax = useTransform(scrollY, [0, 500], [0, 150]);
@@ -37,7 +38,7 @@ export default function HeroSection({
         className="absolute inset-0 top-0 left-0 right-0 h-[calc(100vh+150px)]"
       >
         <Image
-          src={`/api/images/${sectionData.data.image_ref}`}
+          src={sectionData?.data?.image_ref as string}
           alt="Large cargo ship sailing on the sea"
           fill
           priority

@@ -95,7 +95,7 @@ const AboutSection = forwardRef<HTMLDivElement, AboutSectionProps>(
           className="relative w-full lg:w-[50%] min-h-full"
         >
           <Image
-            src={`/api/images/${sectionData.data.image_ref}`}
+            src={sectionData.data.image_ref as string}
             alt="industry"
             width={600}
             height={400}

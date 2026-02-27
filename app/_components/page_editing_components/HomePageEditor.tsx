@@ -51,8 +51,11 @@ export default function HomePageEditor() {
       // Assuming 'home' is the slug for the homepage
       const response =
         await axios.get<ApiResponse<PageDocument>>(`/api/pages/home`);
-        console.log(response.data)
-      setPageData(response.data.data);
+      console.log(response.data);
+      let newData: any = response.data.data;
+      newData.sections = JSON.parse(response.data.data?.sections as any);
+      setPageData(newData);
+      // setPageData(response.data.data);
     } catch (error) {
       console.error("Error fetching home page data:", error);
     } finally {
@@ -62,12 +65,18 @@ export default function HomePageEditor() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!pageData) return;
+    if (!pageData || !sections) return;
 
     setIsSaving(true);
     try {
-      // The PUT endpoint is /api/pages/[slug]
-      await axios.put(`/api/pages/${pageData.slug}`, pageData);
+      const payload = {
+        ...pageData,
+        // 🌟 FIX: Stringify without any formatting arguments to keep it clean.
+        // If your backend expects a true JSON object, remove JSON.stringify entirely.
+        sections: sections,
+      };
+
+      await axios.put(`/api/pages/${pageData.slug}`, payload);
       alert("Home page content saved successfully!");
     } catch (error) {
       console.error("Error saving page data:", error);
@@ -86,7 +95,7 @@ export default function HomePageEditor() {
     key: SectionDataKey,
     // Optional: for nested lists like stats_list or cards
     nestedListKey?: "stats_list" | "cards",
-    nestedItemIndex?: number
+    nestedItemIndex?: number,
   ) => {
     setPageData((prevData: any) => {
       if (!prevData) return null;
@@ -132,16 +141,16 @@ export default function HomePageEditor() {
     "p-4 bg-gray-700 rounded-lg shadow-lg border border-gray-600";
 
   const sections = useMemo(() => {
-    setIsLoading(true)
+    setIsLoading(true);
     // 1. Check if pageData and sections exist
     if (!pageData || !pageData.sections) {
-      setIsLoading(false)
+      setIsLoading(false);
       return [];
     }
 
     // 2. Check if it's already an object/array (no need to parse)
     if (typeof pageData.sections !== "string") {
-      setIsLoading(false)
+      setIsLoading(false);
       return pageData.sections;
     }
 
@@ -151,18 +160,17 @@ export default function HomePageEditor() {
     } catch (error) {
       console.error("Failed to parse sections JSON:", error);
       return [];
-    }finally{
-      setIsLoading(false)
+    } finally {
+      setIsLoading(false);
     }
-    
   }, [pageData]);
 
-  if(isLoading){
-    return(
+  if (isLoading) {
+    return (
       <div>
-        <Loader2 className="animate text-black"/>
+        <Loader2 className="animate text-black" />
       </div>
-    )
+    );
   }
 
   return (
@@ -373,64 +381,62 @@ export default function HomePageEditor() {
                 Stats Cards
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-white">
-                {sections[1].data.stats_list.map(
-                  (i: any, index: number) => (
-                    <div
-                      key={index}
-                      className="p-4 bg-gray-700 rounded-lg border border-gray-600 space-y-3"
-                    >
-                      <h5 className="text-lg font-bold text-white">
-                        Card {index + 1}
-                      </h5>
-                      <div>
-                        <label
-                          htmlFor={`stat-${index}-label`}
-                          className="text-cyan-300 text-sm"
-                        >
-                          Label
-                        </label>
-                        <input
-                          type="text"
-                          id={`stat-${index}-label`}
-                          className={InputStyle}
-                          value={i.label}
-                          onChange={(e) =>
-                            handleChange(
-                              e.target.value,
-                              1,
-                              "label",
-                              "stats_list",
-                              index
-                            )
-                          }
-                        />
-                      </div>
-                      <div>
-                        <label
-                          htmlFor={`stat-${index}-value`}
-                          className="text-cyan-300 text-sm"
-                        >
-                          Value
-                        </label>
-                        <input
-                          type="text"
-                          id={`stat-${index}-value`}
-                          className={InputStyle}
-                          value={i.value}
-                          onChange={(e) =>
-                            handleChange(
-                              e.target.value,
-                              1,
-                              "value",
-                              "stats_list",
-                              index
-                            )
-                          }
-                        />
-                      </div>
+                {sections[1].data.stats_list.map((i: any, index: number) => (
+                  <div
+                    key={index}
+                    className="p-4 bg-gray-700 rounded-lg border border-gray-600 space-y-3"
+                  >
+                    <h5 className="text-lg font-bold text-white">
+                      Card {index + 1}
+                    </h5>
+                    <div>
+                      <label
+                        htmlFor={`stat-${index}-label`}
+                        className="text-cyan-300 text-sm"
+                      >
+                        Label
+                      </label>
+                      <input
+                        type="text"
+                        id={`stat-${index}-label`}
+                        className={InputStyle}
+                        value={i.label}
+                        onChange={(e) =>
+                          handleChange(
+                            e.target.value,
+                            1,
+                            "label",
+                            "stats_list",
+                            index,
+                          )
+                        }
+                      />
                     </div>
-                  )
-                )}
+                    <div>
+                      <label
+                        htmlFor={`stat-${index}-value`}
+                        className="text-cyan-300 text-sm"
+                      >
+                        Value
+                      </label>
+                      <input
+                        type="text"
+                        id={`stat-${index}-value`}
+                        className={InputStyle}
+                        value={i.value}
+                        onChange={(e) =>
+                          handleChange(
+                            e.target.value,
+                            1,
+                            "value",
+                            "stats_list",
+                            index,
+                          )
+                        }
+                      />
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
             <div className="relative mb-6 h-96 text-white">
@@ -438,7 +444,7 @@ export default function HomePageEditor() {
               <ImageEditor
                 sectionIndex={1}
                 imageKey="image_ref"
-                sectionData={sections[0]}
+                sectionData={sections[1]}
                 pageData={pageData}
                 setPageData={setPageData}
                 isLarge={false}
@@ -488,10 +494,9 @@ export default function HomePageEditor() {
               className={`flex items-center px-4 py-2 rounded-md font-semibold transition-colors ${Cyan} `}
             >
               <Ship className="w-5 h-5 mr-2" />
-              Edit Services 
+              Edit Services
             </button>
           </section>
-
 
           {/* Section 4: Gallery (External Edit) - Index is 4 in array, 5th element */}
           <section className={CardStyle}>
@@ -534,7 +539,7 @@ export default function HomePageEditor() {
               className={`flex items-center px-4 py-2 rounded-md font-semibold transition-colors ${Cyan} `}
             >
               <Plus className="w-5 h-5 mr-2" />
-              Edit Gallery 
+              Edit Gallery
             </button>
           </section>
 
@@ -579,7 +584,7 @@ export default function HomePageEditor() {
               className={`flex items-center px-4 py-2 rounded-md font-semibold transition-colors ${Cyan} `}
             >
               <Globe className="w-5 h-5 mr-2" />
-              Edit Locations 
+              Edit Locations
             </button>
           </section>
 
@@ -661,8 +666,6 @@ export default function HomePageEditor() {
                 />
               </div>
             </div>
-            
-            
           </section>
         </form>
       ) : (

@@ -134,6 +134,8 @@ export default function Home() {
 
   // Memoized page sections for cleaner prop passing
   const sections = JSON.parse(pageData?.sections as any);
+  console.log("page data sections: ", pageData.sections)
+  console.log("page data sections parsed: ", sections)
 
   // The rest of the page rendering
   return (

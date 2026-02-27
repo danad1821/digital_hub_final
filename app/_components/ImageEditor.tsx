@@ -31,7 +31,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   if (!pageData || !pageData.sections || !pageData.sections[sectionIndex]) {
-    return null; 
+    return null;
   }
 
   const currentFileId = sectionData.data[imageKey] || null;
@@ -66,7 +66,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({
       alert("Please select a file first.");
       return;
     }
-
+    console.log("Initiating upload for section type:", sectionType);
     const file = fileInputRef.current.files[0];
 
     // We removed the manual 'deletePageImageByFileId' call because
@@ -83,28 +83,49 @@ const ImageEditor: React.FC<ImageEditorProps> = ({
       const result = await updatePageSectionImage(slug, sectionType, formData);
 
       if (result.success && result.newImageUrl) {
-      setPageData((prevData: any) => {
-        if (!prevData) return null;
+        setPageData((prevData: any) => {
+          if (!prevData) return null;
 
-        const sectionIndex = prevData.sections.findIndex(
-          (s: any) => s.type === sectionType
-        );
+          // 1. Ensure sections is an array before using array methods
+          let currentSections = [];
+          try {
+            currentSections =
+              typeof prevData.sections === "string"
+                ? JSON.parse(prevData.sections)
+                : prevData.sections;
+          } catch (e) {
+            console.error("Failed to parse sections in ImageEditor:", e);
+            return prevData;
+          }
 
-        if (sectionIndex === -1) return prevData;
+          // 2. Now findIndex will work
+          const sectionIndex = currentSections.findIndex(
+            (s: any) => s.type === sectionType,
+          );
 
-        const newSections = [...prevData.sections];
-        const imageKey = "image_ref";
+          if (sectionIndex === -1) return prevData;
 
-        newSections[sectionIndex] = {
-          ...newSections[sectionIndex],
-          data: {
-            ...newSections[sectionIndex].data,
-            // 🌟 FIX: Use newImageUrl here
-            [imageKey]: result.newImageUrl,
-          },
-        };
-        return { ...prevData, sections: newSections };
-      });
+          const newSections = [...currentSections];
+          const imageKey = "image_ref";
+
+          newSections[sectionIndex] = {
+            ...newSections[sectionIndex],
+            data: {
+              ...(newSections[sectionIndex].data || {}), // Guard against missing data object
+              [imageKey]: result.newImageUrl,
+            },
+          };
+
+          // 3. Save it back.
+          // If your parent component expects a string, stringify it here.
+          return {
+            ...prevData,
+            sections:
+              typeof prevData.sections === "string"
+                ? JSON.stringify(newSections)
+                : newSections,
+          };
+        });
 
         // Clear input and preview after successful upload
         if (fileInputRef.current) fileInputRef.current.value = "";
@@ -113,7 +134,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({
       } else {
         // Check for explicit error message from server action
         throw new Error(
-          result.error || "Database update failed or returned no file ID."
+          result.error || "Database update failed or returned no file ID.",
         );
       }
     } catch (error) {
@@ -159,17 +180,22 @@ const ImageEditor: React.FC<ImageEditorProps> = ({
     }
   };
 
-  // Determine the source for the visual preview
+
   const imgSrc = useMemo(() => {
     if (previewUrl) {
       return previewUrl;
     }
-    if (currentFileId && !currentFileId.startsWith("/images/")) {
-      // Dynamic GridFS URL
+
+    if (currentFileId) {
+      // 🌟 FIX: If currentFileId is already a full URL or a relative path, use it directly
+      if (currentFileId.startsWith("http") || currentFileId.startsWith("/")) {
+        return currentFileId;
+      }
+      // Otherwise, assume it is a GridFS ID and use the API route
       return `/api/files/${currentFileId}`;
     }
-    // Static URL placeholder (e.g., '/images/image4.jpeg')
-    return currentFileId;
+
+    return null;
   }, [currentFileId, previewUrl]);
 
   // Check if the current reference is a valid uploaded image (i.e., a GridFS ID)
@@ -216,7 +242,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({
         {previewUrl && (
           <button
             type="button"
-            onClick={() => handleUpload(pageData.sections[sectionIndex].type)}
+            onClick={() => handleUpload(sectionData.type)}
             disabled={isUploading}
             className={`flex items-center justify-center p-2 rounded-md transition-colors text-white ${isUploading ? "bg-gray-500" : "bg-green-600 hover:bg-green-700"}`}
           >
