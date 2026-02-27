@@ -53,7 +53,7 @@ export default function HomePageEditor() {
         await axios.get<ApiResponse<PageDocument>>(`/api/pages/home`);
       console.log(response.data);
       let newData: any = response.data.data;
-      newData.sections = JSON.parse(response.data.data?.sections as any);
+      newData.sections = JSON.parse(response.data.data?.sections as any || "[]");
       setPageData(newData);
       // setPageData(response.data.data);
     } catch (error) {
@@ -141,28 +141,12 @@ export default function HomePageEditor() {
     "p-4 bg-gray-700 rounded-lg shadow-lg border border-gray-600";
 
   const sections = useMemo(() => {
-    setIsLoading(true);
-    // 1. Check if pageData and sections exist
-    if (!pageData || !pageData.sections) {
-      setIsLoading(false);
-      return [];
-    }
+    if (!pageData || !pageData.sections) return [];
 
-    // 2. Check if it's already an object/array (no need to parse)
-    if (typeof pageData.sections !== "string") {
-      setIsLoading(false);
+    // If it's already an array or object, just return it
+    
       return pageData.sections;
-    }
-
-    // 3. Try to parse only if it's a string
-    try {
-      return JSON.parse(pageData.sections);
-    } catch (error) {
-      console.error("Failed to parse sections JSON:", error);
-      return [];
-    } finally {
-      setIsLoading(false);
-    }
+    
   }, [pageData]);
 
   if (isLoading) {
