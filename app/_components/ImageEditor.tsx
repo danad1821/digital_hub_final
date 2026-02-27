@@ -204,15 +204,15 @@ const ImageEditor: React.FC<ImageEditorProps> = ({
 
   return (
     <div
-      className={` ${isLarge ? "p-0" : "p-4"} z-10 flex flex-col justify-end items-center max-h-[500px] overflow-hidden rounded-lg`}
+      className={` ${isLarge ? "p-0" : "p-4"} z-10 flex flex-col justify-end items-center max-h-[400px] overflow-hidden rounded-lg`}
     >
       {/* Visual Preview */}
       {imgSrc && (
         <img
           src={imgSrc}
           alt="Current or uploaded image preview"
-          sizes="100vw"
-          className={`object-cover ${isLarge ? "blur-sm opacity-50" : "opacity-20"}`}
+          sizes="50vw"
+          className={`object-cover ${isLarge ? "opacity-50" : "opacity-20"} w-100 h-100`}
         />
       )}
 

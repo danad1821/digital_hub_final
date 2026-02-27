@@ -48,13 +48,16 @@ export default function HomePageEditor() {
   const getHomePageData = async () => {
     setIsLoading(true);
     try {
-      // Assuming 'home' is the slug for the homepage
       const response =
         await axios.get<ApiResponse<PageDocument>>(`/api/pages/home`);
-      console.log(response.data);
-      // let newData: any = response.data.data;
-      // newData.sections = JSON.parse(response.data.data?.sections as any);
-      setPageData(response.data.data);
+
+      const data = response.data.data;
+      // If sections is a string, parse it before putting it in state
+      if (data && typeof data.sections === "string") {
+        data.sections = JSON.parse(data.sections);
+      }
+
+      setPageData(data);
     } catch (error) {
       console.error("Error fetching home page data:", error);
     } finally {
@@ -92,32 +95,34 @@ export default function HomePageEditor() {
     value: string,
     sectionIndex: number,
     key: SectionDataKey,
-    // Optional: for nested lists like stats_list or cards
     nestedListKey?: "stats_list" | "cards",
     nestedItemIndex?: number,
   ) => {
     setPageData((prevData: any) => {
       if (!prevData) return null;
 
-      const newSections = [...prevData.sections];
+      // 1. Deep clone the sections array
+      const newSections = JSON.parse(JSON.stringify(prevData.sections));
       const targetSection = newSections[sectionIndex];
 
       if (!targetSection) return prevData;
 
+      // 2. Ensure the 'data' object exists if we aren't editing title/subtitle
+      if (key !== "title" && key !== "subtitle" && !targetSection.data) {
+        targetSection.data = {};
+      }
+
       if (key === "title" || key === "subtitle") {
-        // Direct property of the section object
-        (targetSection as any)[key] = value;
+        targetSection[key] = value;
       } else if (nestedListKey !== undefined && nestedItemIndex !== undefined) {
-        // Nested item update (e.g., stats_list, why_choose_us cards)
         const newNestedList = [...(targetSection.data[nestedListKey] as any[])];
         newNestedList[nestedItemIndex] = {
           ...newNestedList[nestedItemIndex],
           [key]: value,
         };
-        targetSection.data[nestedListKey] = newNestedList as any;
+        targetSection.data[nestedListKey] = newNestedList;
       } else {
-        // Direct property of the section's 'data' object (e.g., button texts)
-        (targetSection.data as any)[key] = value;
+        targetSection.data[key] = value;
       }
 
       return { ...prevData, sections: newSections };
