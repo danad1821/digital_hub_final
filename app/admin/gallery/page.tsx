@@ -1,14 +1,13 @@
 'use client'; // <-- Must be a client component to use useState and hooks
 
 import { getAllGalleryImages } from '@/app/_actions/gallery';
-import { GalleryImageDocument } from '@/app/_models/GalleryImage';
 import GalleryImageCard from '@/app/_components/cards/GalleryImageCard';
 import AddImageModal from '@/app/_components/modals/AddImageModal';
 import { useEffect, useState, useCallback } from 'react';
 
 export default function AdminGallery() {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [images, setImages] = useState<GalleryImageDocument[]>([]);
+    const [images, setImages] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     
     // Function to fetch all images, similar to getAllMessages
@@ -16,7 +15,7 @@ export default function AdminGallery() {
         setIsLoading(true);
         try {
             // Using the existing server action (will run client-side via RPC)
-            const fetchedImages: GalleryImageDocument[] = await getAllGalleryImages();
+            const fetchedImages: any = await getAllGalleryImages();
             setImages(fetchedImages);
         } catch (error) {
             console.error("Error fetching gallery images:", error);
