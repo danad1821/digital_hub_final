@@ -214,6 +214,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({
           fill
           sizes="100vw"
           className={`object-cover ${isLarge ? "blur-sm opacity-50" : "opacity-20"}`}
+          unoptimized={true}
         />
       )}
 
