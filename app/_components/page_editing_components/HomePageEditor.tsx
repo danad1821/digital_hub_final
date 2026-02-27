@@ -53,7 +53,7 @@ export default function HomePageEditor() {
         await axios.get<ApiResponse<PageDocument>>(`/api/pages/home`);
       console.log(response.data);
       let newData: any = response.data.data;
-      newData.sections = JSON.parse(response.data.data?.sections as any || "[]");
+      newData.sections = JSON.parse(response.data.data?.sections as any);
       setPageData(newData);
       // setPageData(response.data.data);
     } catch (error) {
@@ -144,9 +144,17 @@ export default function HomePageEditor() {
     if (!pageData || !pageData.sections) return [];
 
     // If it's already an array or object, just return it
-    
+    if (typeof pageData.sections !== "string") {
       return pageData.sections;
-    
+    }
+
+    try {
+      // Only parse if it is actually a string
+      return JSON.parse(pageData.sections);
+    } catch (error) {
+      console.error("Failed to parse sections JSON:", error);
+      return [];
+    }
   }, [pageData]);
 
   if (isLoading) {
