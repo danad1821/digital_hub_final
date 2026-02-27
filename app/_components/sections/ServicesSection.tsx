@@ -25,11 +25,7 @@ const icons = [
 const ServicesSection = forwardRef<HTMLDivElement, ServicesSectionProps>(
   ({ sectionData, services, scheduleFileId }, ref) => {
     return (
-      <section
-        ref={ref}
-        id="services"
-        className="py-16 md:py-20 bg-gray-50"
-      >
+      <section ref={ref} id="services" className="py-16 md:py-20 bg-gray-50">
         <div className="custom-container">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -47,45 +43,52 @@ const ServicesSection = forwardRef<HTMLDivElement, ServicesSectionProps>(
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 ">
-            {services.slice(0, 6).map((s, index) => {
-              const isScheduleCard = index === 2 && scheduleFileId; // Only if file ID exists
-              const serviceIcon = icons[index % icons.length];
-              const cardContent = (
-                <HomeInfoCard service={s as any} icon={serviceIcon} />
-              );
+            {services
+              .slice(0, 6)
+              .sort((a, b) => {
+                if (a.id < b.id) return -1;
+                if (a.id > b.id) return 1;
+                return 0;
+              })
+              .map((s, index) => {
+                const isScheduleCard = index === 2 && scheduleFileId; // Only if file ID exists
+                const serviceIcon = icons[index % icons.length];
+                const cardContent = (
+                  <HomeInfoCard service={s as any} icon={serviceIcon} />
+                );
 
-              // Render as a clickable link if it's the schedule card
-              return (
-                <motion.div
-                  key={s.id}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="w-full flex items-center justify-center cursor-pointer"
-                >
-                  {isScheduleCard ? (
-                    <a
-                      href={`/api/schedule/${scheduleFileId}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full flex justify-center"
-                    >
-                      {cardContent}
-                    </a>
-                  ) : (
-                    <div className="w-full flex justify-center">
-                      {cardContent}
-                    </div>
-                  )}
-                </motion.div>
-              );
-            })}
+                // Render as a clickable link if it's the schedule card
+                return (
+                  <motion.div
+                    key={s.id}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    className="w-full flex items-center justify-center cursor-pointer"
+                  >
+                    {isScheduleCard ? (
+                      <a
+                        href={`/api/schedule/${scheduleFileId}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full flex justify-center"
+                      >
+                        {cardContent}
+                      </a>
+                    ) : (
+                      <div className="w-full flex justify-center">
+                        {cardContent}
+                      </div>
+                    )}
+                  </motion.div>
+                );
+              })}
           </div>
         </div>
       </section>
     );
-  }
+  },
 );
 
 ServicesSection.displayName = "ServicesSection"; // Required for forwardRef
