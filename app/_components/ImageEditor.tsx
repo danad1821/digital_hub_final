@@ -208,13 +208,11 @@ const ImageEditor: React.FC<ImageEditorProps> = ({
     >
       {/* Visual Preview */}
       {imgSrc && (
-        <Image
+        <img
           src={imgSrc}
           alt="Current or uploaded image preview"
-          fill
           sizes="100vw"
           className={`object-cover ${isLarge ? "blur-sm opacity-50" : "opacity-20"}`}
-          unoptimized={true}
         />
       )}
 

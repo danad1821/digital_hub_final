@@ -94,13 +94,13 @@ const AboutSection = forwardRef<HTMLDivElement, AboutSectionProps>(
           transition={{ duration: 0.6 }}
           className="relative w-full lg:w-[50%] min-h-full"
         >
-          <Image
+          <img
             src={sectionData.data.image_ref as string}
             alt="industry"
             width={600}
             height={400}
             className="z-[20] w-full h-full rounded-sm object-cover aspect-[4/3] lg:aspect-auto"
-          ></Image>
+          ></img>
           <div className="z-[-1] rounded-sm bg-[#00D9FF]/15 w-full absolute inset-0 rotate-3"></div>
         </motion.div>
       </section>

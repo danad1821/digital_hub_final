@@ -37,14 +37,11 @@ export default function HeroSection({
         style={{ y: yParallax }}
         className="absolute inset-0 top-0 left-0 right-0 h-[calc(100vh+150px)]"
       >
-        <Image
+        <img
           src={sectionData?.data?.image_ref as string}
           alt="Large cargo ship sailing on the sea"
-          fill
-          priority
           sizes="100vw"
           className="object-cover object-center"
-          unoptimized={true}
         />
         {/* Dark Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70 z-10" />
