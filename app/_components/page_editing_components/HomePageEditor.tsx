@@ -52,10 +52,9 @@ export default function HomePageEditor() {
       const response =
         await axios.get<ApiResponse<PageDocument>>(`/api/pages/home`);
       console.log(response.data);
-      let newData: any = response.data.data;
-      newData.sections = JSON.parse(response.data.data?.sections as any);
-      setPageData(newData);
-      // setPageData(response.data.data);
+      // let newData: any = response.data.data;
+      // newData.sections = JSON.parse(response.data.data?.sections as any);
+      setPageData(response.data.data);
     } catch (error) {
       console.error("Error fetching home page data:", error);
     } finally {

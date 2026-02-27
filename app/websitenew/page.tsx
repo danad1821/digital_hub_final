@@ -85,9 +85,6 @@ export default function Home() {
   // 2. COMBINE FETCHING LOGIC INTO A SINGLE ASYNC FUNCTION (Memoized)
   const initDataFetch = useCallback(async () => {
     setIsLoading(true);
-    console.log(process.env.MONGODB_URI
-          ? "URI found"
-          : "URI NOT FOUND IN PROCESS")
     try {
       // 1. Fetch critical page data first
       const pageResponse = await axios.get(`/api/pages/home`);
@@ -113,6 +110,10 @@ export default function Home() {
     initDataFetch();
   }, [initDataFetch]);
 
+  const sections = typeof pageData?.sections === 'string' 
+  ? JSON.parse(pageData.sections) 
+  : pageData?.sections || [];
+
   // 4. Fallback for loading/error
   if (isLoading && !pageData) {
     return (
@@ -133,9 +134,6 @@ export default function Home() {
   }
 
   // Memoized page sections for cleaner prop passing
-  const sections = typeof pageData?.sections === 'string' 
-  ? JSON.parse(pageData.sections) 
-  : pageData?.sections || [];
 
   // The rest of the page rendering
   return (
