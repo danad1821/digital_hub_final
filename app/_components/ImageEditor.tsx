@@ -204,7 +204,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({
 
   return (
     <div
-      className={` ${isLarge ? "p-0" : "p-4"} z-10 flex flex-col justify-end items-center `}
+      className={` ${isLarge ? "p-0" : "p-4"} z-10 flex flex-col justify-end items-center max-h-[500px] overflow-hidden rounded-lg`}
     >
       {/* Visual Preview */}
       {imgSrc && (
