@@ -5,7 +5,7 @@ import { PageSectionData, GalleryImage } from "../../_types";
 
 type GallerySectionProps = {
   sectionData: PageSectionData;
-  gallery: GalleryImage[];
+  gallery: any[];
 };
 
 const GallerySection = forwardRef<HTMLDivElement, GallerySectionProps>(
@@ -44,7 +44,7 @@ const GallerySection = forwardRef<HTMLDivElement, GallerySectionProps>(
                     from next/image is generally preferred for performance. 
                     I'll keep the original structure for direct refactoring. */}
                 <img
-                  src={`/api/images/${img.image}`}
+                  src={img.image_url}
                   alt={`Gallery item ${img.title}`}
                   className="w-full h-full object-cover bg-gray-200"
                 />
