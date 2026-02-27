@@ -55,7 +55,7 @@ export default function Home() {
   const getAllServices = useCallback(async () => {
     try {
       const response = await axios.get("/api/services");
-      console.log(services)
+      console.log(services);
       setServices(response.data.services || response.data);
     } catch (error) {
       console.error("Error fetching services: ", error);
@@ -88,7 +88,7 @@ export default function Home() {
     try {
       // 1. Fetch critical page data first
       const pageResponse = await axios.get(`/api/pages/home`);
-      console.log(pageResponse)
+      console.log(pageResponse);
       setPageData(pageResponse.data.data);
 
       // 2. Fetch auxiliary data (parallelized)
@@ -110,10 +110,22 @@ export default function Home() {
     initDataFetch();
   }, [initDataFetch]);
 
-  const sections = typeof pageData?.sections === 'string' 
-  ? JSON.parse(pageData.sections) 
-  : pageData?.sections || [];
+  const sections = useMemo(() => {
+    if (!pageData || !pageData.sections) return [];
 
+    // If the database returned a real object/array, use it directly
+    if (typeof pageData.sections !== "string") {
+      return pageData.sections;
+    }
+
+    // If the database returned a string, parse it
+    try {
+      return JSON.parse(pageData.sections);
+    } catch (error) {
+      console.error("Failed to parse sections:", error);
+      return [];
+    }
+  }, [pageData]);
   // 4. Fallback for loading/error
   if (isLoading && !pageData) {
     return (
