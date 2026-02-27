@@ -40,8 +40,7 @@ export default function HeroSection({
         <img
           src={sectionData?.data?.image_ref as string}
           alt="Large cargo ship sailing on the sea"
-          sizes="100vw"
-          className="object-cover object-center object-fill"
+          className="object-cover object-center object-fill h-full w-full"
         />
         {/* Dark Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70 z-10" />
