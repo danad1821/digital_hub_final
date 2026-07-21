@@ -32,6 +32,7 @@ export interface Location {
     country: string;        // NEW
     description: string;    // NEW
     status: 'Active Operations' | 'Planned Operations' | 'Maintenance'; // NEW
+    type: 'agent' | 'partner';
     destinations: Destination[];
 }
 

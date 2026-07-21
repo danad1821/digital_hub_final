@@ -13,6 +13,7 @@ interface EditLocationModalProps {
 
 // Enum values for the Status field, mirroring the backend schema
 const STATUS_OPTIONS = ['Active Operations', 'Planned Operations', 'Maintenance'];
+const TYPE_OPTIONS = ['agent', 'partner'] as const;
 
 
 export default function EditLocationModal({
@@ -30,6 +31,7 @@ export default function EditLocationModal({
   const [country, setCountry] = useState(locationToEdit.country);
   const [description, setDescription] = useState(locationToEdit.description);
   const [status, setStatus] = useState(locationToEdit.status);
+  const [type, setType] = useState<'agent' | 'partner'>(locationToEdit.type || 'partner');
 
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -43,6 +45,7 @@ export default function EditLocationModal({
         setCountry(locationToEdit.country);
         setDescription(locationToEdit.description);
         setStatus(locationToEdit.status);
+        setType(locationToEdit.type || 'partner');
 
         
         setError(null);
@@ -59,8 +62,8 @@ export default function EditLocationModal({
     setError(null);
 
     // UPDATED Client-side Validation for required fields
-    if (!name.trim() || !address.trim() || !country.trim() || !description.trim() || !status.trim()) {
-      setError("Port Name, Address, Country, Description, and Status are required.");
+    if (!name.trim() || !address.trim() || !country.trim() || !description.trim() || !status.trim() || !type) {
+      setError("Port Name, Address, Country, Description, Status, and Type are required.");
       return;
     }
 
@@ -75,6 +78,7 @@ export default function EditLocationModal({
     if (country !== locationToEdit.country) updateData.country = country;
     if (description !== locationToEdit.description) updateData.description = description;
     if (status !== locationToEdit.status) updateData.status = status;
+    if (type !== (locationToEdit.type || 'partner')) updateData.type = type;
     
 
 
@@ -195,6 +199,28 @@ export default function EditLocationModal({
                 ))}
               </select>
             </div>
+
+            <div className="space-y-1">
+              <label htmlFor="type" className="text-sm font-medium text-gray-700 flex items-center">
+                <MapPin className="w-4 h-4 mr-2 text-[#00D9FF]" /> Location Type
+              </label>
+              <select
+                id="type"
+                value={type}
+                onChange={(e) => setType(e.target.value as 'agent' | 'partner')}
+                required
+                className="w-full p-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#00D9FF] focus:border-transparent outline-none bg-white"
+              >
+                {TYPE_OPTIONS.map((option) => (
+                  <option key={option} value={option}>
+                    {option === 'agent' ? 'Agent' : 'Partner'}
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs text-gray-500 mt-1">
+                Agents use red map pins; partners use blue map pins.
+              </p>
+            </div>
           </div>
           
           {/* NEW: 5. Description (Full width textarea) */}
@@ -225,7 +251,7 @@ export default function EditLocationModal({
             type="submit"
             onClick={handleSave}
             // Disabled check now includes the new required fields
-            disabled={isSaving || !name.trim() || !address.trim() || !country.trim() || !description.trim() || !status.trim()}
+            disabled={isSaving || !name.trim() || !address.trim() || !country.trim() || !description.trim() || !status.trim() || !type}
             className="flex items-center px-6 py-3 border cursor-pointer border-transparent text-base font-medium rounded-sm text-[#0A1C30] bg-[#00D9FF] hover:bg-[#00D9FF]/50 transition duration-300 shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {isSaving ? (

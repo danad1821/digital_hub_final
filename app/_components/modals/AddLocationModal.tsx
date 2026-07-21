@@ -29,6 +29,7 @@ interface NewLocationDataPayload {
   country: string; // NEW
   description: string; // NEW
   status: string; // NEW
+  type: 'agent' | 'partner';
   destinations: Destination[];
 }
 
@@ -62,7 +63,7 @@ export default function AddLocationModal({
   const [country, setCountry] = useState("");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState<string>(STATUS_OPTIONS[0]); // Default to first option
-  const [type, setType] = useState<string>(TYPE_OPTIONS[0]); // Default to first option
+  const [type, setType] = useState<'agent' | 'partner'>('agent'); // Default to first option
 
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null); // State for modal-level error
@@ -82,8 +83,8 @@ export default function AddLocationModal({
     e.preventDefault();
     setError(null);
 
-    if (!name.trim() || !address.trim() || !country.trim() || !description.trim() || !status.trim()) {
-      setError("Port Name, Address, Country, Description, and Status are required.");
+    if (!name.trim() || !address.trim() || !country.trim() || !description.trim() || !status.trim() || !type) {
+      setError("Port Name, Address, Country, Description, Status, and Type are required.");
       return;
     }
 
@@ -96,6 +97,7 @@ export default function AddLocationModal({
         // .trim() removes leading/trailing spaces but KEEPS new lines (\n) in the middle
         description: description.trim(), 
         status,
+        type,
         destinations: selectedDestinations.map(dest => ({
             name: dest.name,
             lat: dest.lat,
@@ -113,6 +115,7 @@ export default function AddLocationModal({
             setCountry(""); // NEW: Reset
             setDescription(""); // NEW: Reset
             setStatus(STATUS_OPTIONS[0]); // NEW: Reset
+            setType('agent');
             setSelectedDestinations([]);
             onClose();
         }
@@ -232,12 +235,14 @@ export default function AddLocationModal({
               <select
                 id="type"
                 value={type}
-                onChange={(e) => setType(e.target.value)}
+                onChange={(e) => setType(e.target.value as 'agent' | 'partner')}
                 required
                 className="w-full p-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#00D9FF] focus:border-transparent outline-none bg-white"
               >
                 {TYPE_OPTIONS.map(option => (
-                    <option key={option} value={option}>{option}</option>
+                    <option key={option} value={option}>
+                      {option === 'agent' ? 'Agent' : 'Partner'}
+                    </option>
                 ))}
               </select>
             </div>
@@ -271,7 +276,7 @@ export default function AddLocationModal({
           <button
             type="submit"
             onClick={handleSave}
-            disabled={isSaving || !name.trim() || !address.trim() || !country.trim() || !description.trim() || !status.trim()}
+            disabled={isSaving || !name.trim() || !address.trim() || !country.trim() || !description.trim() || !status.trim() || !type}
             className="flex items-center px-6 py-3 border cursor-pointer border-transparent text-base font-medium rounded-sm text-[#0A1C30] bg-[#00D9FF] hover:bg-[#00D9FF]/50 transition duration-300 shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {isSaving ? (
