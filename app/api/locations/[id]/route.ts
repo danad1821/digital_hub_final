@@ -10,7 +10,7 @@ export async function PUT(
   try {
     const { id } = await params;
     const dataToUpdate = await request.json();
-    let { name, address, country, description, status, lat, lng } = dataToUpdate;
+    let { name, address, country, description, status, lat, lng, type } = dataToUpdate;
 
     // Geocoding logic if address changes
     if (address && !lat) {
@@ -36,9 +36,10 @@ export async function PUT(
         lat = COALESCE(?, lat), 
         lng = COALESCE(?, lng), 
         description = COALESCE(?, description), 
-        status = COALESCE(?, status)
+        status = COALESCE(?, status),
+        type = COALESCE(?, type)
        WHERE id = ?`,
-      [name, address, country, lat, lng, description, status, id]
+      [name, address, country, lat, lng, description, status, type, id]
     );
 
     if (result.affectedRows === 0) {

@@ -42,6 +42,7 @@ interface AddLocationModalProps {
 
 // Enum values for the Status field, mirroring the backend schema
 const STATUS_OPTIONS = ['Active Operations', 'Planned Operations', 'Maintenance'];
+const TYPE_OPTIONS = ['agent', 'partner'];
 
 
 export default function AddLocationModal({
@@ -61,6 +62,7 @@ export default function AddLocationModal({
   const [country, setCountry] = useState("");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState<string>(STATUS_OPTIONS[0]); // Default to first option
+  const [type, setType] = useState<string>(TYPE_OPTIONS[0]); // Default to first option
 
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null); // State for modal-level error
@@ -219,6 +221,22 @@ export default function AddLocationModal({
                 className="w-full p-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#00D9FF] focus:border-transparent outline-none bg-white"
               >
                 {STATUS_OPTIONS.map(option => (
+                    <option key={option} value={option}>{option}</option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-1">
+              <label htmlFor="type" className="text-sm font-medium text-gray-700 flex items-center">
+                <CheckCircle className="w-4 h-4 mr-2 text-indigo-600" /> Type
+              </label>
+              <select
+                id="type"
+                value={type}
+                onChange={(e) => setType(e.target.value)}
+                required
+                className="w-full p-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#00D9FF] focus:border-transparent outline-none bg-white"
+              >
+                {TYPE_OPTIONS.map(option => (
                     <option key={option} value={option}>{option}</option>
                 ))}
               </select>
