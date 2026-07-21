@@ -53,7 +53,7 @@ export default function Footer() {
           <li key={link.name}>
             <Link
               href={link.href}
-              className={`text-gray-300 transition duration-150 ${hoverColor}`}
+              className={`text-gray-300 transition duration-150 `}
             >
               {link.name}
             </Link>
@@ -115,15 +115,6 @@ export default function Footer() {
                 M: +86 1366 1933
               </span>
             </Link>
-
-            <div className="pt-4 border-t border-gray-700">
-              <p className="text-sm font-semibold text-gray-400 mb-1">
-                24/7 Operations Center
-              </p>
-              <p className="text-sm text-gray-500">
-                Emergency: +1 (800) 123-4567
-              </p>
-            </div>
           </div>
         </div>
 
