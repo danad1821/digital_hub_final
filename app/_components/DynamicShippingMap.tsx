@@ -25,17 +25,18 @@ type DynamicShippingMapProps = {
 };
 
 // --- 3. PORT PIN CONTENT (Visual, Static HTML) ---
-const PortPinContent = () => {
+const PortPinContent = ({ type }: { type?: string }) => {
+  const isAgent = type?.toLowerCase() === "agent";
+  const pinColor = isAgent ? "#EF4444" : "#00D9FF";
+
   return (
     <div className="w-8 h-8 flex items-center justify-center">
-      {/* 🌊 Wave Effect (Pulsing Rings) */}
-      <div
-        className={`relative w-8 h-8 flex items-center justify-center transition duration-300 hover:scale-150`}
-      >
-        <div className="absolute w-7 h-7 border-2 border-[#00D9FF] rounded-full animate-ping-2 flex items-center justify-center"></div>
-        <div className="absolute w-9 h-9 border-2 border-[#00D9FF] rounded-full animate-ping-1 flex items-center justify-center"></div>
-        <div className="absolute w-6 h-6 rounded-full z-20 shadow-lg bg-white flex items-center justify-center transition duration-300 ">
-          <div className="absolute w-4 h-4 gradient-pin rounded-full z-20 pulsing-pin"></div>
+      <div className="relative w-8 h-8 flex items-center justify-center transition duration-300 hover:scale-125">
+        <div className="w-6 h-6 rounded-full shadow-lg bg-white flex items-center justify-center">
+          <div
+            className="w-4 h-4 rounded-full"
+            style={{ backgroundColor: pinColor }}
+          />
         </div>
       </div>
     </div>
@@ -69,8 +70,8 @@ const PortPinWrapper = ({ loc }: { loc: any }) => {
   }, []); // Run only on mount/unmount
 
   const iconMarkup = useMemo(
-    () => renderToStaticMarkup(<PortPinContent />),
-    []
+    () => renderToStaticMarkup(<PortPinContent type={loc.type} />),
+    [loc.type]
   );
 
   const customIcon = useMemo(
