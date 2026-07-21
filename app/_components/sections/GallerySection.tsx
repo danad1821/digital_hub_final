@@ -48,9 +48,6 @@ const GallerySection = forwardRef<HTMLDivElement, GallerySectionProps>(
                   alt={`Gallery item ${img.title}`}
                   className="w-full h-full object-cover bg-gray-200"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-white flex flex-col justify-end text-lg sm:text-2xl">
-                  <p className="py-3 px-3">{img.title}</p>
-                </div>
               </motion.div>
             ))}
           </div>

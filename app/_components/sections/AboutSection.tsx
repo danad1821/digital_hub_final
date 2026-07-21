@@ -59,9 +59,6 @@ const AboutSection = forwardRef<HTMLDivElement, AboutSectionProps>(
           transition={{ duration: 0.6 }}
           className="lg:max-w-[50%]"
         >
-          <p className="rounded-sm bg-[#00D9FF]/15 w-fit px-5 py-1 text-[#00D9FF] ">
-            Since 1994
-          </p>
           {/* Title (Using memoized parts) */}
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold flex flex-col my-2">
             <span>{aboutSectionParts.titleFirstPart}</span>
