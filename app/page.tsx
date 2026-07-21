@@ -1,43 +1,186 @@
-import React from 'react';
+// src/app/(root)/page.tsx
 
-const Construction = () => {
-  return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 text-gray-800 p-6">
-      <div className="max-w-md text-center">
-        {/* Visual Icon */}
-        <div className="mb-8 flex justify-center">
-          <div className="p-4 bg-yellow-100 rounded-full">
-            <svg 
-              className="w-16 h-16 text-yellow-600" 
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
-            >
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                strokeWidth="2" 
-                d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" 
-              />
-            </svg>
-          </div>
-        </div>
+"use client";
 
-        {/* Content */}
-        <h1 className="text-4xl font-bold mb-4 tracking-tight">
-          Under Construction
-        </h1>
-        <p className="text-lg text-gray-600 mb-8">
-          We're currently working hard to bring you a better experience. 
-          Check back soon!
+import { useEffect, useState, useCallback, useMemo } from "react";
+
+import axios from "axios";
+
+import { Loader2 } from "lucide-react";
+
+// Components
+import Header from "./_components/Header";
+import AboutSection from "./_components/sections/AboutSection";
+import HeroSection from "./_components/sections/HeroSection";
+import ServicesSection from "./_components/sections/ServicesSection";
+import ContactSection from "./_components/sections/ContactSection";
+import LocationsSection from "./_components/sections/LocationSection";
+import GallerySection from "./_components/sections/GallerySection";
+
+// Actions/Helpers
+import { getCurrentSchedule } from "./_actions/uploadFile";
+import { getAllGalleryImages } from "./_actions/gallery";
+import { useScrollToSection } from "./_components/ScrollToSection";
+
+// Types
+import { HomePageData, Service, Location, GalleryImage } from "./_types";
+
+export default function Home() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [services, setServices] = useState<Service[]>([]);
+  const [pageData, setPageData] = useState<HomePageData | null>(null);
+  const [locations, setLocations] = useState<Location[]>([]);
+  const [scheduleFileId, setScheduleFileId] = useState<string | null>(null);
+  const [gallery, setGallery] = useState<GalleryImage[]>([]);
+
+  // ⭐ Use the custom scroll hook
+  const {
+    servicesRef,
+    aboutRef,
+    galleryRef,
+    locationsRef,
+    contactRef,
+    scrollToSection,
+  }: any = useScrollToSection();
+
+  // 1. Memoized data fetching helpers
+  const getAllImages = useCallback(async () => {
+    const allImages: any = await getAllGalleryImages();
+    setGallery(allImages);
+  }, []);
+
+  const getAllServices = useCallback(async () => {
+    try {
+      const response = await axios.get("/api/services");
+      console.log(services);
+      setServices(response.data.services || response.data);
+    } catch (error) {
+      console.error("Error fetching services: ", error);
+    }
+  }, []);
+
+  const getAllLocations = useCallback(async () => {
+    try {
+      const response = await axios.get("/api/locations");
+      setLocations(response.data.data || response.data);
+    } catch (error) {
+      console.error("Error fetching locations: ", error);
+    }
+  }, []);
+
+  const fetchCurrentSchedule = useCallback(async () => {
+    try {
+      const current = await getCurrentSchedule();
+      if (current) {
+        setScheduleFileId(current.id);
+      }
+    } catch (error) {
+      console.error("Error fetching current schedule ID:", error);
+    }
+  }, []);
+
+  // 2. COMBINE FETCHING LOGIC INTO A SINGLE ASYNC FUNCTION (Memoized)
+  const initDataFetch = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      // 1. Fetch critical page data first
+      const pageResponse = await axios.get(`/api/pages/home`);
+      console.log(pageResponse);
+      setPageData(pageResponse.data.data);
+
+      // 2. Fetch auxiliary data (parallelized)
+      await Promise.all([
+        getAllImages(),
+        getAllServices(),
+        getAllLocations(),
+        fetchCurrentSchedule(),
+      ]);
+    } catch (error) {
+      console.error("Error fetching initial page data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [getAllImages, getAllServices, getAllLocations, fetchCurrentSchedule]);
+
+  // 3. UPDATE useEffect TO CALL THE COMBINED FUNCTION
+  useEffect(() => {
+    initDataFetch();
+  }, [initDataFetch]);
+
+  const sections = useMemo(() => {
+    if (!pageData || !pageData.sections) return [];
+
+    // If the database returned a real object/array, use it directly
+    if (typeof pageData.sections !== "string") {
+      return pageData.sections;
+    }
+
+    // If the database returned a string, parse it
+    try {
+      return JSON.parse(pageData.sections);
+    } catch (error) {
+      console.error("Failed to parse sections:", error);
+      return [];
+    }
+  }, [pageData]);
+  // 4. Fallback for loading/error
+  if (isLoading && !pageData) {
+    return (
+      <div className="flex justify-center items-center w-full h-screen">
+        <Loader2 className="w-10 h-10 text-[#00D9FF] animate-spin" />
+      </div>
+    );
+  }
+
+  if (!pageData) {
+    return (
+      <div className="flex justify-center items-center w-full h-screen">
+        <p className="text-red-500 text-xl">
+          Error loading page content. Please try again.
         </p>
       </div>
-      
-      <footer className="mt-16 text-sm text-gray-400">
-        &copy; {new Date().getFullYear()} Alta Maritime. All rights reserved.
-      </footer>
-    </div>
-  );
-};
+    );
+  }
 
-export default Construction;
+  // Memoized page sections for cleaner prop passing
+
+  // The rest of the page rendering
+  return (
+    <main className="min-h-screen">
+      {/* 2. HEADER: Pass the scroll handler */}
+      <Header
+        scrollToSection={scrollToSection as (sectionId: string) => void}
+      />
+
+      {/* --- SECTIONS --- */}
+      <HeroSection
+        sectionData={sections[0]}
+        scrollToSection={scrollToSection}
+      />
+
+      <AboutSection ref={aboutRef} sectionData={sections[1]} />
+
+      <ServicesSection
+        ref={servicesRef}
+        sectionData={sections[2]}
+        services={services}
+        scheduleFileId={scheduleFileId}
+      />
+
+      {/* Sections[3] is skipped in original code, assuming it's Section[4] */}
+      <GallerySection
+        ref={galleryRef}
+        sectionData={sections[3]}
+        gallery={gallery}
+      />
+
+      <LocationsSection ref={locationsRef} sectionData={sections[4]} />
+
+      <ContactSection
+        ref={contactRef}
+        sectionData={sections[5]}
+        locations={locations}
+      />
+    </main>
+  );
+}
