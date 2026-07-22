@@ -171,6 +171,24 @@ const PortPinWrapper = ({ loc }: { loc: any }) => {
           <p className="text-sm text-gray-600 mb-4 leading-relaxed whitespace-pre-line">
             {loc.description || "Logistics and port operations center"}
           </p>
+
+          {(loc.emails || loc.phones) && (
+            <div className="space-y-2 mb-4 text-sm">
+              {loc.emails && (
+                <div>
+                  <p className="font-medium text-gray-700">Email</p>
+                  <p className="text-gray-600 whitespace-pre-line break-words">{loc.emails}</p>
+                </div>
+              )}
+              {loc.phones && (
+                <div>
+                  <p className="font-medium text-gray-700">Phone</p>
+                  <p className="text-gray-600 whitespace-pre-line break-words">{loc.phones}</p>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Separator Line */}
           <hr className="my-3 border-gray-200" />
           {/* Active Operations Chip (Styled as a Light Green Badge) */}

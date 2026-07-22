@@ -11,7 +11,9 @@ import {
     Loader, 
     Globe,      // New icon for Country
     CheckCircle, // New icon for Status
-    Truck       // New icon for Description/Operations
+    Truck,      // New icon for Description/Operations
+    Mail,
+    Phone
 } from 'lucide-react';
 import EditLocationModal from '../modals/EditLocationModal';
 
@@ -33,6 +35,8 @@ export interface Location {
     description: string;    // NEW
     status: 'Active Operations' | 'Planned Operations' | 'Maintenance'; // NEW
     type: 'agent' | 'partner';
+    emails: string;
+    phones: string;
     destinations: Destination[];
 }
 
@@ -154,6 +158,22 @@ export default function LocationCard({
                         <p className="text-xs font-medium text-gray-500">Coordinates</p>
                         <p><strong>Lat:</strong> {location.lat}</p>
                         <p><strong>Lng:</strong> {location.lng}</p>
+                    </div>
+                </div>
+
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t pt-3">
+                    <div>
+                        <p className="text-xs font-medium text-gray-500 flex items-center">
+                            <Mail className="w-4 h-4 mr-1 text-blue-600"/> Emails
+                        </p>
+                        <p className="text-gray-700 mt-1 whitespace-pre-line break-words">{location.emails}</p>
+                    </div>
+                    <div>
+                        <p className="text-xs font-medium text-gray-500 flex items-center">
+                            <Phone className="w-4 h-4 mr-1 text-green-600"/> Phones
+                        </p>
+                        <p className="text-gray-700 mt-1 whitespace-pre-line break-words">{location.phones}</p>
                     </div>
                 </div>
 

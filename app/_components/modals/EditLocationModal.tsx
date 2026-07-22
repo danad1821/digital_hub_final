@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { X, Save, MapPin, Anchor, Loader, Globe, Truck, CheckCircle } from "lucide-react";
+import { X, Save, MapPin, Anchor, Loader, Globe, Truck, CheckCircle, Mail, Phone } from "lucide-react";
 
 interface EditLocationModalProps {
   isOpen: boolean;
@@ -32,6 +32,8 @@ export default function EditLocationModal({
   const [description, setDescription] = useState(locationToEdit.description);
   const [status, setStatus] = useState(locationToEdit.status);
   const [type, setType] = useState<'agent' | 'partner'>(locationToEdit.type || 'partner');
+  const [emails, setEmails] = useState(locationToEdit.emails || "");
+  const [phones, setPhones] = useState(locationToEdit.phones || "");
 
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,6 +48,8 @@ export default function EditLocationModal({
         setDescription(locationToEdit.description);
         setStatus(locationToEdit.status);
         setType(locationToEdit.type || 'partner');
+        setEmails(locationToEdit.emails || "");
+        setPhones(locationToEdit.phones || "");
 
         
         setError(null);
@@ -79,6 +83,8 @@ export default function EditLocationModal({
     if (description !== locationToEdit.description) updateData.description = description;
     if (status !== locationToEdit.status) updateData.status = status;
     if (type !== (locationToEdit.type || 'partner')) updateData.type = type;
+    if (emails !== (locationToEdit.emails || "")) updateData.emails = emails;
+    if (phones !== (locationToEdit.phones || "")) updateData.phones = phones;
     
 
 
@@ -223,6 +229,39 @@ export default function EditLocationModal({
             </div>
           </div>
           
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-1">
+              <label htmlFor="emails" className="text-sm font-medium text-gray-700 flex items-center">
+                <Mail className="w-4 h-4 mr-2 text-blue-600" /> Emails <span className="ml-1 text-xs font-normal text-gray-400">(Optional)</span>
+              </label>
+              <textarea
+                id="emails"
+                value={emails}
+                onChange={(e) => setEmails(e.target.value)}
+                placeholder={"admin@gmail.com\ntest@gmail.com"}
+                rows={4}
+                className="w-full p-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#00D9FF] focus:border-transparent outline-none resize-y whitespace-pre-wrap"
+              />
+              <p className="text-xs text-gray-500 mt-1">Enter one email per line. Line breaks are saved exactly as typed.</p>
+            </div>
+
+            <div className="space-y-1">
+              <label htmlFor="phones" className="text-sm font-medium text-gray-700 flex items-center">
+                <Phone className="w-4 h-4 mr-2 text-green-600" /> Phones <span className="ml-1 text-xs font-normal text-gray-400">(Optional)</span>
+              </label>
+              <textarea
+                id="phones"
+                value={phones}
+                onChange={(e) => setPhones(e.target.value)}
+                placeholder={"+961 1 234 567\n+961 3 456 789"}
+                rows={4}
+                className="w-full p-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#00D9FF] focus:border-transparent outline-none resize-y whitespace-pre-wrap"
+              />
+              <p className="text-xs text-gray-500 mt-1">Enter one phone number per line. Line breaks are saved exactly as typed.</p>
+            </div>
+          </div>
+
           {/* NEW: 5. Description (Full width textarea) */}
           <div className="space-y-1">
             <label htmlFor="description" className="text-sm font-medium text-gray-700 flex items-center">

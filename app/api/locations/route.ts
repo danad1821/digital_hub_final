@@ -34,6 +34,8 @@ export async function POST(request: Request) {
   try {
     const requestData = await request.json();
     const { name, address, country, description, status, type } = requestData;
+    const emails = typeof requestData.emails === "string" ? requestData.emails : "";
+    const phones = typeof requestData.phones === "string" ? requestData.phones : "";
 
     if (!name || !address || !country || !description || !status || !type) {
       return NextResponse.json(
@@ -58,9 +60,9 @@ export async function POST(request: Request) {
     // Note: If you kept MongoDB IDs as strings, use VARCHAR(24) for the ID column.
     // If using AUTO_INCREMENT, let MySQL handle the ID.
     const [result]: any = await pool.query(
-      `INSERT INTO locations (name, address, country, lat, lng, description, status, type) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [name, display_name, country, parseFloat(lat), parseFloat(lon), description, status, type]
+      `INSERT INTO locations (name, address, country, emails, phones, lat, lng, description, status, type) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [name, display_name, country, emails, phones, parseFloat(lat), parseFloat(lon), description, status, type]
     );
 
     return NextResponse.json({ id: result.insertId, name }, { status: 201 });

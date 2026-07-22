@@ -13,9 +13,17 @@ export type Service = {
 };
 
 export type Location = {
+  id?: string | number;
   country: string;
   name: string;
-  // Add other location properties as needed
+  address?: string;
+  description?: string;
+  status?: string;
+  type?: "agent" | "partner";
+  emails?: string;
+  phones?: string;
+  lat?: number;
+  lng?: number;
 };
 
 export type GalleryImage = {

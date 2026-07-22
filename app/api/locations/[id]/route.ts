@@ -10,7 +10,12 @@ export async function PUT(
   try {
     const { id } = await params;
     const dataToUpdate = await request.json();
-    let { name, address, country, description, status, lat, lng, type } = dataToUpdate;
+    let { name, address, country, description, status, lat, lng, type, emails, phones } = dataToUpdate;
+
+    // Emails and phones are optional. Empty strings intentionally clear the fields,
+    // while omitted values leave the existing database values unchanged.
+    if (emails !== undefined && typeof emails !== "string") emails = "";
+    if (phones !== undefined && typeof phones !== "string") phones = "";
 
     // Geocoding logic if address changes
     if (address && !lat) {
@@ -37,9 +42,11 @@ export async function PUT(
         lng = COALESCE(?, lng), 
         description = COALESCE(?, description), 
         status = COALESCE(?, status),
-        type = COALESCE(?, type)
+        type = COALESCE(?, type),
+        emails = COALESCE(?, emails),
+        phones = COALESCE(?, phones)
        WHERE id = ?`,
-      [name, address, country, lat, lng, description, status, type, id]
+      [name, address, country, lat, lng, description, status, type, emails, phones, id]
     );
 
     if (result.affectedRows === 0) {

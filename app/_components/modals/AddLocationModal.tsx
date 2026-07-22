@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { X, Save, MapPin, Anchor, Loader, Globe, Truck, CheckCircle } from "lucide-react";
+import { X, Save, MapPin, Anchor, Loader, Globe, Truck, CheckCircle, Mail, Phone } from "lucide-react";
 
 // Define the shape of the data for better type safety
 interface Destination {
@@ -19,6 +19,8 @@ interface Location {
   country: string; // NEW: Required by schema
   description: string; // NEW: Required by schema
   status: 'Active Operations' | 'Planned Operations' | 'Maintenance'; // NEW: Required by schema (using enum values)
+  emails: string;
+  phones: string;
   destinations: Destination[];
 }
 
@@ -30,6 +32,8 @@ interface NewLocationDataPayload {
   description: string; // NEW
   status: string; // NEW
   type: 'agent' | 'partner';
+  emails: string;
+  phones: string;
   destinations: Destination[];
 }
 
@@ -64,6 +68,8 @@ export default function AddLocationModal({
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState<string>(STATUS_OPTIONS[0]); // Default to first option
   const [type, setType] = useState<'agent' | 'partner'>('agent'); // Default to first option
+  const [emails, setEmails] = useState("");
+  const [phones, setPhones] = useState("");
 
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null); // State for modal-level error
@@ -98,6 +104,9 @@ export default function AddLocationModal({
         description: description.trim(), 
         status,
         type,
+        // Keep the textarea content exactly as entered, including line breaks.
+        emails,
+        phones,
         destinations: selectedDestinations.map(dest => ({
             name: dest.name,
             lat: dest.lat,
@@ -116,6 +125,8 @@ export default function AddLocationModal({
             setDescription(""); // NEW: Reset
             setStatus(STATUS_OPTIONS[0]); // NEW: Reset
             setType('agent');
+            setEmails("");
+            setPhones("");
             setSelectedDestinations([]);
             onClose();
         }
@@ -248,6 +259,39 @@ export default function AddLocationModal({
             </div>
           </div>
           
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-1">
+              <label htmlFor="emails" className="text-sm font-medium text-gray-700 flex items-center">
+                <Mail className="w-4 h-4 mr-2 text-blue-600" /> Emails <span className="ml-1 text-xs font-normal text-gray-400">(Optional)</span>
+              </label>
+              <textarea
+                id="emails"
+                value={emails}
+                onChange={(e) => setEmails(e.target.value)}
+                placeholder={"admin@gmail.com\ntest@gmail.com"}
+                rows={4}
+                className="w-full p-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#00D9FF] focus:border-transparent outline-none resize-y whitespace-pre-wrap"
+              />
+              <p className="text-xs text-gray-500 mt-1">Enter one email per line. Line breaks are saved exactly as typed.</p>
+            </div>
+
+            <div className="space-y-1">
+              <label htmlFor="phones" className="text-sm font-medium text-gray-700 flex items-center">
+                <Phone className="w-4 h-4 mr-2 text-green-600" /> Phones <span className="ml-1 text-xs font-normal text-gray-400">(Optional)</span>
+              </label>
+              <textarea
+                id="phones"
+                value={phones}
+                onChange={(e) => setPhones(e.target.value)}
+                placeholder={"+961 1 234 567\n+961 3 456 789"}
+                rows={4}
+                className="w-full p-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#00D9FF] focus:border-transparent outline-none resize-y whitespace-pre-wrap"
+              />
+              <p className="text-xs text-gray-500 mt-1">Enter one phone number per line. Line breaks are saved exactly as typed.</p>
+            </div>
+          </div>
+
           {/* NEW: 5. Description (Full width textarea) */}
           <div className="space-y-1">
             <label htmlFor="description" className="text-sm font-medium text-gray-700 flex items-center">

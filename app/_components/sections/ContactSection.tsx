@@ -95,12 +95,55 @@ const ContactSection = forwardRef<HTMLDivElement, ContactSectionProps>(
                   Regional Offices
                 </h3>
                 <div className="grid grid-cols-2 gap-y-4 gap-x-8">
-                  {locations.map((l) => (
-                    <div key={l.country + " "+l.name}>
-                      <p className="text-[#2A3544] text-xl mb-4">{l.country}</p>
-                      <p className="text-gray-400 text-lg">{l.name} Office</p>
-                    </div>
-                  ))}
+                  {locations.map((location) => {
+                    const emails = (location.emails || "")
+                      .split(/\r?\n/)
+                      .filter((email) => email.trim());
+                    const phones = (location.phones || "")
+                      .split(/\r?\n/)
+                      .filter((phone) => phone.trim());
+
+                    return (
+                      <div key={location.id || `${location.country}-${location.name}`}>
+                        <p className="text-[#2A3544] text-xl mb-3">
+                          {location.country}
+                        </p>
+                        <p className="text-gray-400 text-lg mb-2">
+                          {location.name} Office
+                        </p>
+
+                        {emails.length > 0 && (
+                          <div className="space-y-1 mb-2">
+                            {emails.map((email, index) => (
+                              <a
+                                key={`${email}-${index}`}
+                                href={`mailto:${email.trim()}`}
+                                className="flex items-start gap-2 text-sm text-gray-500 hover:text-[#00D9FF] break-all"
+                              >
+                                <Mail className="w-4 h-4 mt-0.5 shrink-0" />
+                                <span>{email}</span>
+                              </a>
+                            ))}
+                          </div>
+                        )}
+
+                        {phones.length > 0 && (
+                          <div className="space-y-1">
+                            {phones.map((phone, index) => (
+                              <a
+                                key={`${phone}-${index}`}
+                                href={`tel:${phone.replace(/[^+\d]/g, "")}`}
+                                className="flex items-start gap-2 text-sm text-gray-500 hover:text-[#00D9FF]"
+                              >
+                                <Phone className="w-4 h-4 mt-0.5 shrink-0" />
+                                <span>{phone}</span>
+                              </a>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </motion.div>
