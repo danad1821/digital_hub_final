@@ -73,7 +73,7 @@ export default function Footer() {
             {/* Logo Block */}
             <div className="flex items-center gap-2">
               <Image
-                src="/images/ultamaritime.svg"
+                src="/ultamaritimeWhite.svg"
                 alt="alta maritime logo"
                 width={200}
                 height={100}
