@@ -13,7 +13,7 @@ interface EditLocationModalProps {
 
 // Enum values for the Status field, mirroring the backend schema
 const STATUS_OPTIONS = ['Active Operations', 'Planned Operations', 'Maintenance'];
-const TYPE_OPTIONS = ['agent', 'partner'] as const;
+const TYPE_OPTIONS = ['agent', 'partner', 'coming-soon'] as const;
 
 
 export default function EditLocationModal({
@@ -31,7 +31,7 @@ export default function EditLocationModal({
   const [country, setCountry] = useState(locationToEdit.country);
   const [description, setDescription] = useState(locationToEdit.description);
   const [status, setStatus] = useState(locationToEdit.status);
-  const [type, setType] = useState<'agent' | 'partner'>(locationToEdit.type || 'partner');
+  const [type, setType] = useState<'agent' | 'partner' | 'coming-soon'>(locationToEdit.type || 'partner');
   const [emails, setEmails] = useState(locationToEdit.emails || "");
   const [phones, setPhones] = useState(locationToEdit.phones || "");
 
@@ -213,18 +213,18 @@ export default function EditLocationModal({
               <select
                 id="type"
                 value={type}
-                onChange={(e) => setType(e.target.value as 'agent' | 'partner')}
+                onChange={(e) => setType(e.target.value as 'agent' | 'partner' | 'coming-soon')}
                 required
                 className="w-full p-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#00D9FF] focus:border-transparent outline-none bg-white"
               >
                 {TYPE_OPTIONS.map((option) => (
                   <option key={option} value={option}>
-                    {option === 'agent' ? 'Agent' : 'Partner'}
+                    {option === 'agent' ? 'Agent' : option === 'partner' ? 'Partner' : 'Coming Soon'}
                   </option>
                 ))}
               </select>
               <p className="text-xs text-gray-500 mt-1">
-                Agents use red map pins; partners use blue map pins.
+                Agents use blue pins, partners use red pins, and coming-soon locations use green pins.
               </p>
             </div>
           </div>

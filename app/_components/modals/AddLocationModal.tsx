@@ -31,7 +31,7 @@ interface NewLocationDataPayload {
   country: string; // NEW
   description: string; // NEW
   status: string; // NEW
-  type: 'agent' | 'partner';
+  type: 'agent' | 'partner' | 'coming-soon';
   emails: string;
   phones: string;
   destinations: Destination[];
@@ -47,7 +47,7 @@ interface AddLocationModalProps {
 
 // Enum values for the Status field, mirroring the backend schema
 const STATUS_OPTIONS = ['Active Operations', 'Planned Operations', 'Maintenance'];
-const TYPE_OPTIONS = ['agent', 'partner'];
+const TYPE_OPTIONS = ['agent', 'partner', 'coming-soon'] as const;
 
 
 export default function AddLocationModal({
@@ -67,7 +67,7 @@ export default function AddLocationModal({
   const [country, setCountry] = useState("");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState<string>(STATUS_OPTIONS[0]); // Default to first option
-  const [type, setType] = useState<'agent' | 'partner'>('agent'); // Default to first option
+  const [type, setType] = useState<'agent' | 'partner' | 'coming-soon'>('agent'); // Default to first option
   const [emails, setEmails] = useState("");
   const [phones, setPhones] = useState("");
 
@@ -246,13 +246,13 @@ export default function AddLocationModal({
               <select
                 id="type"
                 value={type}
-                onChange={(e) => setType(e.target.value as 'agent' | 'partner')}
+                onChange={(e) => setType(e.target.value as 'agent' | 'partner' | 'coming-soon')}
                 required
                 className="w-full p-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#00D9FF] focus:border-transparent outline-none bg-white"
               >
                 {TYPE_OPTIONS.map(option => (
                     <option key={option} value={option}>
-                      {option === 'agent' ? 'Agent' : 'Partner'}
+                      {option === 'agent' ? 'Agent' : option === 'partner' ? 'Partner' : 'Coming Soon'}
                     </option>
                 ))}
               </select>

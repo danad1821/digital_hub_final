@@ -26,20 +26,35 @@ type DynamicShippingMapProps = {
 
 // --- 3. PORT PIN CONTENT (Visual, Static HTML) ---
 const PortPinContent = ({ type }: { type?: string }) => {
-  const isAgent = type?.toLowerCase() === "agent";
-  const pinColor = isAgent ? "#EF4444" : "#00D9FF";
+  const normalizedType = type?.toLowerCase();
+  const pinColor =
+    normalizedType === "partner"
+      ? "#EF4444"
+      : normalizedType === "coming-soon"
+        ? "#22C55E"
+        : "#00D9FF";
 
   return (
-    <div className="w-8 h-8 flex items-center justify-center">
-      <div className="relative w-8 h-8 flex items-center justify-center transition duration-300 hover:scale-125">
-        <div className="w-6 h-6 rounded-full shadow-lg bg-white flex items-center justify-center">
+    <>
+      <style>{`
+        @keyframes altaPinBlink {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.25; transform: scale(0.72); }
+        }
+
+        .alta-map-pin:hover .alta-map-pin__dot {
+          animation: altaPinBlink 0.75s ease-in-out infinite;
+        }
+      `}</style>
+      <div className="alta-map-pin w-7 h-7 flex items-center justify-center">
+        <div className="w-[18px] h-[18px] rounded-full shadow-md bg-white flex items-center justify-center transition-transform duration-200 hover:scale-110">
           <div
-            className="w-4 h-4 rounded-full"
+            className="alta-map-pin__dot w-2.5 h-2.5 rounded-full"
             style={{ backgroundColor: pinColor }}
           />
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
@@ -79,55 +94,23 @@ const PortPinWrapper = ({ loc }: { loc: any }) => {
       L.divIcon({
         html: iconMarkup,
         className: "custom-div-icon cursor-pointer",
-        iconSize: [40, 40], // Ensures hover detection
-        iconAnchor: [20, 20],
+        iconSize: [28, 28],
+        iconAnchor: [14, 14],
       }),
     [iconMarkup]
   );
 
-  const eventHandlers = useMemo(() => {
-    if (isMobile) {
-      // ⭐️ MOBILE LOGIC: Use 'click' to open the popup
-      // Note: Leaflet handles popup closing on map click by default
-      return {
-        click: () => {
-          if (markerRef.current) {
-            markerRef.current.openPopup();
-          }
-        },
-        mouseout: () => {
-          // Use a small delay for better hover UX
-          setTimeout(() => {
-            if (markerRef.current) {
-              markerRef.current.closePopup();
-            }
-          }, 50);
-        },
-      };
-    } else {
-      // ⭐️ DESKTOP LOGIC: Use 'mouseover' and 'mouseout' for hover
-      return {
-        click: () => {
-          if (markerRef.current) {
-            markerRef.current.openPopup();
-          }
-        },
-        mouseover: () => {
-          if (markerRef.current) {
-            markerRef.current.openPopup();
-          }
-        },
-        mouseout: () => {
-          // Use a small delay for better hover UX
-          setTimeout(() => {
-            if (markerRef.current) {
-              markerRef.current.closePopup();
-            }
-          }, 50);
-        },
-      };
-    }
-  }, [isMobile]); // Re-calculate handlers when isMobile changes
+  const eventHandlers = useMemo(
+    () => ({
+      click: () => {
+        markerRef.current?.openPopup();
+      },
+      mouseover: () => {
+        markerRef.current?.openPopup();
+      },
+    }),
+    []
+  );
 
   return (
     <Marker
@@ -139,12 +122,10 @@ const PortPinWrapper = ({ loc }: { loc: any }) => {
       eventHandlers={eventHandlers}
     >
       <Popup
-        offset={[0,255]}
-        // We need to allow the popup to be closed automatically on mobile click
-        // But keep it from closing automatically when using hover (desktop)
-        closeButton={isMobile} // Show close button on mobile
-        autoClose={!isMobile} // Automatically close on map click on mobile
-        closeOnClick={isMobile} // Allow close on click (for mobile)
+        offset={[-170,255]}
+        closeButton={isMobile}
+        autoClose={true}
+        closeOnClick={true}
         className="custom-popup"
       >
         <div className="p-4 text-gray-800 rounded-sm">
@@ -215,7 +196,7 @@ export default function DynamicShippingMap({
   locations,
 }: DynamicShippingMapProps) {
   const center: [number, number] = [30, 10];
-  const desktopZoom = 3;
+  const desktopZoom = 4;
   const mobileZoom = -2; // Target zoom for mobile devices
   const MOBILE_BREAKPOINT = 768; // Screen width threshold for mobile
 

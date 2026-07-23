@@ -19,7 +19,7 @@ export type Location = {
   address?: string;
   description?: string;
   status?: string;
-  type?: "agent" | "partner";
+  type?: "agent" | "partner" | "coming-soon";
   emails?: string;
   phones?: string;
   lat?: number;
